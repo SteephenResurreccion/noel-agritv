@@ -40,7 +40,7 @@ export default function HomePage() {
                   width={720}
                   height={960}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[420px] min-[741px]:max-h-[480px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[420px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
