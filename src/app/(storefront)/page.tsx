@@ -22,16 +22,16 @@ export default function HomePage() {
       <section className="relative overflow-hidden border-b border-brand-darkest/10 bg-bg">
         <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-16">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
-            {/* Left — Hero image, tall portrait like TBOF */}
+            {/* Left — Hero image, tall portrait like TBOF (no rounded corners) */}
             <div className="relative min-[741px]:self-stretch">
-              <div className="overflow-hidden rounded-2xl min-[741px]:h-full">
+              <div className="overflow-hidden min-[741px]:h-full">
                 <Image
                   src="/images/founder-with-plants.jpg"
                   alt="Noel Tolentino holding fresh harvested vegetables"
                   width={720}
                   height={960}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:min-h-[540px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[500px] min-[741px]:min-h-[620px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
