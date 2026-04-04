@@ -22,7 +22,7 @@ const videos: VideoItem[] = [
   {
     title: "Bio Plant Booster sa Dapog Day 5",
     href: "https://www.facebook.com/noeltolentino2728/videos/bio-plant-booster/1465821378472117/",
-    thumbnail: "/images/products/bio-plant-booster.webp",
+    thumbnail: "/images/videos/bio-plant-booster-dapog.jpg",
     product: {
       name: "Bio Plant Booster",
       image: "/images/products/bio-plant-booster.webp",
@@ -33,7 +33,7 @@ const videos: VideoItem[] = [
   {
     title: "Effects of Bio Enzyme Decomposer",
     href: "https://www.facebook.com/noeltolentino2728/videos/effects-of-bio-enzyme-decomposer/1468190017709752/",
-    thumbnail: "/images/products/bio-enzyme.webp",
+    thumbnail: "/images/videos/bio-enzyme-effects.jpg",
     product: {
       name: "Bio Enzyme",
       image: "/images/products/bio-enzyme.webp",
@@ -44,7 +44,7 @@ const videos: VideoItem[] = [
   {
     title: "Bio Enzyme at Organic Fertilizer",
     href: "https://www.facebook.com/noeltolentino2728/videos/tangkay-ng-guyabanobio-enzyme-at-organic-fertilizer/341631831216480/",
-    thumbnail: "/images/products/bio-enzyme.webp",
+    thumbnail: "/images/videos/bio-enzyme-fertilizer.jpg",
     product: {
       name: "Bio Enzyme",
       image: "/images/products/bio-enzyme.webp",
@@ -55,7 +55,7 @@ const videos: VideoItem[] = [
   {
     title: "Bio Plant Booster at Bio Enzyme",
     href: "https://www.facebook.com/noeltolentino2728/videos/bio-plant-booster-at-bio-enzyme-noelagritv-09272743281/1809173639854778/",
-    thumbnail: "/images/products/bio-plant-booster.webp",
+    thumbnail: "/images/videos/bio-plant-booster-enzyme.jpg",
     product: {
       name: "Bio Plant Booster",
       image: "/images/products/bio-plant-booster.webp",
@@ -88,7 +88,7 @@ const videos: VideoItem[] = [
   {
     title: "How to Control Rice Black Bugs",
     href: "https://www.facebook.com/noeltolentino2728/videos/how-to-control-rice-black-bugs/1150412736514923/",
-    thumbnail: "/images/products/jasmine-479-rice-seeds.webp",
+    thumbnail: "/images/videos/rice-black-bugs.jpg",
     product: {
       name: "Jasmine 479 Seeds",
       image: "/images/products/jasmine-479-rice-seeds.webp",
@@ -99,7 +99,7 @@ const videos: VideoItem[] = [
   {
     title: "Rice Pruning — Tinesting Natin",
     href: "https://www.facebook.com/noeltolentino2728/videos/749528474756504/",
-    thumbnail: "/images/products/jasmine-479-rice-seeds.webp",
+    thumbnail: "/images/videos/rice-pruning.jpg",
     product: {
       name: "Jasmine 479 Seeds",
       image: "/images/products/jasmine-479-rice-seeds.webp",
