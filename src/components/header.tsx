@@ -92,11 +92,11 @@ export function Header() {
               {/* Desktop search trigger */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="hidden h-9 items-center gap-2 rounded-md border border-border bg-bg px-3 text-sm text-text-secondary/60 transition-colors hover:border-brand-accent/40 hover:text-text-secondary md:flex"
+                className="hidden h-10 w-[280px] items-center justify-between rounded-md border border-text-primary/30 px-4 text-sm text-text-secondary/50 transition-colors hover:border-text-primary/50 md:flex"
                 aria-label="Search products"
               >
-                <Search className="h-4 w-4" />
                 <span>Search products...</span>
+                <Search className="h-4 w-4" />
               </button>
 
               {/* Mobile: hamburger menu */}
