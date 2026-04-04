@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Section 1: Hero Banner — TBOF style ── */}
-      <section className="relative overflow-hidden bg-bg pb-0">
+      <section className="relative overflow-hidden bg-bg pb-[120px] min-[741px]:pb-[160px]">
         {/* Warm accent — sun/circle top-right like TBOF */}
         <div className="absolute right-6 top-6 z-10 hidden min-[741px]:block" aria-hidden="true">
           <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
@@ -28,11 +28,11 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Main content */}
-        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
+        {/* Main content — z-[3] keeps everything above the landscape */}
+        <div className="container-site relative z-[3] mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
             {/* Left — Hero image, rounded, extends into landscape */}
-            <div className="relative z-[1] min-[741px]:mb-[-60px]">
+            <div className="relative z-[1] min-[741px]:mb-[-80px]">
               <div className="overflow-hidden rounded-2xl">
                 <Image
                   src="/images/founder-with-plants.jpg"
@@ -40,7 +40,7 @@ export default function HomePage() {
                   width={720}
                   height={960}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[420px] min-[741px]:max-h-[440px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[420px] min-[741px]:max-h-[480px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
@@ -80,73 +80,73 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Decorative farm landscape — warm golden palette like TBOF */}
+        {/* Decorative farm landscape — thin band at very bottom like TBOF */}
         <div className="absolute inset-x-0 bottom-0 z-[2]" aria-hidden="true">
           <svg
-            viewBox="0 0 1440 320"
+            viewBox="0 0 1440 200"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="block h-[180px] w-full min-[741px]:h-[240px]"
+            className="block h-[120px] w-full min-[741px]:h-[160px]"
             preserveAspectRatio="none"
           >
             {/* Back hills — lightest, warm tan */}
             <path
-              d="M0 180 C160 100,320 140,520 110 C720 80,900 130,1100 100 C1250 80,1380 120,1440 105 L1440 320 L0 320Z"
+              d="M0 80 C160 30,320 60,520 40 C720 20,900 55,1100 35 C1250 20,1380 50,1440 40 L1440 200 L0 200Z"
               fill="#B8A040"
               fillOpacity="0.25"
             />
             {/* Middle hills — olive gold */}
             <path
-              d="M0 210 C100 160,280 185,460 165 C640 145,780 175,960 155 C1120 140,1300 170,1440 155 L1440 320 L0 320Z"
+              d="M0 110 C100 70,280 90,460 78 C640 65,780 85,960 72 C1120 62,1300 80,1440 72 L1440 200 L0 200Z"
               fill="#9E8A30"
               fillOpacity="0.45"
             />
             {/* Front hills — darkest, earthy brown */}
             <path
-              d="M0 250 C180 210,350 235,550 218 C750 200,900 228,1100 212 C1260 200,1380 222,1440 215 L1440 320 L0 320Z"
+              d="M0 140 C180 110,350 125,550 115 C750 105,900 122,1100 112 C1260 104,1380 118,1440 112 L1440 200 L0 200Z"
               fill="#7A6B20"
               fillOpacity="0.6"
             />
-            {/* Ground base — transitions toward white for next section */}
-            <rect x="0" y="290" width="1440" height="30" fill="#8B7A28" fillOpacity="0.5" />
+            {/* Ground base */}
+            <rect x="0" y="175" width="1440" height="25" fill="#8B7A28" fillOpacity="0.5" />
           </svg>
 
           {/* Farmer and tree — separate SVG so they don't stretch */}
           <svg
-            viewBox="0 0 1440 320"
+            viewBox="0 0 1440 200"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="absolute inset-0 block h-full w-full"
             preserveAspectRatio="xMidYMax meet"
           >
-            {/* Farmer silhouette — walking with watering can */}
-            <g transform="translate(720,170)" fill="#3A3015" fillOpacity="1">
-              <circle cx="16" cy="0" r="9" />
-              <ellipse cx="16" cy="-4" rx="13" ry="3" />
-              <path d="M10 9 L8 50 L14 50 L16 30 L18 50 L24 50 L22 9Z" />
-              <path d="M10 14 L0 32 L4 34 L12 20Z" />
-              <rect x="-3" y="30" width="9" height="10" rx="1.5" />
-              <path d="M-3 32 L-8 28" stroke="#3A3015" strokeWidth="2" fill="none" />
-              <path d="M22 14 L30 28 L26 30 L20 20Z" />
-              <path d="M12 48 L10 70 L14 70 L15 55 L16 55 L17 70 L21 70 L19 48Z" />
+            {/* Farmer silhouette — left-center, within the landscape band */}
+            <g transform="translate(480,90)" fill="#3A3015" fillOpacity="1">
+              <circle cx="16" cy="0" r="7" />
+              <ellipse cx="16" cy="-3" rx="10" ry="2.5" />
+              <path d="M11 7 L9 38 L14 38 L16 24 L18 38 L23 38 L21 7Z" />
+              <path d="M11 11 L3 24 L6 26 L13 16Z" />
+              <rect x="0" y="22" width="7" height="8" rx="1" />
+              <path d="M0 24 L-4 20" stroke="#3A3015" strokeWidth="1.5" fill="none" />
+              <path d="M21 11 L27 22 L24 24 L19 16Z" />
+              <path d="M12 36 L10 52 L14 52 L15 42 L16 42 L17 52 L21 52 L19 36Z" />
             </g>
 
             {/* Tree — right side */}
-            <g transform="translate(1240,80)" fill="#3A3015" fillOpacity="0.9">
-              <rect x="28" y="70" width="10" height="60" rx="2" />
-              <path d="M38 90 Q55 75 60 65" stroke="#3A3015" strokeOpacity="0.8" strokeWidth="3" fill="none" />
-              <ellipse cx="33" cy="50" rx="32" ry="24" />
-              <ellipse cx="22" cy="42" rx="20" ry="18" />
-              <ellipse cx="48" cy="46" rx="22" ry="20" />
-              <ellipse cx="62" cy="60" rx="10" ry="8" />
+            <g transform="translate(1280,40)" fill="#3A3015" fillOpacity="0.9">
+              <rect x="20" y="50" width="8" height="45" rx="2" />
+              <path d="M28 62 Q42 50 46 42" stroke="#3A3015" strokeOpacity="0.8" strokeWidth="2.5" fill="none" />
+              <ellipse cx="24" cy="35" rx="26" ry="19" />
+              <ellipse cx="15" cy="28" rx="16" ry="14" />
+              <ellipse cx="38" cy="32" rx="18" ry="16" />
+              <ellipse cx="50" cy="42" rx="8" ry="6" />
             </g>
 
             {/* Birds */}
-            <g transform="translate(1300,70)" fill="#5A4A20" fillOpacity="0.6">
-              <path d="M0 6 Q4 0 8 4 Q12 0 16 6 Q12 4 8 8 Q4 4 0 6Z" />
+            <g transform="translate(1320,30)" fill="#5A4A20" fillOpacity="0.6">
+              <path d="M0 5 Q3 0 6 3 Q9 0 12 5 Q9 3 6 6 Q3 3 0 5Z" />
             </g>
-            <g transform="translate(1230,55)" fill="#5A4A20" fillOpacity="0.5">
-              <path d="M0 5 Q3 0 6 3 Q9 0 12 5 Q9 3.5 6 6.5 Q3 3.5 0 5Z" />
+            <g transform="translate(1260,20)" fill="#5A4A20" fillOpacity="0.5">
+              <path d="M0 4 Q2.5 0 5 2.5 Q7.5 0 10 4 Q7.5 2.8 5 5.2 Q2.5 2.8 0 4Z" />
             </g>
           </svg>
         </div>
