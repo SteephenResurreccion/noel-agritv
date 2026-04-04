@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     inlineCss: true,
-    optimizePackageImports: ["lucide-react", "@radix-ui/react-accordion"],
+    optimizePackageImports: ["lucide-react", "@base-ui/react"],
   },
   images: {
     formats: ["image/webp"],
