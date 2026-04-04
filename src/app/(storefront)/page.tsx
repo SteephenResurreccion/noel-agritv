@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 import { SocialProofStrip } from "@/components/social-proof-strip";
+import { ProductCard } from "@/components/product-card";
+import { HomeProductFilter } from "@/components/home-product-filter";
+import { products } from "@/data/products";
 import { categories } from "@/data/categories";
 
 export const metadata: Metadata = {
@@ -43,43 +45,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 2: Category Tiles ───────────────────────────────────── */}
+      {/* ── Section 2: Our Products (TBOF-style: filter pills + product cards) */}
       <section className="bg-bg px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
         <div className="container-site mx-auto">
           <h2
-            className="text-center font-bold text-text-primary"
+            className="font-bold text-brand-darkest"
             style={{ fontSize: "var(--font-size-h2)" }}
           >
             Our Products
           </h2>
-          <div
-            className="mt-[var(--spacing-grid-gap)] grid grid-cols-2 gap-[var(--spacing-grid-gap)]"
-          >
-            {categories.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/products?category=${category.slug}`}
-                className="group overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface transition-shadow hover:shadow-md"
-              >
-                <div className="relative h-[120px] w-full md:h-[200px]">
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                  />
-                </div>
-                <div className="p-4">
-                  <p className="font-semibold text-text-primary">
-                    {category.name}
-                  </p>
-                  <p className="mt-0.5 text-[length:var(--font-size-meta)] text-text-secondary">
-                    {category.subtitle}
-                  </p>
-                </div>
-              </Link>
-            ))}
+
+          {/* Category filter pills */}
+          <HomeProductFilter categories={categories} products={products} />
+
+          {/* "View all" link */}
+          <div className="mt-4 text-right">
+            <Link
+              href="/products"
+              className="text-sm font-semibold text-brand-accent hover:underline"
+            >
+              View all Products →
+            </Link>
           </div>
         </div>
       </section>
