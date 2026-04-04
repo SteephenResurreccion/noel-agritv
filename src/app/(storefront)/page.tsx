@@ -18,54 +18,54 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      {/* ── Section 1: Hero Banner — TBOF style (image left, text right) ── */}
-      <section className="relative overflow-hidden border-b border-brand-darkest/10 bg-bg">
-        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-16">
-          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
-            {/* Left — Hero image, tall portrait like TBOF (no rounded corners) */}
-            <div className="relative min-[741px]:self-stretch">
-              <div className="overflow-hidden min-[741px]:h-full">
-                <Image
-                  src="/images/founder-with-plants.jpg"
-                  alt="Noel Tolentino holding fresh harvested vegetables"
-                  width={720}
-                  height={960}
-                  priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[500px] min-[741px]:min-h-[620px]"
-                  sizes="(max-width: 740px) 100vw, 50vw"
-                />
-              </div>
+      {/* ── Section 1: Hero Banner — TBOF style ── */}
+      <section className="relative overflow-hidden bg-bg">
+        <div className="min-[741px]:min-h-[85vh]">
+          <div className="grid min-[741px]:grid-cols-2 min-[741px]:min-h-[85vh]">
+            {/* Left — Hero image, full-bleed on left edge */}
+            <div className="relative">
+              <Image
+                src="/images/founder-with-plants.jpg"
+                alt="Noel Tolentino holding fresh harvested vegetables"
+                width={720}
+                height={960}
+                priority
+                className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[520px] min-[741px]:absolute min-[741px]:inset-0"
+                sizes="(max-width: 740px) 100vw, 50vw"
+              />
             </div>
 
-            {/* Right — Text content */}
-            <div className="text-center min-[741px]:text-left">
-              <p className="text-2xl italic text-brand-dark min-[741px]:text-[28px]">
-                Bio-organic products
-              </p>
-              <p className="text-2xl italic text-brand-dark min-[741px]:text-[28px]">
-                trusted by Filipino farmers
-              </p>
-              <h1 className="mt-4 text-[40px] font-bold leading-[1.05] text-brand-darkest min-[741px]:text-[56px]">
-                Natural Solutions
-              </h1>
-              <h1 className="text-[40px] font-bold leading-[1.05] text-brand-accent min-[741px]:text-[56px]">
-                For Better Harvests
-              </h1>
-              <p className="mt-4 text-xl font-semibold text-brand-dark">
-                Since 2021 · 250k+ Followers
-              </p>
+            {/* Right — Text content, vertically centered */}
+            <div className="flex items-center px-[var(--spacing-container-gutter)] py-12 max-[740px]:text-center min-[741px]:py-20 min-[741px]:pl-12 min-[741px]:pr-[var(--spacing-container-gutter)]">
+              <div>
+                <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[30px]">
+                  Bio-organic products
+                </p>
+                <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[30px]">
+                  trusted by Filipino farmers
+                </p>
+                <h1 className="mt-5 text-[46px] font-bold leading-[1] text-brand-darkest min-[741px]:text-[64px]">
+                  Natural Solutions
+                </h1>
+                <h1 className="text-[46px] font-bold leading-[1] text-brand-accent min-[741px]:text-[64px]">
+                  For Better Harvests
+                </h1>
+                <p className="mt-5 text-[18px] font-semibold text-brand-dark min-[741px]:text-xl">
+                  Since 2021 · 250k+ Followers
+                </p>
 
-              <div className="mt-8 flex flex-col items-center gap-3 min-[741px]:flex-row min-[741px]:items-start">
-                <Link
-                  href="/products"
-                  className="inline-flex h-14 items-center justify-center rounded-[var(--radius-button)] bg-brand-darkest px-10 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-brand-dark"
-                >
-                  Browse Products
-                </Link>
-              </div>
+                <div className="mt-10 flex flex-col items-center gap-3 min-[741px]:flex-row min-[741px]:items-start">
+                  <Link
+                    href="/products"
+                    className="inline-flex h-14 items-center justify-center rounded-[var(--radius-button)] bg-brand-darkest px-12 text-[13px] font-bold uppercase tracking-[0.15em] text-white transition-colors hover:bg-brand-dark"
+                  >
+                    Browse Products
+                  </Link>
+                </div>
 
-              <div className="mt-6">
-                <SocialProofStrip variant="dark" />
+                <div className="mt-8">
+                  <SocialProofStrip variant="dark" />
+                </div>
               </div>
             </div>
           </div>
