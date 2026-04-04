@@ -30,7 +30,7 @@ export default function HomePage() {
 
         {/* Main content — grid layout with image BEHIND landscape, text ABOVE */}
         <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
-          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-24">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
             {/* Left — Hero image, z-[1] so landscape (z-[2]) covers its bottom */}
             <div className="relative z-[1] min-[741px]:mb-[-100px] min-[741px]:max-w-[80%]">
               <div className="overflow-hidden rounded-2xl">
@@ -92,23 +92,20 @@ export default function HomePage() {
             {/* Back hills — lightest, warm tan */}
             <path
               d="M0 80 C160 30,320 60,520 40 C720 20,900 55,1100 35 C1250 20,1380 50,1440 40 L1440 200 L0 200Z"
-              fill="#B8A040"
-              fillOpacity="0.25"
+              fill="#C8B050"
             />
             {/* Middle hills — olive gold */}
             <path
               d="M0 110 C100 70,280 90,460 78 C640 65,780 85,960 72 C1120 62,1300 80,1440 72 L1440 200 L0 200Z"
-              fill="#9E8A30"
-              fillOpacity="0.45"
+              fill="#A89030"
             />
             {/* Front hills — darkest, earthy brown */}
             <path
               d="M0 140 C180 110,350 125,550 115 C750 105,900 122,1100 112 C1260 104,1380 118,1440 112 L1440 200 L0 200Z"
-              fill="#7A6B20"
-              fillOpacity="0.6"
+              fill="#8A7A25"
             />
             {/* Ground base */}
-            <rect x="0" y="175" width="1440" height="25" fill="#8B7A28" fillOpacity="0.5" />
+            <rect x="0" y="175" width="1440" height="25" fill="#7A6B20" />
           </svg>
 
           {/* Farmer and tree — separate SVG so they don't stretch */}
