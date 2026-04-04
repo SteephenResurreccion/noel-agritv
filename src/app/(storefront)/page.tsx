@@ -20,8 +20,8 @@ export default function HomePage() {
     <>
       {/* ── Section 1: Hero Banner — TBOF style (image left, text right) ── */}
       <section className="relative overflow-hidden bg-bg">
-        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-8 min-[741px]:py-16">
-          <div className="grid items-center gap-6 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-20">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
             {/* Left — Hero image, tall like TBOF */}
             <div className="relative min-[741px]:self-stretch">
               <div className="overflow-hidden rounded-2xl shadow-xl min-[741px]:h-full">
@@ -31,7 +31,7 @@ export default function HomePage() {
                   width={2000}
                   height={1125}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[16/9] min-[741px]:min-h-[420px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[16/9] min-[741px]:min-h-[480px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
