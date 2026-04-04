@@ -143,117 +143,120 @@ export function VideoReelSection() {
         <ellipse cx="140" cy="50" rx="30" ry="20" />
       </svg>
 
-      <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)]">
-        {/* Heading — TBOF: bold italic, large */}
+      {/* Heading — centered, inside container */}
+      <div className="px-[var(--spacing-container-gutter)]">
         <h2 className="text-center text-[26px] font-bold italic text-brand-darkest min-[741px]:text-[36px]">
           See It From the Farm — Come Take a Peek!
         </h2>
+      </div>
 
-        {/* Carousel wrapper */}
-        <div className="relative mt-10">
-          {/* Left arrow — TBOF: white circle, subtle border */}
-          <button
-            onClick={() => scroll("left")}
-            className="absolute -left-5 top-[40%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-50 md:flex"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="h-5 w-5 text-text-primary" />
-          </button>
+      {/* Full-bleed carousel — extends to viewport edges like TBOF */}
+      <div className="relative mt-10">
+        {/* Left arrow */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-2 top-[35%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-50 md:flex"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft className="h-5 w-5 text-text-primary" />
+        </button>
 
-          {/* Right arrow */}
-          <button
-            onClick={() => scroll("right")}
-            className="absolute -right-5 top-[40%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-50 md:flex"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="h-5 w-5 text-text-primary" />
-          </button>
+        {/* Right arrow */}
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-2 top-[35%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-50 md:flex"
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="h-5 w-5 text-text-primary" />
+        </button>
 
-          {/* Scrollable track */}
-          <div
-            ref={scrollRef}
-            className="scrollbar-hide flex gap-5 overflow-x-auto px-1 pb-4"
-          >
-            {videos.map((video, i) => (
-              <div
-                key={i}
-                className="w-[175px] shrink-0 overflow-hidden rounded-2xl border border-brand-accent/20 bg-white shadow-sm transition-shadow hover:shadow-lg"
+        {/* Scrollable track — full width, no container constraint */}
+        <div
+          ref={scrollRef}
+          className="scrollbar-hide flex gap-5 overflow-x-auto pl-[var(--spacing-container-gutter)] pr-4 pb-4"
+        >
+          {videos.map((video, i) => (
+            <div
+              key={i}
+              className="w-[185px] shrink-0 overflow-hidden rounded-2xl border border-brand-accent/20 bg-white shadow-sm transition-shadow hover:shadow-lg"
+            >
+              {/* Video thumbnail with title overlay */}
+              <a
+                href={video.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative block aspect-[9/16] w-full overflow-hidden"
               >
-                {/* Video thumbnail — clean, no text overlay, TBOF style */}
-                <a
-                  href={video.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative block aspect-[9/16] w-full overflow-hidden"
-                >
-                  <Image
-                    src={video.thumbnail}
-                    alt={video.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="175px"
-                  />
-                  {/* Play button — TBOF: dark semi-transparent circle, white play icon */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-black/50 transition-colors group-hover:bg-black/60">
-                      <Play className="ml-0.5 h-5 w-5 fill-white text-white" />
-                    </div>
+                <Image
+                  src={video.thumbnail}
+                  alt={video.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="185px"
+                />
+                {/* Title overlay at top */}
+                <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/60 via-black/30 to-transparent px-3 pb-8 pt-3">
+                  <p className="line-clamp-2 text-[11px] font-bold uppercase leading-tight tracking-wide text-white drop-shadow-sm">
+                    {video.title}
+                  </p>
+                </div>
+                {/* Play button — TBOF: dark semi-transparent circle */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-black/50 transition-colors group-hover:bg-black/60">
+                    <Play className="ml-0.5 h-5 w-5 fill-white text-white" />
                   </div>
-                </a>
+                </div>
+              </a>
 
-                {/* Product info card — TBOF: floating white area with product, price, CTA */}
-                {video.product && (
-                  <div className="border-t border-brand-accent/10 px-2.5 pb-2.5 pt-2">
-                    {/* Product thumbnail + name */}
-                    <div className="flex items-center gap-2">
-                      <Image
-                        src={video.product.image}
-                        alt={video.product.name}
-                        width={28}
-                        height={28}
-                        className="h-7 w-7 shrink-0 rounded-full border border-border/40 object-cover"
-                      />
-                      <span className="line-clamp-1 text-[11px] font-semibold text-text-primary">
-                        {video.product.name}
-                      </span>
-                    </div>
-                    {/* Price */}
-                    <p className="mt-1 pl-9 text-xs font-bold text-text-primary">
-                      {formatPrice(video.product.price)}
-                    </p>
-                    {/* CTA — TBOF green button */}
-                    <div className="mt-2 flex gap-1">
-                      <a
-                        href={messengerProductLink(
-                          video.product.name,
-                          video.product.packSize
-                        )}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex flex-1 items-center justify-center gap-1 rounded bg-brand-accent py-1.5 text-[10px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-mid"
-                      >
-                        <MessageCircle className="h-3 w-3" />
-                        Message
-                      </a>
-                    </div>
+              {/* Product info card at bottom */}
+              {video.product && (
+                <div className="border-t border-brand-accent/10 px-2.5 pb-2.5 pt-2">
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={video.product.image}
+                      alt={video.product.name}
+                      width={28}
+                      height={28}
+                      className="h-7 w-7 shrink-0 rounded-full border border-border/40 object-cover"
+                    />
+                    <span className="line-clamp-1 text-[11px] font-semibold text-text-primary">
+                      {video.product.name}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  <p className="mt-1 pl-9 text-xs font-bold text-text-primary">
+                    {formatPrice(video.product.price)}
+                  </p>
+                  <div className="mt-2 flex gap-1">
+                    <a
+                      href={messengerProductLink(
+                        video.product.name,
+                        video.product.packSize
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-1 items-center justify-center gap-1 rounded bg-brand-accent py-1.5 text-[10px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-mid"
+                    >
+                      <MessageCircle className="h-3 w-3" />
+                      Message
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* CTA to Facebook */}
-        <div className="mt-4 text-center">
-          <a
-            href={FACEBOOK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-accent hover:underline"
-          >
-            See all videos on Facebook →
-          </a>
-        </div>
+      {/* CTA to Facebook — centered */}
+      <div className="mt-4 text-center">
+        <a
+          href={FACEBOOK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-accent hover:underline"
+        >
+          See all videos on Facebook →
+        </a>
       </div>
     </section>
   );

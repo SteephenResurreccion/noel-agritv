@@ -73,7 +73,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 2: Our Products (TBOF-style: filter pills + product cards) */}
-      <section className="bg-bg px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
+      <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
         <div className="container-site mx-auto">
           <div>
             <h2
