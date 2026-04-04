@@ -18,11 +18,12 @@
   --color-brand-accent: #4D734C;
   --color-brand-black: #0D0D0D;
 
-  /* Brand neutrals */
+  /* Brand neutrals — Google Material opacity system */
   --color-bg: #faf7ee;
   --color-surface: #ffffff;
-  --color-text-primary: #282828;
-  --color-text-secondary: #555555;
+  --color-text-primary: rgba(0, 0, 0, 0.87);
+  --color-text-secondary: rgba(0, 0, 0, 0.60);
+  --color-text-disabled: rgba(0, 0, 0, 0.38);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -65,8 +66,8 @@
   /* Brand-overridden semantic colors */
   /* #faf7ee warm cream → oklch approx */
   --background: oklch(0.978 0.012 90);
-  /* #282828 near-black → oklch approx */
-  --foreground: oklch(0.195 0 0);
+  /* Black at 87% opacity → oklch approx */
+  --foreground: oklch(0.195 0 0 / 87%);
   /* white surface */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.195 0 0);
@@ -78,7 +79,7 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(0 0 0 / 60%);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   /* #de2a2a error red → oklch approx */
