@@ -1,18 +1,26 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
 import { products } from "@/data/products";
+import { categories } from "@/data/categories";
+
+const TRENDING_SEARCHES = [
+  "Bio Plant Booster",
+  "Bio Enzyme",
+  "Rice Seeds",
+  "Jasmine",
+  "Mayumi",
+];
 
 export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchOverlayRef = useRef<HTMLDivElement>(null);
 
   // Filter products based on query
   const results =
@@ -23,6 +31,11 @@ export function Header() {
             p.oneLiner.toLowerCase().includes(query.toLowerCase())
         )
       : [];
+
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    setQuery("");
+  }, []);
 
   // Focus search input when opened
   useEffect(() => {
@@ -35,11 +48,10 @@ export function Header() {
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(e.target as Node)
+        searchOverlayRef.current &&
+        !searchOverlayRef.current.contains(e.target as Node)
       ) {
-        setSearchOpen(false);
-        setQuery("");
+        closeSearch();
       }
     }
     if (searchOpen) {
@@ -47,11 +59,26 @@ export function Header() {
       return () =>
         document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [searchOpen]);
+  }, [searchOpen, closeSearch]);
 
-  // Close mobile menu on route change (link click)
+  // Close on Escape
+  useEffect(() => {
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === "Escape") closeSearch();
+    }
+    if (searchOpen) {
+      document.addEventListener("keydown", handleEsc);
+      return () => document.removeEventListener("keydown", handleEsc);
+    }
+  }, [searchOpen, closeSearch]);
+
   function handleNavClick() {
     setMobileMenuOpen(false);
+  }
+
+  function handleTrendingClick(term: string) {
+    setQuery(term);
+    if (searchInputRef.current) searchInputRef.current.focus();
   }
 
   return (
@@ -60,85 +87,17 @@ export function Header() {
         <div className="container-site">
           {/* Main header row — 3-column grid */}
           <div className="grid h-14 grid-cols-[1fr_auto_1fr] items-center md:h-[72px]">
-            {/* Left — Search (desktop: input, mobile: icon) */}
-            <div className="flex items-center" ref={searchContainerRef}>
-              {/* Desktop search input */}
-              <div className="relative hidden md:block">
-                {searchOpen ? (
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search products..."
-                      className="h-9 w-[280px] rounded-md border border-border bg-bg pl-9 pr-8 text-sm text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none"
-                    />
-                    <button
-                      onClick={() => {
-                        setSearchOpen(false);
-                        setQuery("");
-                      }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
-                      aria-label="Close search"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-
-                    {/* Search results dropdown */}
-                    {query.length >= 2 && (
-                      <div className="absolute left-0 top-full z-50 mt-1 w-[320px] rounded-lg border border-border bg-surface shadow-lg">
-                        {results.length > 0 ? (
-                          <ul className="max-h-[320px] overflow-y-auto py-2">
-                            {results.map((product) => (
-                              <li key={product.slug}>
-                                <Link
-                                  href={`/products/${product.slug}`}
-                                  onClick={() => {
-                                    setSearchOpen(false);
-                                    setQuery("");
-                                  }}
-                                  className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-bg"
-                                >
-                                  <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    width={40}
-                                    height={40}
-                                    className="h-10 w-10 rounded-md object-cover"
-                                  />
-                                  <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-semibold text-text-primary">
-                                      {product.name}
-                                    </p>
-                                    <p className="truncate text-xs text-text-secondary">
-                                      {product.oneLiner}
-                                    </p>
-                                  </div>
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="px-4 py-6 text-center text-sm text-text-secondary">
-                            No products found
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setSearchOpen(true)}
-                    className="flex h-9 items-center gap-2 rounded-md border border-border bg-bg px-3 text-sm text-text-secondary/60 transition-colors hover:border-brand-accent/40 hover:text-text-secondary"
-                    aria-label="Search products"
-                  >
-                    <Search className="h-4 w-4" />
-                    <span>Search products...</span>
-                  </button>
-                )}
-              </div>
+            {/* Left — Search (desktop: input, mobile: hamburger) */}
+            <div className="flex items-center">
+              {/* Desktop search trigger */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="hidden h-9 items-center gap-2 rounded-md border border-border bg-bg px-3 text-sm text-text-secondary/60 transition-colors hover:border-brand-accent/40 hover:text-text-secondary md:flex"
+                aria-label="Search products"
+              >
+                <Search className="h-4 w-4" />
+                <span>Search products...</span>
+              </button>
 
               {/* Mobile: hamburger menu */}
               <button
@@ -191,7 +150,7 @@ export function Header() {
 
               {/* Mobile search icon */}
               <button
-                onClick={() => setMobileMenuOpen(true)}
+                onClick={() => setSearchOpen(true)}
                 className="flex h-10 w-10 items-center justify-center md:hidden"
                 aria-label="Search"
               >
@@ -200,6 +159,159 @@ export function Header() {
             </div>
           </div>
         </div>
+
+        {/* ── Search overlay (TBOF-style full-width dropdown) ── */}
+        {searchOpen && (
+          <div
+            ref={searchOverlayRef}
+            className="absolute inset-x-0 top-0 z-50 border-b border-border bg-surface shadow-lg"
+          >
+            <div className="container-site py-4">
+              {/* Search input row + Close */}
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="h-10 w-full rounded-md border border-border bg-bg pl-9 pr-4 text-sm text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none"
+                  />
+                </div>
+                <button
+                  onClick={closeSearch}
+                  className="text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+                >
+                  Close
+                </button>
+              </div>
+
+              {/* Active search results */}
+              {query.length >= 2 ? (
+                <div className="mt-4">
+                  {results.length > 0 ? (
+                    <>
+                      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                        Products
+                      </p>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                        {results.map((product) => (
+                          <Link
+                            key={product.slug}
+                            href={`/products/${product.slug}`}
+                            onClick={closeSearch}
+                            className="group rounded-lg border border-border bg-bg p-3 transition-shadow hover:shadow-md"
+                          >
+                            <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-md">
+                              <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                className="object-cover transition-transform group-hover:scale-105"
+                                sizes="150px"
+                              />
+                            </div>
+                            <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
+                              {product.name}
+                            </p>
+                            <p className="mt-0.5 text-sm font-bold text-brand-accent">
+                              ₱{product.variants[0].price.toLocaleString()}
+                            </p>
+                            <p className="mt-0.5 text-xs text-text-secondary">
+                              {product.variants[0].packSize}
+                            </p>
+                          </Link>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="py-8 text-center text-sm text-text-secondary">
+                      No products found for &ldquo;{query}&rdquo;
+                    </p>
+                  )}
+                </div>
+              ) : (
+                /* Default state: trending + categories + top products */
+                <div className="mt-4 space-y-6">
+                  {/* Trending Searches */}
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                      Trending Searches
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {TRENDING_SEARCHES.map((term) => (
+                        <button
+                          key={term}
+                          onClick={() => handleTrendingClick(term)}
+                          className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Shop By Category */}
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                      Shop By Category
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.slug}
+                          href={`/products?category=${cat.slug}`}
+                          onClick={closeSearch}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-brand-accent/30 bg-brand-accent/5 px-4 py-1.5 text-xs font-semibold text-brand-accent transition-colors hover:bg-brand-accent/10"
+                        >
+                          {cat.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Top Products */}
+                  <div>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                      Top Products
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                      {products.slice(0, 5).map((product) => (
+                        <Link
+                          key={product.slug}
+                          href={`/products/${product.slug}`}
+                          onClick={closeSearch}
+                          className="group rounded-lg border border-border bg-bg p-3 transition-shadow hover:shadow-md"
+                        >
+                          <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-md">
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              fill
+                              className="object-cover transition-transform group-hover:scale-105"
+                              sizes="150px"
+                            />
+                          </div>
+                          <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
+                            {product.name}
+                          </p>
+                          <p className="mt-0.5 text-sm font-bold text-brand-accent">
+                            ₱{product.variants[0].price.toLocaleString()}
+                          </p>
+                          <p className="mt-0.5 text-xs text-text-secondary">
+                            {product.variants[0].packSize}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Mobile menu overlay */}
@@ -229,58 +341,6 @@ export function Header() {
               >
                 <X className="h-5 w-5 text-text-primary" />
               </button>
-            </div>
-
-            {/* Mobile search */}
-            <div className="border-b border-border p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
-                <input
-                  ref={mobileSearchInputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="h-10 w-full rounded-md border border-border bg-bg pl-9 pr-4 text-sm text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none"
-                />
-              </div>
-
-              {/* Mobile search results */}
-              {query.length >= 2 && (
-                <div className="mt-2 max-h-[200px] overflow-y-auto rounded-md border border-border bg-bg">
-                  {results.length > 0 ? (
-                    <ul>
-                      {results.map((product) => (
-                        <li key={product.slug}>
-                          <Link
-                            href={`/products/${product.slug}`}
-                            onClick={() => {
-                              setQuery("");
-                              handleNavClick();
-                            }}
-                            className="flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-surface"
-                          >
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              width={32}
-                              height={32}
-                              className="h-8 w-8 rounded object-cover"
-                            />
-                            <p className="truncate text-sm font-medium text-text-primary">
-                              {product.name}
-                            </p>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="px-3 py-4 text-center text-sm text-text-secondary">
-                      No products found
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Mobile nav links */}
