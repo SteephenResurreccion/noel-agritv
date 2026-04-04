@@ -116,51 +116,55 @@ export default function HomePage() {
             className="absolute inset-0 block h-full w-full"
             preserveAspectRatio="xMidYMax meet"
           >
-            {/* Tree 1 — far left, tall slim cypress */}
-            <g transform="translate(50,30)" fill="#000000">
-              <rect x="12" y="60" width="10" height="70" rx="2" />
-              <ellipse cx="17" cy="35" rx="18" ry="40" />
-              <ellipse cx="17" cy="20" rx="12" ry="28" />
+            {/* Tree 1 — far left, large wide canopy, sits lower */}
+            <g transform="translate(60,55)" fill="#000000">
+              <rect x="40" y="75" width="14" height="65" rx="3" />
+              <ellipse cx="47" cy="45" rx="50" ry="38" />
+              <ellipse cx="30" cy="35" rx="35" ry="28" />
+              <ellipse cx="68" cy="40" rx="38" ry="30" />
+              <ellipse cx="85" cy="55" rx="16" ry="12" />
             </g>
 
-            {/* Tree 2 — left-center, round oak shape */}
-            <g transform="translate(350,40)" fill="#000000">
-              <rect x="22" y="65" width="12" height="60" rx="2" />
-              <ellipse cx="28" cy="40" rx="35" ry="30" />
-              <ellipse cx="18" cy="32" rx="22" ry="22" />
-              <ellipse cx="42" cy="36" rx="24" ry="24" />
+            {/* Tree 2 — left-center, tall with clustered round canopy, higher up */}
+            <g transform="translate(420,25)" fill="#000000">
+              <rect x="30" y="80" width="12" height="75" rx="2" />
+              <ellipse cx="36" cy="48" rx="42" ry="36" />
+              <ellipse cx="22" cy="38" rx="30" ry="26" />
+              <ellipse cx="54" cy="42" rx="32" ry="28" />
+              <ellipse cx="36" cy="28" rx="24" ry="20" />
             </g>
 
-            {/* Tree 3 — center-right, triangular pine/conifer */}
-            <g transform="translate(850,35)" fill="#000000">
-              <rect x="16" y="75" width="10" height="55" rx="2" />
-              <path d="M21 10 L-5 55 L47 55Z" />
-              <path d="M21 25 L-10 70 L52 70Z" />
+            {/* Tree 3 — center, medium spreading, lower in landscape */}
+            <g transform="translate(780,60)" fill="#000000">
+              <rect x="35" y="65" width="12" height="60" rx="2" />
+              <ellipse cx="41" cy="40" rx="44" ry="32" />
+              <ellipse cx="26" cy="32" rx="28" ry="24" />
+              <ellipse cx="60" cy="36" rx="30" ry="26" />
             </g>
 
-            {/* Tree 4 — right, broad spreading canopy */}
-            <g transform="translate(1180,10)" fill="#000000">
-              <rect x="45" y="90" width="16" height="80" rx="3" />
-              <path d="M61 105 Q85 85 92 70" stroke="#000000" strokeWidth="4" fill="none" />
-              <ellipse cx="53" cy="55" rx="55" ry="42" />
-              <ellipse cx="35" cy="42" rx="38" ry="32" />
-              <ellipse cx="78" cy="48" rx="40" ry="34" />
-              <ellipse cx="100" cy="65" rx="18" ry="14" />
+            {/* Tree 4 — right, biggest and tallest, prominent */}
+            <g transform="translate(1120,15)" fill="#000000">
+              <rect x="48" y="85" width="16" height="80" rx="3" />
+              <path d="M64 100 Q90 80 98 65" stroke="#000000" strokeWidth="4" fill="none" />
+              <ellipse cx="56" cy="50" rx="58" ry="44" />
+              <ellipse cx="38" cy="38" rx="40" ry="34" />
+              <ellipse cx="80" cy="44" rx="42" ry="36" />
+              <ellipse cx="104" cy="60" rx="20" ry="16" />
             </g>
 
-            {/* Tree 5 — far right edge, small palm-like */}
-            <g transform="translate(1380,45)" fill="#000000">
-              <rect x="8" y="55" width="8" height="65" rx="2" />
-              <ellipse cx="12" cy="38" rx="28" ry="22" />
-              <ellipse cx="0" cy="30" rx="16" ry="16" />
-              <ellipse cx="26" cy="32" rx="18" ry="18" />
+            {/* Tree 5 — far right, medium rounded, sits mid-height */}
+            <g transform="translate(1340,40)" fill="#000000">
+              <rect x="28" y="70" width="12" height="65" rx="2" />
+              <ellipse cx="34" cy="42" rx="38" ry="32" />
+              <ellipse cx="20" cy="34" rx="26" ry="22" />
+              <ellipse cx="50" cy="38" rx="28" ry="24" />
             </g>
 
             {/* Birds */}
-            <g transform="translate(1320,15)" fill="#000000" fillOpacity="0.7">
+            <g transform="translate(1280,20)" fill="#000000" fillOpacity="0.7">
               <path d="M0 6 Q4 0 8 4 Q12 0 16 6 Q12 3.5 8 7.5 Q4 3.5 0 6Z" />
             </g>
-            <g transform="translate(950,18)" fill="#000000" fillOpacity="0.6">
+            <g transform="translate(680,30)" fill="#000000" fillOpacity="0.6">
               <path d="M0 5 Q3.5 0 7 3 Q10.5 0 14 5 Q10.5 3 7 6.5 Q3.5 3 0 5Z" />
             </g>
           </svg>
