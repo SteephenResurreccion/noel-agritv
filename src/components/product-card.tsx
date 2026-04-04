@@ -14,7 +14,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const defaultVariant = product.variants[0];
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface">
+    <div className="group flex flex-col overflow-hidden bg-surface">
       <Link href={`/products/${product.slug}`} className="block overflow-hidden">
         <Image
           src={product.image}

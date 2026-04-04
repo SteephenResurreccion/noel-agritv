@@ -34,7 +34,7 @@ export default function HomePage() {
           <div className="mt-8">
             <Link
               href="/products"
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-brand-accent px-5 text-sm font-medium whitespace-nowrap text-white transition-colors hover:bg-brand-mid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="inline-flex h-12 items-center justify-center rounded-[var(--radius-button)] bg-brand-accent px-8 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-brand-mid"
             >
               Browse Products
             </Link>

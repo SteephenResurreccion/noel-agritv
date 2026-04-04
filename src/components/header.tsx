@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm">
-      <div className="container-site flex h-14 items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface">
+      <div className="container-site flex h-16 items-center justify-between md:h-20">
         {/* Mobile: centered logo */}
         <Link
           href="/"

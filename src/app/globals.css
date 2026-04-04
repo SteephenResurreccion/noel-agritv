@@ -113,12 +113,12 @@
 
   /* Spacing */
   --spacing-section: 32px;
-  --spacing-grid-gap: 12px;
-  --spacing-container-gutter: 20px;
+  --spacing-grid-gap: 24px;
+  --spacing-container-gutter: 24px;
 
-  /* Radii */
-  --radius-button: 6px;
-  --radius-card: 8px;
+  /* Radii — TBOF uses 0px cards, 4px buttons */
+  --radius-button: 4px;
+  --radius-card: 0px;
 }
 
 .dark {
@@ -158,7 +158,7 @@
 /* Desktop overrides (741px = spec breakpoint) */
 @media (min-width: 741px) {
   :root {
-    --font-size-h1: 40px;
+    --font-size-h1: 44px;
     --font-size-h2: 32px;
     --font-size-h3: 26px;
     --spacing-section: 48px;
@@ -168,7 +168,7 @@
 }
 
 .container-site {
-  max-width: 1200px;
+  max-width: 1400px;
   margin-inline: auto;
   padding-inline: var(--spacing-container-gutter);
 }
@@ -185,5 +185,8 @@
   }
   html {
     @apply font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.1;
   }
 }
