@@ -28,26 +28,26 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Main content */}
-        <div className="container-site relative z-10 mx-auto px-[var(--spacing-container-gutter)] pb-[200px] pt-10 min-[741px]:pb-[260px] min-[741px]:pt-16">
+        {/* Main content — pb matches landscape height so image sits into hills */}
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-10 min-[741px]:pt-16">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
-            {/* Left — Hero image */}
-            <div className="relative z-10">
-              <div className="overflow-hidden">
+            {/* Left — Hero image, rounded, extends into landscape */}
+            <div className="relative z-[1] min-[741px]:mb-[-80px]">
+              <div className="overflow-hidden rounded-2xl">
                 <Image
                   src="/images/founder-with-plants.jpg"
                   alt="Noel Tolentino holding fresh harvested vegetables"
                   width={720}
                   height={960}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[500px] min-[741px]:min-h-[560px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:max-h-[520px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
             </div>
 
             {/* Right — Text content */}
-            <div className="text-center min-[741px]:text-left">
+            <div className="pb-8 text-center min-[741px]:pb-16 min-[741px]:text-left">
               <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[28px]">
                 Bio-organic products
               </p>
@@ -81,7 +81,7 @@ export default function HomePage() {
         </div>
 
         {/* Decorative farm landscape — warm golden palette like TBOF */}
-        <div className="absolute inset-x-0 bottom-0 z-0" aria-hidden="true">
+        <div className="absolute inset-x-0 bottom-0 z-[2]" aria-hidden="true">
           <svg
             viewBox="0 0 1440 320"
             fill="none"
