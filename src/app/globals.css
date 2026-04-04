@@ -19,7 +19,7 @@
   --color-brand-black: #0D0D0D;
 
   /* Brand neutrals */
-  --color-bg: #f8f7f4;
+  --color-bg: #faf7ee;
   --color-surface: #ffffff;
   --color-text-primary: #282828;
   --color-text-secondary: #555555;
@@ -63,8 +63,8 @@
 
 :root {
   /* Brand-overridden semantic colors */
-  /* #f8f7f4 warm off-white → oklch approx */
-  --background: oklch(0.979 0.004 91);
+  /* #faf7ee warm cream → oklch approx */
+  --background: oklch(0.978 0.012 90);
   /* #282828 near-black → oklch approx */
   --foreground: oklch(0.195 0 0);
   /* white surface */
