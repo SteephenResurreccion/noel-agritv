@@ -20,24 +20,24 @@ export default function HomePage() {
     <>
       {/* ── Section 1: Hero Banner — TBOF style (image left, text right) ── */}
       <section className="relative overflow-hidden border-b border-brand-darkest/10 bg-bg">
-        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-20">
-          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
-            {/* Left — Hero image, tall like TBOF */}
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-16">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
+            {/* Left — Hero image, tall portrait like TBOF */}
             <div className="relative min-[741px]:self-stretch">
-              <div className="overflow-hidden rounded-2xl shadow-xl min-[741px]:h-full">
+              <div className="overflow-hidden rounded-2xl min-[741px]:h-full">
                 <Image
-                  src="/images/possible_hero.jpg"
-                  alt="Noel AgriTV — Filipino farming community"
-                  width={2000}
-                  height={1125}
+                  src="/images/founder-with-plants.jpg"
+                  alt="Noel Tolentino holding fresh harvested vegetables"
+                  width={720}
+                  height={960}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[16/9] min-[741px]:min-h-[480px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:min-h-[540px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
             </div>
 
-            {/* Right — Text content, larger typography like TBOF */}
+            {/* Right — Text content */}
             <div className="text-center min-[741px]:text-left">
               <p className="text-2xl italic text-brand-dark min-[741px]:text-[28px]">
                 Bio-organic products
@@ -100,32 +100,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 3: Mission + About Noel ────────────────────────────── */}
+      {/* ── Section 3: Mission — Brightland-style (text left, image right) ── */}
       <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
-        <div className="container-site mx-auto max-w-[480px] text-center">
-          {/* Circular photo placeholder — no photo yet */}
-          <div className="mx-auto h-[100px] w-[100px] rounded-full bg-brand-darkest" />
-          <p className="mt-6 text-[length:var(--font-size-meta)] font-semibold uppercase tracking-widest text-brand-accent">
-            Our Mission
-          </p>
-          <h2
-            className="mt-4 font-bold text-text-primary"
-            style={{ fontSize: "var(--font-size-h2)" }}
-          >
-            Helping Filipino farmers grow more with less
-          </h2>
-          <p className="mt-4 text-text-secondary">
-            Noel Tolentino has been farming and teaching natural agriculture
-            techniques since 2021. With 250,000 followers on Facebook, he
-            shares practical, affordable bio-organic solutions that work in
-            Philippine soil and climate.
-          </p>
-          <Link
-            href="/about"
-            className="mt-6 inline-flex items-center gap-1 font-semibold text-brand-accent underline-offset-4 hover:underline"
-          >
-            Learn Noel&apos;s Story →
-          </Link>
+        <div className="container-site mx-auto">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
+            {/* Left — Text content */}
+            <div>
+              <p className="text-[length:var(--font-size-meta)] font-semibold uppercase tracking-widest text-brand-accent">
+                Our Mission
+              </p>
+              <blockquote className="mt-6">
+                <p className="text-[28px] font-bold leading-[1.25] text-text-primary min-[741px]:text-[36px]">
+                  &ldquo;I started Noel AgriTV to help Filipino farmers grow
+                  more with less — using natural, affordable solutions that
+                  actually work in our soil and climate.&rdquo;
+                </p>
+              </blockquote>
+              <p className="mt-6 text-sm font-semibold uppercase tracking-widest text-text-secondary">
+                Noel Tolentino — Founder
+              </p>
+              <Link
+                href="/about"
+                className="mt-6 inline-flex h-10 items-center justify-center rounded-full bg-brand-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+              >
+                Our Story →
+              </Link>
+            </div>
+
+            {/* Right — Portrait photo */}
+            <div className="relative min-[741px]:self-stretch">
+              <div className="overflow-hidden rounded-2xl min-[741px]:h-full">
+                <Image
+                  src="/images/mission.jpg"
+                  alt="Noel Tolentino standing in a rice paddy"
+                  width={640}
+                  height={960}
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:min-h-[480px]"
+                  sizes="(max-width: 740px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
