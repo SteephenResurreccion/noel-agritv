@@ -20,89 +20,51 @@ export default function HomePage() {
     <>
       {/* ── Section 1: Hero Banner — TBOF style (image left, text right) ── */}
       <section className="relative overflow-hidden bg-bg">
-        {/* Decorative farm landscape at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-20 min-[741px]:h-28">
-          <svg
-            viewBox="0 0 1440 120"
-            fill="none"
-            className="absolute bottom-0 w-full"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M0 80 C200 20 400 100 600 60 C800 20 1000 90 1200 50 C1350 30 1420 60 1440 55 L1440 120 L0 120Z"
-              fill="#3B593F"
-              opacity="0.25"
-            />
-            <path
-              d="M0 95 C180 50 380 110 580 75 C780 40 980 100 1180 65 C1350 45 1420 75 1440 70 L1440 120 L0 120Z"
-              fill="#2A4038"
-              opacity="0.35"
-            />
-            <path
-              d="M0 105 C160 70 360 115 560 90 C760 65 960 110 1160 80 C1340 60 1420 90 1440 85 L1440 120 L0 120Z"
-              fill="#172621"
-              opacity="0.5"
-            />
-          </svg>
-        </div>
-
-        {/* Decorative bird silhouette — top right */}
-        <svg
-          className="absolute right-8 top-6 h-6 w-10 text-brand-darkest/15 max-[740px]:hidden"
-          viewBox="0 0 40 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M20 12 C16 4 8 2 0 6 C8 4 14 6 18 12 C14 6 8 6 2 10 C10 6 16 8 20 12Z" />
-          <path d="M20 12 C24 4 32 2 40 6 C32 4 26 6 22 12 C26 6 32 6 38 10 C30 6 24 8 20 12Z" />
-        </svg>
-
-        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-14">
-          <div className="grid items-center gap-8 min-[741px]:grid-cols-2 min-[741px]:gap-12">
-            {/* Left — Hero image with rounded corners */}
-            <div className="relative mx-auto w-full max-w-[520px] min-[741px]:mx-0">
-              <div className="overflow-hidden rounded-2xl shadow-xl">
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-8 min-[741px]:py-16">
+          <div className="grid items-center gap-6 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
+            {/* Left — Hero image, tall like TBOF */}
+            <div className="relative min-[741px]:self-stretch">
+              <div className="overflow-hidden rounded-2xl shadow-xl min-[741px]:h-full">
                 <Image
                   src="/images/possible_hero.jpg"
                   alt="Noel AgriTV — Filipino farming community"
                   width={2000}
                   height={1125}
                   priority
-                  className="aspect-[16/9] w-full object-cover"
+                  className="h-full w-full object-cover max-[740px]:aspect-[16/9] min-[741px]:min-h-[420px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
             </div>
 
-            {/* Right — Text content */}
+            {/* Right — Text content, larger typography like TBOF */}
             <div className="text-center min-[741px]:text-left">
-              <p className="text-xl italic text-brand-dark min-[741px]:text-2xl">
+              <p className="text-2xl italic text-brand-dark min-[741px]:text-[28px]">
                 Bio-organic products
               </p>
-              <p className="text-xl italic text-brand-dark min-[741px]:text-2xl">
+              <p className="text-2xl italic text-brand-dark min-[741px]:text-[28px]">
                 trusted by Filipino farmers
               </p>
-              <h1 className="mt-3 text-[32px] font-bold leading-[1.1] text-brand-darkest min-[741px]:text-[44px]">
+              <h1 className="mt-4 text-[40px] font-bold leading-[1.05] text-brand-darkest min-[741px]:text-[56px]">
                 Natural Solutions
               </h1>
-              <h1 className="text-[32px] font-bold leading-[1.1] text-brand-accent min-[741px]:text-[44px]">
+              <h1 className="text-[40px] font-bold leading-[1.05] text-brand-accent min-[741px]:text-[56px]">
                 For Better Harvests
               </h1>
-              <p className="mt-3 text-lg font-semibold text-brand-dark">
+              <p className="mt-4 text-xl font-semibold text-brand-dark">
                 Since 2021 · 250k+ Followers
               </p>
 
-              <div className="mt-6 flex flex-col items-center gap-3 min-[741px]:flex-row min-[741px]:items-start">
+              <div className="mt-8 flex flex-col items-center gap-3 min-[741px]:flex-row min-[741px]:items-start">
                 <Link
                   href="/products"
-                  className="inline-flex h-12 items-center justify-center rounded-[var(--radius-button)] bg-brand-darkest px-8 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-brand-dark"
+                  className="inline-flex h-14 items-center justify-center rounded-[var(--radius-button)] bg-brand-darkest px-10 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-brand-dark"
                 >
                   Browse Products
                 </Link>
               </div>
 
-              <div className="mt-5">
+              <div className="mt-6">
                 <SocialProofStrip variant="dark" />
               </div>
             </div>
