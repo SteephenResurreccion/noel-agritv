@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Section 1: Hero Banner — TBOF style (image left, text right) ── */}
-      <section className="relative overflow-hidden bg-bg">
+      <section className="relative overflow-hidden border-b border-brand-darkest/10 bg-bg">
         <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-20">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
             {/* Left — Hero image, tall like TBOF */}
