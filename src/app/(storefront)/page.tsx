@@ -28,11 +28,11 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Main content — pb matches landscape height so image sits into hills */}
-        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-10 min-[741px]:pt-16">
-          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
+        {/* Main content */}
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
             {/* Left — Hero image, rounded, extends into landscape */}
-            <div className="relative z-[1] min-[741px]:mb-[-80px]">
+            <div className="relative z-[1] min-[741px]:mb-[-60px]">
               <div className="overflow-hidden rounded-2xl">
                 <Image
                   src="/images/founder-with-plants.jpg"
@@ -40,14 +40,14 @@ export default function HomePage() {
                   width={720}
                   height={960}
                   priority
-                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:max-h-[520px]"
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[420px] min-[741px]:max-h-[440px]"
                   sizes="(max-width: 740px) 100vw, 50vw"
                 />
               </div>
             </div>
 
-            {/* Right — Text content */}
-            <div className="pb-8 text-center min-[741px]:pb-16 min-[741px]:text-left">
+            {/* Right — Text content, vertically centered */}
+            <div className="pb-8 text-center min-[741px]:pb-12 min-[741px]:text-left">
               <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[28px]">
                 Bio-organic products
               </p>
