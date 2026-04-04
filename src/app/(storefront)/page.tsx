@@ -30,12 +30,12 @@ export default function HomePage() {
 
         {/* Main content — z-[3] keeps everything above the landscape */}
         <div className="container-site relative z-[3] mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
-          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-24">
             {/* Left — Hero image, rounded, extends into landscape */}
             <div className="relative z-[1] min-[741px]:mb-[-80px]">
               <div className="overflow-hidden rounded-2xl">
                 <Image
-                  src="/images/founder-with-plants.jpg"
+                  src="/images/New-Found-Hero.png"
                   alt="Noel Tolentino holding fresh harvested vegetables"
                   width={720}
                   height={960}
