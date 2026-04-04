@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SocialProofStrip } from "@/components/social-proof-strip";
 import { ProductCard } from "@/components/product-card";
 import { HomeProductFilter } from "@/components/home-product-filter";
+import { VideoReelSection } from "@/components/video-reel-section";
 import { products } from "@/data/products";
 import { categories } from "@/data/categories";
 
@@ -102,7 +103,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 4: Featured Video ───────────────────────────────────
+      {/* ── Section 4: Video Reels (TBOF-style carousel) ──────────────── */}
+      <VideoReelSection />
+
+      {/* ── Section 5: Featured Video ───────────────────────────────────
            COMMENTED OUT — waiting for client to provide YouTube video ID.
            To enable: import YouTubeFacade, add videoId and title props.
 

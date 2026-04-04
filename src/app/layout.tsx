@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans } from "next/font/google";
+import { Noto_Sans, Montserrat } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -8,6 +8,13 @@ const notoSans = Noto_Sans({
   weight: ["400", "600", "700"],
   display: "swap",
   variable: "--font-noto-sans",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  display: "swap",
+  variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${notoSans.variable} antialiased`}>
+    <html lang="en" className={`${notoSans.variable} ${montserrat.variable} antialiased`}>
       <head>
         <link rel="preconnect" href="https://i.ytimg.com" />
       </head>

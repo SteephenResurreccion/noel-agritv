@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-noto-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-montserrat), var(--font-sans);
 
   /* Brand greens */
   --color-brand-darkest: #172621;
@@ -187,7 +187,9 @@
     @apply font-sans;
   }
   h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
     line-height: 1.1;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -207,4 +209,13 @@
 
 .announcement-track:hover {
   animation-play-state: paused;
+}
+
+/* Hide scrollbar but keep scroll functional */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
