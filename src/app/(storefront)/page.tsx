@@ -28,24 +28,26 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Main content — no container on the grid so image can bleed left */}
-        <div className="relative z-10 pt-10 min-[741px]:pt-12">
-          <div className="grid items-center max-[740px]:gap-8 min-[741px]:grid-cols-[55fr_45fr]">
-            {/* Left — Hero image, bleeds to left edge */}
-            <div className="relative z-10 max-[740px]:px-[var(--spacing-container-gutter)] min-[741px]:mb-[-60px]">
-              <Image
-                src="/images/founder-with-plants.jpg"
-                alt="Noel Tolentino holding fresh harvested vegetables"
-                width={720}
-                height={960}
-                priority
-                className="h-auto w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[500px]"
-                sizes="(max-width: 740px) 100vw, 55vw"
-              />
+        {/* Main content */}
+        <div className="container-site relative z-10 mx-auto px-[var(--spacing-container-gutter)] pb-[200px] pt-10 min-[741px]:pb-[260px] min-[741px]:pt-16">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-12">
+            {/* Left — Hero image */}
+            <div className="relative z-10">
+              <div className="overflow-hidden">
+                <Image
+                  src="/images/founder-with-plants.jpg"
+                  alt="Noel Tolentino holding fresh harvested vegetables"
+                  width={720}
+                  height={960}
+                  priority
+                  className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[500px] min-[741px]:min-h-[560px]"
+                  sizes="(max-width: 740px) 100vw, 50vw"
+                />
+              </div>
             </div>
 
             {/* Right — Text content */}
-            <div className="px-[var(--spacing-container-gutter)] pb-12 text-center min-[741px]:pb-20 min-[741px]:pr-[var(--spacing-container-gutter)] min-[741px]:text-left">
+            <div className="text-center min-[741px]:text-left">
               <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[28px]">
                 Bio-organic products
               </p>
