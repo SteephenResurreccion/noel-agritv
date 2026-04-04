@@ -160,15 +160,15 @@ export function Header() {
           </div>
         </div>
 
-        {/* ── Search overlay (TBOF-style full-width dropdown) ── */}
+        {/* ── Search overlay — full-screen on mobile, dropdown on desktop ── */}
         {searchOpen && (
           <div
             ref={searchOverlayRef}
-            className="absolute inset-x-0 top-0 z-50 border-b border-border bg-surface shadow-lg"
+            className="fixed inset-0 z-50 overflow-y-auto bg-surface md:absolute md:inset-x-0 md:top-0 md:bottom-auto md:border-b md:border-border md:shadow-lg"
           >
             <div className="container-site py-4">
               {/* Search input row + Close */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
                   <input
@@ -177,14 +177,15 @@ export function Header() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search products..."
-                    className="h-10 w-full rounded-md border border-border bg-bg pl-9 pr-4 text-sm text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none"
+                    className="h-12 w-full rounded-md border border-border bg-bg pl-9 pr-4 text-base text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none md:h-10 md:text-sm"
                   />
                 </div>
                 <button
                   onClick={closeSearch}
-                  className="text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+                  className="flex h-12 items-center px-3 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary md:h-auto md:px-0"
                 >
-                  Close
+                  <X className="h-5 w-5 md:hidden" />
+                  <span className="hidden md:inline">Close</span>
                 </button>
               </div>
 
@@ -245,7 +246,7 @@ export function Header() {
                         <button
                           key={term}
                           onClick={() => handleTrendingClick(term)}
-                          className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+                          className="rounded-full border border-border px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent md:px-3 md:py-1.5 md:text-xs"
                         >
                           {term}
                         </button>
@@ -264,7 +265,7 @@ export function Header() {
                           key={cat.slug}
                           href={`/products?category=${cat.slug}`}
                           onClick={closeSearch}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-brand-accent/30 bg-brand-accent/5 px-4 py-1.5 text-xs font-semibold text-brand-accent transition-colors hover:bg-brand-accent/10"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-brand-accent/30 bg-brand-accent/5 px-4 py-2 text-sm font-semibold text-brand-accent transition-colors hover:bg-brand-accent/10 md:py-1.5 md:text-xs"
                         >
                           {cat.name}
                         </Link>
