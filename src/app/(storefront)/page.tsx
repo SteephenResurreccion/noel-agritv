@@ -28,11 +28,11 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* Main content — z-[3] keeps everything above the landscape */}
-        <div className="container-site relative z-[3] mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
+        {/* Main content — grid layout with image BEHIND landscape, text ABOVE */}
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-24">
-            {/* Left — Hero image, rounded, extends into landscape */}
-            <div className="relative z-[1] min-[741px]:mb-[-120px]">
+            {/* Left — Hero image, z-[1] so landscape (z-[2]) covers its bottom */}
+            <div className="relative z-[1] min-[741px]:mb-[-100px] min-[741px]:max-w-[80%]">
               <div className="overflow-hidden rounded-2xl">
                 <Image
                   src="/images/New-Found-Hero.png"
@@ -46,8 +46,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right — Text content, vertically centered */}
-            <div className="pb-8 text-center min-[741px]:pb-12 min-[741px]:text-left">
+            {/* Right — Text content, z-[3] so it stays above landscape */}
+            <div className="relative z-[3] pb-8 text-center min-[741px]:pb-12 min-[741px]:text-left">
               <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[28px]">
                 Bio-organic products
               </p>
