@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Section 1: Hero Banner — TBOF style ── */}
-      <section className="relative overflow-hidden bg-bg pb-[120px] min-[741px]:pb-[160px]">
+      <section className="relative overflow-hidden bg-bg pb-[100px] min-[741px]:pb-[130px]">
         {/* Warm accent — sun/circle top-right like TBOF */}
         <div className="absolute right-6 top-6 z-10 hidden min-[741px]:block" aria-hidden="true">
           <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
@@ -32,7 +32,7 @@ export default function HomePage() {
         <div className="container-site relative z-[3] mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-24">
             {/* Left — Hero image, rounded, extends into landscape */}
-            <div className="relative z-[1] min-[741px]:mb-[-80px]">
+            <div className="relative z-[1] min-[741px]:mb-[-120px]">
               <div className="overflow-hidden rounded-2xl">
                 <Image
                   src="/images/New-Found-Hero.png"
