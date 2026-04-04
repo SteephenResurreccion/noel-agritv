@@ -190,3 +190,21 @@
     line-height: 1.1;
   }
 }
+
+/* Announcement bar infinite scroll */
+@keyframes announcement-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.announcement-track {
+  animation: announcement-scroll 30s linear infinite;
+}
+
+.announcement-track:hover {
+  animation-play-state: paused;
+}

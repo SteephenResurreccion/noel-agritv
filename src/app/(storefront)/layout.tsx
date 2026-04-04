@@ -1,3 +1,4 @@
+import { AnnouncementBar } from "@/components/announcement-bar";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { MobileBottomBar } from "@/components/mobile-bottom-bar";
@@ -9,6 +10,7 @@ export default function StorefrontLayout({
 }) {
   return (
     <>
+      <AnnouncementBar />
       <Header />
       <main className="min-h-screen pb-16 md:pb-0">{children}</main>
       <Footer />
