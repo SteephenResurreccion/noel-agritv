@@ -116,34 +116,22 @@ export default function HomePage() {
             className="absolute inset-0 block h-full w-full"
             preserveAspectRatio="xMidYMax meet"
           >
-            {/* Farmer silhouette — left-center, within the landscape band */}
-            <g transform="translate(480,90)" fill="#3A3015" fillOpacity="1">
-              <circle cx="16" cy="0" r="7" />
-              <ellipse cx="16" cy="-3" rx="10" ry="2.5" />
-              <path d="M11 7 L9 38 L14 38 L16 24 L18 38 L23 38 L21 7Z" />
-              <path d="M11 11 L3 24 L6 26 L13 16Z" />
-              <rect x="0" y="22" width="7" height="8" rx="1" />
-              <path d="M0 24 L-4 20" stroke="#3A3015" strokeWidth="1.5" fill="none" />
-              <path d="M21 11 L27 22 L24 24 L19 16Z" />
-              <path d="M12 36 L10 52 L14 52 L15 42 L16 42 L17 52 L21 52 L19 36Z" />
-            </g>
-
-            {/* Tree — right side */}
-            <g transform="translate(1280,40)" fill="#3A3015" fillOpacity="0.9">
-              <rect x="20" y="50" width="8" height="45" rx="2" />
-              <path d="M28 62 Q42 50 46 42" stroke="#3A3015" strokeOpacity="0.8" strokeWidth="2.5" fill="none" />
-              <ellipse cx="24" cy="35" rx="26" ry="19" />
-              <ellipse cx="15" cy="28" rx="16" ry="14" />
-              <ellipse cx="38" cy="32" rx="18" ry="16" />
-              <ellipse cx="50" cy="42" rx="8" ry="6" />
+            {/* Tree — right side, large and prominent */}
+            <g transform="translate(1180,10)" fill="#000000">
+              <rect x="45" y="90" width="16" height="80" rx="3" />
+              <path d="M61 105 Q85 85 92 70" stroke="#000000" strokeWidth="4" fill="none" />
+              <ellipse cx="53" cy="55" rx="55" ry="42" />
+              <ellipse cx="35" cy="42" rx="38" ry="32" />
+              <ellipse cx="78" cy="48" rx="40" ry="34" />
+              <ellipse cx="100" cy="65" rx="18" ry="14" />
             </g>
 
             {/* Birds */}
-            <g transform="translate(1320,30)" fill="#5A4A20" fillOpacity="0.6">
-              <path d="M0 5 Q3 0 6 3 Q9 0 12 5 Q9 3 6 6 Q3 3 0 5Z" />
+            <g transform="translate(1320,15)" fill="#000000" fillOpacity="0.7">
+              <path d="M0 6 Q4 0 8 4 Q12 0 16 6 Q12 3.5 8 7.5 Q4 3.5 0 6Z" />
             </g>
-            <g transform="translate(1260,20)" fill="#5A4A20" fillOpacity="0.5">
-              <path d="M0 4 Q2.5 0 5 2.5 Q7.5 0 10 4 Q7.5 2.8 5 5.2 Q2.5 2.8 0 4Z" />
+            <g transform="translate(1250,5)" fill="#000000" fillOpacity="0.6">
+              <path d="M0 5 Q3.5 0 7 3 Q10.5 0 14 5 Q10.5 3 7 6.5 Q3.5 3 0 5Z" />
             </g>
           </svg>
         </div>
