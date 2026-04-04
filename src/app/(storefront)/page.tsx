@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { SocialProofStrip } from "@/components/social-proof-strip";
@@ -17,31 +18,94 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      {/* ── Section 1: Hero + Social Proof ─────────────────────────────── */}
-      <section className="bg-brand-darkest px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
-        <div className="container-site mx-auto max-w-2xl text-center">
-          <p className="text-[length:var(--font-size-meta)] font-semibold uppercase tracking-widest text-brand-accent">
-            Noel AgriTV
-          </p>
-          <h1
-            className="mt-4 font-bold text-white"
-            style={{ fontSize: "var(--font-size-h1)" }}
+      {/* ── Section 1: Hero Banner — TBOF style (image left, text right) ── */}
+      <section className="relative overflow-hidden bg-bg">
+        {/* Decorative farm landscape at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-20 min-[741px]:h-28">
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            className="absolute bottom-0 w-full"
+            preserveAspectRatio="none"
+            aria-hidden="true"
           >
-            Natural solutions for better harvests
-          </h1>
-          <p className="mt-4 text-white/70">
-            Bio-organic products trusted by Filipino farmers since 2021
-          </p>
-          <div className="mt-8">
-            <Link
-              href="/products"
-              className="inline-flex h-12 items-center justify-center rounded-[var(--radius-button)] bg-brand-accent px-8 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-brand-mid"
-            >
-              Browse Products
-            </Link>
-          </div>
-          <div className="mt-6">
-            <SocialProofStrip />
+            <path
+              d="M0 80 C200 20 400 100 600 60 C800 20 1000 90 1200 50 C1350 30 1420 60 1440 55 L1440 120 L0 120Z"
+              fill="#3B593F"
+              opacity="0.25"
+            />
+            <path
+              d="M0 95 C180 50 380 110 580 75 C780 40 980 100 1180 65 C1350 45 1420 75 1440 70 L1440 120 L0 120Z"
+              fill="#2A4038"
+              opacity="0.35"
+            />
+            <path
+              d="M0 105 C160 70 360 115 560 90 C760 65 960 110 1160 80 C1340 60 1420 90 1440 85 L1440 120 L0 120Z"
+              fill="#172621"
+              opacity="0.5"
+            />
+          </svg>
+        </div>
+
+        {/* Decorative bird silhouette — top right */}
+        <svg
+          className="absolute right-8 top-6 h-6 w-10 text-brand-darkest/15 max-[740px]:hidden"
+          viewBox="0 0 40 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M20 12 C16 4 8 2 0 6 C8 4 14 6 18 12 C14 6 8 6 2 10 C10 6 16 8 20 12Z" />
+          <path d="M20 12 C24 4 32 2 40 6 C32 4 26 6 22 12 C26 6 32 6 38 10 C30 6 24 8 20 12Z" />
+        </svg>
+
+        <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] py-10 min-[741px]:py-14">
+          <div className="grid items-center gap-8 min-[741px]:grid-cols-2 min-[741px]:gap-12">
+            {/* Left — Hero image with rounded corners */}
+            <div className="relative mx-auto w-full max-w-[520px] min-[741px]:mx-0">
+              <div className="overflow-hidden rounded-2xl shadow-xl">
+                <Image
+                  src="/images/possible_hero.jpg"
+                  alt="Noel AgriTV — Filipino farming community"
+                  width={2000}
+                  height={1125}
+                  priority
+                  className="aspect-[16/9] w-full object-cover"
+                  sizes="(max-width: 740px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+
+            {/* Right — Text content */}
+            <div className="text-center min-[741px]:text-left">
+              <p className="text-xl italic text-brand-dark min-[741px]:text-2xl">
+                Bio-organic products
+              </p>
+              <p className="text-xl italic text-brand-dark min-[741px]:text-2xl">
+                trusted by Filipino farmers
+              </p>
+              <h1 className="mt-3 text-[32px] font-bold leading-[1.1] text-brand-darkest min-[741px]:text-[44px]">
+                Natural Solutions
+              </h1>
+              <h1 className="text-[32px] font-bold leading-[1.1] text-brand-accent min-[741px]:text-[44px]">
+                For Better Harvests
+              </h1>
+              <p className="mt-3 text-lg font-semibold text-brand-dark">
+                Since 2021 · 250k+ Followers
+              </p>
+
+              <div className="mt-6 flex flex-col items-center gap-3 min-[741px]:flex-row min-[741px]:items-start">
+                <Link
+                  href="/products"
+                  className="inline-flex h-12 items-center justify-center rounded-[var(--radius-button)] bg-brand-darkest px-8 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-brand-dark"
+                >
+                  Browse Products
+                </Link>
+              </div>
+
+              <div className="mt-5">
+                <SocialProofStrip variant="dark" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
