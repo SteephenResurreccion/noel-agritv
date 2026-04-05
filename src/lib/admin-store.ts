@@ -58,7 +58,7 @@ export async function getAdminConfig(): Promise<AdminConfig> {
 
 export async function saveAdminConfig(config: AdminConfig): Promise<void> {
   await put(CONFIG_PATH, JSON.stringify(config, null, 2), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
     contentType: "application/json",
   });
