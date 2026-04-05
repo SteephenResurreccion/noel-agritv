@@ -8,6 +8,8 @@ import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
 import { products } from "@/data/products";
 import { categories } from "@/data/categories";
+import { getAdminConfig } from "@/lib/admin-store";
+import { defaultVideos } from "@/data/videos";
 
 export const metadata: Metadata = {
   title: "Noel AgriTV — Natural Solutions for Better Harvests",
@@ -15,20 +17,27 @@ export const metadata: Metadata = {
     "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021. Browse our products and message us to order.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  let visibleProducts = products;
+  let videoItems = defaultVideos.filter((v) => v.visible);
+
+  try {
+    const config = await getAdminConfig();
+    visibleProducts = products.filter(
+      (p) => !config.hiddenProducts.includes(p.slug)
+    );
+    if (config.videos) {
+      videoItems = config.videos.filter((v) => v.visible);
+    }
+  } catch {
+    // Blob not configured — use defaults
+  }
+
   return (
     <>
       {/* ── Section 1: Hero Banner — TBOF style ── */}
       <section className="relative overflow-hidden bg-bg pb-[100px] min-[741px]:pb-[130px]">
-        {/* Warm accent — sun/circle top-right like TBOF */}
-        <div className="absolute right-6 top-6 z-10 hidden min-[741px]:block" aria-hidden="true">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="30" r="28" fill="#C97B3A" fillOpacity="0.85" />
-            <path d="M18 22 Q22 16 28 20 Q32 14 36 22" stroke="#fff" strokeWidth="1.5" fill="none" strokeOpacity="0.6" />
-          </svg>
-        </div>
-
-        {/* Main content — grid layout with image BEHIND landscape, text ABOVE */}
+{/* Main content — grid layout with image BEHIND landscape, text ABOVE */}
         <div className="container-site relative mx-auto px-[var(--spacing-container-gutter)] pt-8 min-[741px]:pt-10">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-6">
             {/* Left — Hero image, z-[1] so landscape (z-[2]) covers its bottom */}
@@ -174,7 +183,7 @@ export default function HomePage() {
           </h2>
 
           {/* Category filter pills */}
-          <HomeProductFilter categories={categories} products={products} />
+          <HomeProductFilter categories={categories} products={visibleProducts} />
 
           {/* "View all" link */}
           <div className="mt-4 text-right">
@@ -233,7 +242,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 4: Video Reels (TBOF-style carousel) ──────────────── */}
-      <VideoReelSection />
+      <VideoReelSection videos={videoItems} />
 
       {/* ── Section 5: Featured Video ───────────────────────────────────
            COMMENTED OUT — waiting for client to provide YouTube video ID.

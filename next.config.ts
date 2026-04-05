@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/webp"],
     deviceSizes: [375, 750, 1000, 1500],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
   },
 };
 
