@@ -83,8 +83,8 @@ export function Footer() {
               <Link href="/products" className="text-sm text-white/70 transition-colors hover:text-white">
                 All Products
               </Link>
-              <Link href="/products?category=bio-organic-solutions" className="text-sm text-white/70 transition-colors hover:text-white">
-                Bio-Organic Solutions
+              <Link href="/products?category=crop-care" className="text-sm text-white/70 transition-colors hover:text-white">
+                Crop Care
               </Link>
               <Link href="/products?category=seeds" className="text-sm text-white/70 transition-colors hover:text-white">
                 Seeds
