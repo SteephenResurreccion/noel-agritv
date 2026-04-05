@@ -103,45 +103,36 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree at left edge — trunk hugs x=0, canopy extends right */}
+      {/* Tree at left edge — half cropped, only right side of canopy visible */}
       <svg
-        className="pointer-events-none absolute left-0 top-0 h-[260px] w-[140px] min-[741px]:h-[340px] min-[741px]:w-[180px]"
-        viewBox="0 0 180 360"
+        className="pointer-events-none absolute -left-[70px] -top-[20px] h-[240px] w-[160px] min-[741px]:-left-[80px] min-[741px]:-top-[10px] min-[741px]:h-[320px] min-[741px]:w-[200px]"
+        viewBox="0 0 200 360"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk at the very left edge */}
-        <rect x="-4" y="200" width="18" height="160" rx="4" fill="#2A4038" />
-        {/* Branch extending right */}
-        <path d="M14 240 Q45 220 60 195" stroke="#2A4038" strokeWidth="6" fill="none" strokeLinecap="round" />
-        {/* Canopy — anchored at left edge, extending right */}
-        <ellipse cx="30" cy="140" rx="85" ry="75" fill="#2A4038" />
-        <ellipse cx="10" cy="115" rx="60" ry="48" fill="#172621" />
-        <ellipse cx="70" cy="125" rx="55" ry="45" fill="#2A4038" />
-        <ellipse cx="40" cy="85" rx="50" ry="40" fill="#172621" />
-        <ellipse cx="80" cy="100" rx="30" ry="25" fill="#2A4038" />
-        {/* Accent dot */}
-        <circle cx="125" cy="70" r="10" fill="#4D734C" fillOpacity="0.45" />
+        <rect x="90" y="210" width="16" height="150" rx="4" fill="#2A4038" />
+        <path d="M106 250 Q135 230 148 205" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <ellipse cx="100" cy="140" rx="85" ry="75" fill="#2A4038" />
+        <ellipse cx="75" cy="112" rx="60" ry="48" fill="#172621" />
+        <ellipse cx="135" cy="125" rx="55" ry="45" fill="#2A4038" />
+        <ellipse cx="105" cy="82" rx="48" ry="38" fill="#172621" />
+        <circle cx="175" cy="72" r="9" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Tree at right edge — trunk hugs right side, canopy extends left */}
+      {/* Tree at right edge — half cropped, only left side of canopy visible */}
       <svg
-        className="pointer-events-none absolute bottom-0 right-0 h-[240px] w-[130px] min-[741px]:h-[310px] min-[741px]:w-[170px]"
-        viewBox="0 0 170 340"
+        className="pointer-events-none absolute -bottom-[40px] -right-[65px] h-[220px] w-[150px] min-[741px]:-bottom-[30px] min-[741px]:-right-[75px] min-[741px]:h-[300px] min-[741px]:w-[190px]"
+        viewBox="0 0 190 340"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk at the very right edge */}
-        <rect x="156" y="190" width="18" height="150" rx="4" fill="#2A4038" />
-        {/* Branch extending left */}
-        <path d="M156 225 Q125 210 110 185" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
-        {/* Canopy — anchored at right edge, extending left */}
-        <ellipse cx="140" cy="125" rx="80" ry="68" fill="#2A4038" />
-        <ellipse cx="160" cy="100" rx="55" ry="44" fill="#172621" />
-        <ellipse cx="100" cy="115" rx="50" ry="42" fill="#2A4038" />
-        <ellipse cx="130" cy="75" rx="42" ry="35" fill="#172621" />
-        {/* Leaf accent */}
-        <path d="M58 150 Q68 130 62 108 Q78 126 66 148Z" fill="#3B593F" fillOpacity="0.45" />
+        <rect x="88" y="195" width="15" height="145" rx="4" fill="#2A4038" />
+        <path d="M88 230 Q58 215 45 190" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <ellipse cx="95" cy="130" rx="80" ry="68" fill="#2A4038" />
+        <ellipse cx="120" cy="105" rx="55" ry="44" fill="#172621" />
+        <ellipse cx="60" cy="118" rx="48" ry="40" fill="#2A4038" />
+        <ellipse cx="90" cy="78" rx="40" ry="34" fill="#172621" />
+        <path d="M22 158 Q32 138 26 115 Q42 133 30 155Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
