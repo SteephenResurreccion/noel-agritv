@@ -103,42 +103,48 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree top-left — single organic silhouette, left half cropped */}
+      {/* Tree top-left — translated off left edge, overflow-hidden crops it */}
       <svg
-        className="pointer-events-none absolute left-0 top-0 h-[200px] w-[90px] min-[741px]:h-[280px] min-[741px]:w-[120px]"
-        viewBox="-80 0 160 320"
+        className="pointer-events-none absolute left-0 top-0 h-[220px] w-[160px] -translate-x-[45%] min-[741px]:h-[300px] min-[741px]:w-[200px]"
+        viewBox="0 0 200 340"
         fill="none"
         aria-hidden="true"
       >
-        {/* Single organic tree shape — centered at x=0 so left half is cropped by viewBox */}
+        {/* Trunk */}
+        <rect x="90" y="200" width="16" height="140" rx="4" fill="#2A4038" />
+        {/* Canopy — natural rounded tree shape */}
         <path
-          d="M-8 320 L-8 190 Q-8 170 -20 155 Q-55 120 -60 80 Q-65 30 -10 10 Q30 -5 60 25 Q85 50 75 90 Q68 120 40 145 Q15 165 8 185 L8 320Z"
+          d="M98 210 Q40 190 25 140 Q10 90 40 50 Q65 15 100 10 Q140 5 165 40 Q190 75 178 125 Q168 170 130 195 Q110 208 98 210Z"
           fill="#2A4038"
         />
         <path
-          d="M-10 160 Q-45 130 -48 85 Q-52 40 -5 22 Q25 10 48 32 Q65 52 58 85 Q52 115 30 140 Q15 155 -10 160Z"
+          d="M98 185 Q55 170 42 130 Q30 90 55 60 Q75 35 100 30 Q130 25 150 50 Q170 75 160 115 Q152 150 125 172 Q110 185 98 185Z"
           fill="#172621"
         />
-        <circle cx="72" cy="45" r="8" fill="#4D734C" fillOpacity="0.45" />
+        {/* Accent dot */}
+        <circle cx="170" cy="38" r="9" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Tree bottom-right — single organic silhouette, right half cropped */}
+      {/* Tree bottom-right — translated off right edge, overflow-hidden crops it */}
       <svg
-        className="pointer-events-none absolute bottom-0 right-0 h-[190px] w-[85px] min-[741px]:h-[260px] min-[741px]:w-[110px]"
-        viewBox="-80 0 160 310"
+        className="pointer-events-none absolute bottom-0 right-0 h-[200px] w-[150px] translate-x-[45%] min-[741px]:h-[270px] min-[741px]:w-[185px]"
+        viewBox="0 0 185 310"
         fill="none"
         aria-hidden="true"
       >
-        {/* Mirrored tree — centered at x=0, right half cropped */}
+        {/* Trunk */}
+        <rect x="82" y="190" width="15" height="120" rx="4" fill="#2A4038" />
+        {/* Canopy */}
         <path
-          d="M8 310 L8 185 Q8 165 20 150 Q55 115 60 75 Q65 25 10 8 Q-30 -5 -60 22 Q-85 48 -75 85 Q-68 115 -40 140 Q-15 160 -8 180 L-8 310Z"
+          d="M90 200 Q145 180 162 135 Q178 88 150 50 Q125 18 90 12 Q50 6 28 38 Q5 68 15 115 Q24 158 60 182 Q78 195 90 200Z"
           fill="#2A4038"
         />
         <path
-          d="M10 155 Q45 125 48 80 Q52 35 5 18 Q-25 8 -48 28 Q-65 48 -58 80 Q-52 110 -30 135 Q-15 150 10 155Z"
+          d="M90 175 Q132 160 145 125 Q158 88 135 58 Q115 35 90 30 Q60 24 42 48 Q25 70 32 108 Q38 142 65 165 Q80 175 90 175Z"
           fill="#172621"
         />
-        <path d="M-68 48 Q-58 30 -62 10 Q-48 28 -60 46Z" fill="#3B593F" fillOpacity="0.45" />
+        {/* Leaf accent */}
+        <path d="M20 55 Q30 35 25 15 Q40 32 28 52Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
