@@ -7,13 +7,44 @@ import type { Category } from "@/data/categories";
 import { compressImage } from "@/lib/compress-image";
 import { addProduct } from "../actions";
 
+const CATEGORY_SPECS: Record<string, { label: string; value: string }[]> = {
+  "crop-care": [
+    { label: "Type", value: "" },
+    { label: "Application", value: "" },
+    { label: "Suitable For", value: "" },
+    { label: "Active Ingredient", value: "" },
+  ],
+  seeds: [
+    { label: "Variety", value: "" },
+    { label: "Season", value: "" },
+    { label: "Days to Maturity", value: "" },
+    { label: "Seed Rate", value: "" },
+  ],
+};
+
 export function AddProductForm({ categories }: { categories: Category[] }) {
   const [showForm, setShowForm] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [specs, setSpecs] = useState<{ label: string; value: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState(
+    categories[0]?.slug ?? ""
+  );
+  const [specs, setSpecs] = useState<{ label: string; value: string }[]>(
+    CATEGORY_SPECS[categories[0]?.slug] ?? []
+  );
   const [crops, setCrops] = useState<string[]>([]);
   const [cropInput, setCropInput] = useState("");
   const router = useRouter();
+
+  function handleCategoryChange(slug: string) {
+    setSelectedCategory(slug);
+    // Only auto-fill specs if the user hasn't typed any values yet
+    const hasValues = specs.some((s) => s.value.trim());
+    if (!hasValues) {
+      setSpecs(
+        CATEGORY_SPECS[slug]?.map((s) => ({ ...s })) ?? []
+      );
+    }
+  }
 
   function addSpec() {
     setSpecs([...specs, { label: "", value: "" }]);
@@ -64,7 +95,8 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
       await addProduct(formData);
       router.refresh();
       form.reset();
-      setSpecs([]);
+      setSelectedCategory(categories[0]?.slug ?? "");
+      setSpecs(CATEGORY_SPECS[categories[0]?.slug]?.map((s) => ({ ...s })) ?? []);
       setCrops([]);
       setCropInput("");
       setShowForm(false);
@@ -110,6 +142,8 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
               <select
                 name="categorySlug"
                 required
+                value={selectedCategory}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="h-9 w-full rounded-md border border-border bg-bg px-3 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
               >
                 {categories.map((cat) => (
@@ -149,7 +183,7 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
           <div className="mt-6 border-t border-border pt-4">
             <div className="mb-2 flex items-center justify-between">
               <label className="text-xs font-semibold text-text-secondary">
-                Specs (Type, Variety, Application, etc.)
+                Product Specs
               </label>
               <button
                 type="button"
@@ -159,11 +193,6 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
                 <Plus className="h-3 w-3" /> Add Spec
               </button>
             </div>
-            {specs.length === 0 && (
-              <p className="text-xs text-text-secondary/50">
-                No specs added yet. Click &quot;Add Spec&quot; to add product details like Type, Variety, Season, etc.
-              </p>
-            )}
             <div className="space-y-2">
               {specs.map((spec, i) => (
                 <div key={i} className="flex items-center gap-2">
