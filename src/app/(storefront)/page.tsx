@@ -169,15 +169,9 @@ export default function HomePage() {
       {/* ── Section 2: Our Products (TBOF-style: filter pills + product cards) */}
       <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
         <div className="container-site mx-auto">
-          <div>
-            <h2
-              className="font-bold text-brand-darkest"
-              style={{ fontSize: "var(--font-size-h2)" }}
-            >
-              Our Products
-            </h2>
-            <div className="mt-2 h-1 w-12 bg-brand-accent" />
-          </div>
+          <h2 className="font-heading text-[32px] font-bold italic text-brand-accent min-[741px]:text-[48px]">
+            Top Picks For You
+          </h2>
 
           {/* Category filter pills */}
           <HomeProductFilter categories={categories} products={products} />

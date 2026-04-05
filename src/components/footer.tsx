@@ -20,7 +20,7 @@ export function Footer() {
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
               <Image
-                src="/images/Use this for logo.png"
+                src="/images/NewLogo.png"
                 alt="Noel AgriTV"
                 width={80}
                 height={80}
