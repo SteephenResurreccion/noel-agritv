@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { toggleProductVisibility } from "../actions";
 
@@ -12,12 +13,20 @@ export function ProductToggle({
   visible: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function handleToggle() {
+    startTransition(async () => {
+      await toggleProductVisibility(slug);
+      router.refresh();
+    });
+  }
 
   return (
     <div className="inline-flex items-center gap-2">
       <button
         disabled={isPending}
-        onClick={() => startTransition(() => toggleProductVisibility(slug))}
+        onClick={handleToggle}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
           visible ? "bg-brand-accent" : "bg-gray-300"
         } ${isPending ? "opacity-50" : ""}`}
@@ -32,8 +41,8 @@ export function ProductToggle({
       <button
         disabled={isPending}
         onClick={() => {
-          if (confirm("Hide this product permanently? It will no longer appear on the storefront.")) {
-            startTransition(() => toggleProductVisibility(slug));
+          if (confirm("Hide this product permanently?")) {
+            handleToggle();
           }
         }}
         className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600"

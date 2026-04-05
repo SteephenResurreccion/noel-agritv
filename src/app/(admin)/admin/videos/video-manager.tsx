@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Trash2, Plus } from "lucide-react";
 import type { AdminVideo } from "@/lib/admin-store";
 import { compressImage } from "@/lib/compress-image";
@@ -18,6 +19,7 @@ export function VideoManager({
 }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   return (
     <div className="mt-6">
@@ -51,6 +53,7 @@ export function VideoManager({
             onClick={() =>
               startTransition(async () => {
                 await saveVideos(initialVideos);
+                router.refresh();
               })
             }
             className="mt-2 rounded-md bg-brand-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-50"
@@ -72,6 +75,7 @@ export function VideoManager({
 
 function VideoRow({ video }: { video: AdminVideo }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   return (
     <div
@@ -89,7 +93,10 @@ function VideoRow({ video }: { video: AdminVideo }) {
       <div className="flex shrink-0 items-center gap-1">
         <button
           onClick={() =>
-            startTransition(() => toggleVideoVisibility(video.id))
+            startTransition(async () => {
+              await toggleVideoVisibility(video.id);
+              router.refresh();
+            })
           }
           className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
           title={video.visible ? "Hide" : "Show"}
@@ -103,7 +110,10 @@ function VideoRow({ video }: { video: AdminVideo }) {
         <button
           onClick={() => {
             if (confirm("Remove this video?")) {
-              startTransition(() => removeVideo(video.id));
+              startTransition(async () => {
+                await removeVideo(video.id);
+                router.refresh();
+              });
             }
           }}
           className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600"
@@ -118,6 +128,7 @@ function VideoRow({ video }: { video: AdminVideo }) {
 
 function AddVideoForm({ onDone }: { onDone: () => void }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -133,6 +144,7 @@ function AddVideoForm({ onDone }: { onDone: () => void }) {
 
     startTransition(async () => {
       await addVideo(formData);
+      router.refresh();
       form.reset();
       onDone();
     });

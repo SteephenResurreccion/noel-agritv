@@ -1,12 +1,14 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Trash2 } from "lucide-react";
 import type { AdminProduct } from "@/lib/admin-store";
 import { toggleCustomProductVisibility, removeProduct } from "../actions";
 
 export function CustomProductRow({ product }: { product: AdminProduct }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   return (
     <tr
@@ -22,7 +24,10 @@ export function CustomProductRow({ product }: { product: AdminProduct }) {
         <div className="inline-flex items-center gap-1">
           <button
             onClick={() =>
-              startTransition(() => toggleCustomProductVisibility(product.id))
+              startTransition(async () => {
+                await toggleCustomProductVisibility(product.id);
+                router.refresh();
+              })
             }
             className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
             title={product.visible ? "Hide" : "Show"}
@@ -36,7 +41,10 @@ export function CustomProductRow({ product }: { product: AdminProduct }) {
           <button
             onClick={() => {
               if (confirm("Remove this product?")) {
-                startTransition(() => removeProduct(product.id));
+                startTransition(async () => {
+                  await removeProduct(product.id);
+                  router.refresh();
+                });
               }
             }}
             className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600"
