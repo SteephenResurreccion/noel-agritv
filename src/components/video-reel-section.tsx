@@ -103,45 +103,45 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Upright tree at top-left corner — trunk goes down, canopy up, partially cropped by edge */}
+      {/* Tree at left edge — trunk hugs x=0, canopy extends right */}
       <svg
-        className="pointer-events-none absolute -left-[60px] -top-[30px] h-[250px] w-[180px] min-[741px]:-left-[50px] min-[741px]:-top-[20px] min-[741px]:h-[320px] min-[741px]:w-[220px]"
-        viewBox="0 0 220 360"
+        className="pointer-events-none absolute left-0 top-0 h-[260px] w-[140px] min-[741px]:h-[340px] min-[741px]:w-[180px]"
+        viewBox="0 0 180 360"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk — vertical, rooted at bottom */}
-        <rect x="100" y="200" width="18" height="160" rx="4" fill="#2A4038" />
+        {/* Trunk at the very left edge */}
+        <rect x="-4" y="200" width="18" height="160" rx="4" fill="#2A4038" />
         {/* Branch extending right */}
-        <path d="M118 240 Q150 220 165 195" stroke="#2A4038" strokeWidth="6" fill="none" strokeLinecap="round" />
-        {/* Main canopy — large organic mass */}
-        <ellipse cx="115" cy="140" rx="85" ry="75" fill="#2A4038" />
-        <ellipse cx="85" cy="115" rx="60" ry="48" fill="#172621" />
-        <ellipse cx="150" cy="125" rx="55" ry="45" fill="#2A4038" />
-        <ellipse cx="115" cy="85" rx="50" ry="40" fill="#172621" />
-        <ellipse cx="155" cy="95" rx="30" ry="25" fill="#2A4038" />
-        {/* Small accent dot */}
-        <circle cx="195" cy="68" r="10" fill="#4D734C" fillOpacity="0.45" />
+        <path d="M14 240 Q45 220 60 195" stroke="#2A4038" strokeWidth="6" fill="none" strokeLinecap="round" />
+        {/* Canopy — anchored at left edge, extending right */}
+        <ellipse cx="30" cy="140" rx="85" ry="75" fill="#2A4038" />
+        <ellipse cx="10" cy="115" rx="60" ry="48" fill="#172621" />
+        <ellipse cx="70" cy="125" rx="55" ry="45" fill="#2A4038" />
+        <ellipse cx="40" cy="85" rx="50" ry="40" fill="#172621" />
+        <ellipse cx="80" cy="100" rx="30" ry="25" fill="#2A4038" />
+        {/* Accent dot */}
+        <circle cx="125" cy="70" r="10" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Upright tree at bottom-right corner — partially cropped by edge */}
+      {/* Tree at right edge — trunk hugs right side, canopy extends left */}
       <svg
-        className="pointer-events-none absolute -bottom-[60px] -right-[55px] h-[230px] w-[170px] min-[741px]:-bottom-[50px] min-[741px]:-right-[45px] min-[741px]:h-[300px] min-[741px]:w-[210px]"
-        viewBox="0 0 210 340"
+        className="pointer-events-none absolute bottom-0 right-0 h-[240px] w-[130px] min-[741px]:h-[310px] min-[741px]:w-[170px]"
+        viewBox="0 0 170 340"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk */}
-        <rect x="95" y="190" width="16" height="150" rx="4" fill="#2A4038" />
+        {/* Trunk at the very right edge */}
+        <rect x="156" y="190" width="18" height="150" rx="4" fill="#2A4038" />
         {/* Branch extending left */}
-        <path d="M95 230 Q65 215 50 190" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
-        {/* Canopy */}
-        <ellipse cx="105" cy="130" rx="78" ry="68" fill="#2A4038" />
-        <ellipse cx="130" cy="108" rx="55" ry="44" fill="#172621" />
-        <ellipse cx="75" cy="118" rx="48" ry="40" fill="#2A4038" />
-        <ellipse cx="105" cy="80" rx="42" ry="35" fill="#172621" />
-        {/* Small leaf */}
-        <path d="M38 165 Q48 145 42 122 Q58 140 46 162Z" fill="#3B593F" fillOpacity="0.45" />
+        <path d="M156 225 Q125 210 110 185" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
+        {/* Canopy — anchored at right edge, extending left */}
+        <ellipse cx="140" cy="125" rx="80" ry="68" fill="#2A4038" />
+        <ellipse cx="160" cy="100" rx="55" ry="44" fill="#172621" />
+        <ellipse cx="100" cy="115" rx="50" ry="42" fill="#2A4038" />
+        <ellipse cx="130" cy="75" rx="42" ry="35" fill="#172621" />
+        {/* Leaf accent */}
+        <path d="M58 150 Q68 130 62 108 Q78 126 66 148Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
