@@ -58,7 +58,15 @@ function validateImageFile(file: File): void {
 
 async function requireAuth() {
   const session = await auth();
-  if (!session) throw new Error("Unauthorized");
+  if (!session?.user?.role) throw new Error("Unauthorized");
+  return session;
+}
+
+async function requireOwner() {
+  const session = await requireAuth();
+  if (session.user.role !== "owner") {
+    throw new Error("Only the owner can perform this action.");
+  }
   return session;
 }
 
@@ -351,5 +359,57 @@ export async function moveVideo(id: string, direction: "up" | "down") {
   } catch (e) {
     console.error("moveVideo failed:", e);
     throw new Error("Failed to reorder video. Please try again.");
+  }
+}
+
+// ── Team Management (Owner only) ──
+
+export async function addManager(email: string) {
+  await requireOwner();
+  try {
+    const validated = z.string().email().toLowerCase().parse(email.trim());
+
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+
+    // Check not already a manager
+    if (config.managers.map((e) => e.toLowerCase()).includes(validated)) {
+      throw new Error("This email is already a manager.");
+    }
+
+    // Check not an owner
+    const { getOwnerEmails } = await import("@/lib/admin-store");
+    if (getOwnerEmails().includes(validated)) {
+      throw new Error("This email is already an owner.");
+    }
+
+    config.managers = [...config.managers, validated];
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/team");
+  } catch (e) {
+    console.error("addManager failed:", e);
+    if (e instanceof Error && (e.message.includes("already") || e.message.includes("owner"))) {
+      throw e;
+    }
+    throw new Error("Failed to add manager. Please try again.");
+  }
+}
+
+export async function removeManager(email: string) {
+  await requireOwner();
+  try {
+    const validated = z.string().email().toLowerCase().parse(email.trim());
+
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+
+    config.managers = config.managers.filter(
+      (e) => e.toLowerCase() !== validated
+    );
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/team");
+  } catch (e) {
+    console.error("removeManager failed:", e);
+    throw new Error("Failed to remove manager. Please try again.");
   }
 }

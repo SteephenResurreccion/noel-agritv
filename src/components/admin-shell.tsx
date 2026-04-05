@@ -1,12 +1,22 @@
 import { auth, signOut } from "@/auth";
 import Image from "next/image";
 import Link from "next/link";
-import { LayoutDashboard, Package, Video, ExternalLink } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Video,
+  ExternalLink,
+  Users,
+} from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/videos", label: "Videos", icon: Video },
+];
+
+const OWNER_NAV_ITEMS = [
+  { href: "/admin/team", label: "Team", icon: Users },
 ];
 
 export async function AdminShell({ children }: { children: React.ReactNode }) {
@@ -43,6 +53,17 @@ export async function AdminShell({ children }: { children: React.ReactNode }) {
               {item.label}
             </Link>
           ))}
+          {session?.user?.role === "owner" &&
+            OWNER_NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            ))}
         </nav>
 
         <div className="mt-auto border-t border-border px-2 py-3">
@@ -85,6 +106,17 @@ export async function AdminShell({ children }: { children: React.ReactNode }) {
             <span className="text-sm text-text-secondary">
               {session?.user?.name}
             </span>
+            {session?.user?.role && (
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  session.user.role === "owner"
+                    ? "bg-amber-50 text-amber-700"
+                    : "bg-brand-accent/10 text-brand-accent"
+                }`}
+              >
+                {session.user.role === "owner" ? "Owner" : "Manager"}
+              </span>
+            )}
             <form
               action={async () => {
                 "use server";

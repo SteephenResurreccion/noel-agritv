@@ -2,6 +2,8 @@ import { put, get } from "@vercel/blob";
 
 const CONFIG_PATH = "admin/config.json";
 
+export type AdminRole = "owner" | "manager";
+
 export interface AdminConfig {
   /** Optimistic lock — incremented on each save to detect concurrent writes */
   version: number;
@@ -11,6 +13,8 @@ export interface AdminConfig {
   videos: AdminVideo[] | null;
   /** Admin-created products */
   customProducts: AdminProduct[] | null;
+  /** Manager emails — these users can manage products/videos but not team */
+  managers: string[];
 }
 
 export interface AdminVideo {
@@ -45,6 +49,7 @@ const DEFAULT_CONFIG: AdminConfig = {
   hiddenProducts: [],
   videos: null,
   customProducts: null,
+  managers: [],
 };
 
 /**
@@ -79,6 +84,33 @@ export async function getAdminConfig(
  * Pass expectedVersion (from the config you read) to detect concurrent writes.
  * If another save happened in between, this throws to prevent data loss.
  */
+/** Get owner emails from env var */
+export function getOwnerEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** Resolve an email to a role, or null if unauthorized */
+export async function resolveRole(
+  email: string
+): Promise<AdminRole | null> {
+  const normalized = email.toLowerCase();
+  const owners = getOwnerEmails();
+  if (owners.includes(normalized)) return "owner";
+
+  try {
+    const config = await getAdminConfig();
+    if (config.managers.map((e) => e.toLowerCase()).includes(normalized)) {
+      return "manager";
+    }
+  } catch {
+    // Blob not configured — only owners allowed
+  }
+  return null;
+}
+
 export async function saveAdminConfig(
   config: AdminConfig,
   expectedVersion?: number

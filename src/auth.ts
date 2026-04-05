@@ -1,5 +1,18 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { resolveRole } from "@/lib/admin-store";
+import type { AdminRole } from "@/lib/admin-store";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role?: AdminRole;
+    };
+  }
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
@@ -8,16 +21,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async signIn({ profile }) {
-      // Only allow whitelisted admin emails
-      const allowed = (process.env.ADMIN_EMAILS ?? "")
-        .split(",")
-        .map((e) => e.trim().toLowerCase())
-        .filter(Boolean);
+      const email = profile?.email;
+      if (!email) return false;
 
-      if (allowed.length === 0) return false;
-      return allowed.includes(profile?.email?.toLowerCase() ?? "");
+      const role = await resolveRole(email);
+      return role !== null;
     },
     async session({ session }) {
+      if (session.user?.email) {
+        const role = await resolveRole(session.user.email);
+        session.user.role = role ?? undefined;
+      }
       return session;
     },
   },
