@@ -117,9 +117,9 @@
   --spacing-grid-gap: 24px;
   --spacing-container-gutter: 24px;
 
-  /* Radii — TBOF uses 0px cards, 4px buttons */
+  /* Radii */
   --radius-button: 4px;
-  --radius-card: 0px;
+  --radius-card: 6px;
 }
 
 .dark {
