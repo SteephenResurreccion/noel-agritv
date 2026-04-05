@@ -102,25 +102,61 @@ export function VideoReelSection() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Decorative organic shapes */}
+    <section className="relative overflow-hidden bg-bg py-[var(--spacing-section)]">
+      {/* Wavy green background wash — spans full section */}
       <svg
-        className="absolute -left-8 -top-4 h-24 w-48 text-brand-accent/20"
-        viewBox="0 0 200 100"
-        fill="currentColor"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 1440 600"
+        fill="none"
+        preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <ellipse cx="60" cy="50" rx="80" ry="45" />
-        <ellipse cx="150" cy="40" rx="50" ry="30" />
+        <path
+          d="M-50 80 C200 -20,400 120,700 60 C1000 0,1200 100,1500 40 L1500 520 C1200 580,900 460,600 530 C300 600,100 480,-50 540Z"
+          fill="#d4e6c8"
+          fillOpacity="0.35"
+        />
+        <path
+          d="M-50 140 C250 60,500 180,800 110 C1100 40,1300 150,1500 100 L1500 480 C1250 540,1000 430,700 500 C400 570,150 440,-50 500Z"
+          fill="#c2d9b4"
+          fillOpacity="0.2"
+        />
       </svg>
+
+      {/* Tree silhouette — top left */}
       <svg
-        className="absolute -bottom-6 -right-6 h-20 w-40 text-brand-accent/15"
-        viewBox="0 0 160 80"
-        fill="currentColor"
+        className="pointer-events-none absolute -left-4 -top-2 h-[140px] w-[120px] min-[741px]:h-[180px] min-[741px]:w-[150px]"
+        viewBox="0 0 150 200"
+        fill="none"
         aria-hidden="true"
       >
-        <ellipse cx="80" cy="40" rx="70" ry="38" />
-        <ellipse cx="140" cy="50" rx="30" ry="20" />
+        {/* Trunk */}
+        <rect x="60" y="120" width="14" height="70" rx="3" fill="#2A4038" />
+        {/* Canopy */}
+        <ellipse cx="67" cy="80" rx="55" ry="50" fill="#2A4038" />
+        <ellipse cx="45" cy="65" rx="35" ry="30" fill="#2A4038" />
+        <ellipse cx="90" cy="72" rx="38" ry="32" fill="#2A4038" />
+        <ellipse cx="67" cy="50" rx="30" ry="24" fill="#172621" />
+        {/* Small circle accent like TBOI */}
+        <circle cx="120" cy="40" r="8" fill="#4D734C" fillOpacity="0.6" />
+      </svg>
+
+      {/* Tree silhouette — bottom right */}
+      <svg
+        className="pointer-events-none absolute -bottom-4 -right-4 h-[130px] w-[110px] min-[741px]:h-[170px] min-[741px]:w-[140px]"
+        viewBox="0 0 140 190"
+        fill="none"
+        aria-hidden="true"
+      >
+        {/* Trunk */}
+        <rect x="55" y="110" width="12" height="70" rx="3" fill="#2A4038" />
+        {/* Canopy */}
+        <ellipse cx="61" cy="75" rx="48" ry="44" fill="#2A4038" />
+        <ellipse cx="40" cy="60" rx="30" ry="26" fill="#2A4038" />
+        <ellipse cx="82" cy="66" rx="32" ry="28" fill="#2A4038" />
+        <ellipse cx="61" cy="46" rx="26" ry="20" fill="#172621" />
+        {/* Leaf accent */}
+        <path d="M15 140 Q25 120 20 100 Q30 115 22 138Z" fill="#3B593F" fillOpacity="0.7" />
       </svg>
 
       {/* Heading */}
