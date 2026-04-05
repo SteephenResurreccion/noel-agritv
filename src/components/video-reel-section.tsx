@@ -103,44 +103,42 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree at left edge — trunk flush with left side, canopy extends right */}
+      {/* Tree top-left — single organic silhouette, left half cropped */}
       <svg
-        className="pointer-events-none absolute left-0 top-0 h-[240px] w-[120px] min-[741px]:h-[320px] min-[741px]:w-[150px]"
-        viewBox="0 0 150 360"
+        className="pointer-events-none absolute left-0 top-0 h-[200px] w-[90px] min-[741px]:h-[280px] min-[741px]:w-[120px]"
+        viewBox="-80 0 160 320"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk at x=0, touching the left edge */}
-        <rect x="-2" y="210" width="16" height="150" rx="4" fill="#2A4038" />
-        {/* Branch */}
-        <path d="M14 248 Q40 228 52 205" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
-        {/* Canopy — left half extends past x=0 (clipped by viewBox), right half visible */}
-        <ellipse cx="10" cy="140" rx="80" ry="72" fill="#2A4038" />
-        <ellipse cx="-10" cy="112" rx="55" ry="45" fill="#172621" />
-        <ellipse cx="50" cy="125" rx="52" ry="44" fill="#2A4038" />
-        <ellipse cx="15" cy="82" rx="45" ry="36" fill="#172621" />
-        {/* Accent dot */}
-        <circle cx="95" cy="72" r="9" fill="#4D734C" fillOpacity="0.45" />
+        {/* Single organic tree shape — centered at x=0 so left half is cropped by viewBox */}
+        <path
+          d="M-8 320 L-8 190 Q-8 170 -20 155 Q-55 120 -60 80 Q-65 30 -10 10 Q30 -5 60 25 Q85 50 75 90 Q68 120 40 145 Q15 165 8 185 L8 320Z"
+          fill="#2A4038"
+        />
+        <path
+          d="M-10 160 Q-45 130 -48 85 Q-52 40 -5 22 Q25 10 48 32 Q65 52 58 85 Q52 115 30 140 Q15 155 -10 160Z"
+          fill="#172621"
+        />
+        <circle cx="72" cy="45" r="8" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Tree at right edge — trunk flush with right side, canopy extends left */}
+      {/* Tree bottom-right — single organic silhouette, right half cropped */}
       <svg
-        className="pointer-events-none absolute bottom-0 right-0 h-[220px] w-[110px] min-[741px]:h-[300px] min-[741px]:w-[140px]"
-        viewBox="0 0 140 340"
+        className="pointer-events-none absolute bottom-0 right-0 h-[190px] w-[85px] min-[741px]:h-[260px] min-[741px]:w-[110px]"
+        viewBox="-80 0 160 310"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk at right edge */}
-        <rect x="126" y="195" width="16" height="145" rx="4" fill="#2A4038" />
-        {/* Branch */}
-        <path d="M126 228 Q98 212 85 188" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
-        {/* Canopy — right half extends past viewBox (clipped), left half visible */}
-        <ellipse cx="130" cy="128" rx="78" ry="66" fill="#2A4038" />
-        <ellipse cx="150" cy="102" rx="52" ry="42" fill="#172621" />
-        <ellipse cx="90" cy="116" rx="48" ry="40" fill="#2A4038" />
-        <ellipse cx="125" cy="76" rx="40" ry="32" fill="#172621" />
-        {/* Leaf accent */}
-        <path d="M42 152 Q52 132 46 110 Q60 128 48 150Z" fill="#3B593F" fillOpacity="0.45" />
+        {/* Mirrored tree — centered at x=0, right half cropped */}
+        <path
+          d="M8 310 L8 185 Q8 165 20 150 Q55 115 60 75 Q65 25 10 8 Q-30 -5 -60 22 Q-85 48 -75 85 Q-68 115 -40 140 Q-15 160 -8 180 L-8 310Z"
+          fill="#2A4038"
+        />
+        <path
+          d="M10 155 Q45 125 48 80 Q52 35 5 18 Q-25 8 -48 28 Q-65 48 -58 80 Q-52 110 -30 135 Q-15 150 10 155Z"
+          fill="#172621"
+        />
+        <path d="M-68 48 Q-58 30 -62 10 Q-48 28 -60 46Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
