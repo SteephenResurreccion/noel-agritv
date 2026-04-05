@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/data/products";
 import { getCategoryBySlug } from "@/data/categories";
-import { formatPrice } from "@/lib/utils";
 import { MessengerCTA } from "./messenger-cta";
 
 interface ProductCardProps {
@@ -11,7 +10,6 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const category = getCategoryBySlug(product.categorySlug);
-  const defaultVariant = product.variants[0];
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-md bg-surface shadow-sm">
@@ -26,29 +24,18 @@ export function ProductCard({ product }: ProductCardProps) {
         />
       </Link>
       <div className="flex flex-1 flex-col gap-1.5 px-4 py-4">
-        <div className="flex items-start justify-between gap-2">
-          <Link href={`/products/${product.slug}`} className="hover:underline">
-            <h3 className="text-base font-bold leading-snug text-brand-darkest">
-              {product.name}
-            </h3>
-          </Link>
-          <p className="shrink-0 text-base font-bold text-brand-darkest">
-            {formatPrice(defaultVariant.price)}
-          </p>
-        </div>
+        <Link href={`/products/${product.slug}`} className="hover:underline">
+          <h3 className="text-base font-bold leading-snug text-brand-darkest">
+            {product.name}
+          </h3>
+        </Link>
         <p className="text-[13px] text-text-secondary">
           {product.oneLiner}
-          {product.variants.length > 1 && (
-            <span> · {defaultVariant.packSize}</span>
-          )}
-          {product.variants.length === 1 && (
-            <span> · {defaultVariant.packSize}</span>
-          )}
         </p>
         <div className="mt-auto pt-3">
           <MessengerCTA
             productName={product.name}
-            packSize={defaultVariant.packSize}
+            packSize=""
             label="ASK ON MESSENGER"
             variant="default"
             size="default"

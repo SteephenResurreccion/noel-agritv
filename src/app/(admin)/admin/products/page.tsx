@@ -2,7 +2,6 @@ import { AdminShell } from "@/components/admin-shell";
 import { products } from "@/data/products";
 import { getAdminConfig } from "@/lib/admin-store";
 import { getCategoryBySlug } from "@/data/categories";
-import { formatPrice } from "@/lib/utils";
 import { ProductToggle } from "./product-toggle";
 
 export default async function AdminProductsPage() {
@@ -35,9 +34,6 @@ export default async function AdminProductsPage() {
               <th className="hidden px-4 py-3 font-semibold text-text-secondary md:table-cell">
                 Category
               </th>
-              <th className="hidden px-4 py-3 font-semibold text-text-secondary md:table-cell">
-                Price
-              </th>
               <th className="px-4 py-3 text-right font-semibold text-text-secondary">
                 Visible
               </th>
@@ -58,14 +54,11 @@ export default async function AdminProductsPage() {
                       {product.name}
                     </p>
                     <p className="text-xs text-text-secondary md:hidden">
-                      {category?.name} · {formatPrice(product.variants[0].price)}
+                      {category?.name}
                     </p>
                   </td>
                   <td className="hidden px-4 py-3 text-text-secondary md:table-cell">
                     {category?.name}
-                  </td>
-                  <td className="hidden px-4 py-3 text-text-secondary md:table-cell">
-                    {formatPrice(product.variants[0].price)}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <ProductToggle slug={product.slug} visible={isVisible} />
