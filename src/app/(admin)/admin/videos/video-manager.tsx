@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Eye, EyeOff, Trash2, Plus } from "lucide-react";
 import type { AdminVideo } from "@/lib/admin-store";
+import { compressImage } from "@/lib/compress-image";
 import {
   saveVideos,
   removeVideo,
@@ -36,12 +37,7 @@ export function VideoManager({
       </div>
 
       {/* Add form */}
-      {showAddForm && (
-        <AddVideoForm
-          onDone={() => setShowAddForm(false)}
-          existingCount={initialVideos.length}
-        />
-      )}
+      {showAddForm && <AddVideoForm onDone={() => setShowAddForm(false)} />}
 
       {/* Initialize button — shown only when Blob has no videos yet */}
       {initialVideos[0]?.id === "v1" && (
@@ -83,7 +79,7 @@ function VideoRow({ video }: { video: AdminVideo }) {
         !video.visible ? "opacity-50" : ""
       } ${isPending ? "pointer-events-none opacity-30" : ""}`}
     >
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-text-primary">
           {video.title}
         </p>
@@ -120,27 +116,23 @@ function VideoRow({ video }: { video: AdminVideo }) {
   );
 }
 
-function AddVideoForm({
-  onDone,
-  existingCount,
-}: {
-  onDone: () => void;
-  existingCount: number;
-}) {
+function AddVideoForm({ onDone }: { onDone: () => void }) {
   const [isPending, startTransition] = useTransition();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const data = new FormData(form);
+    const formData = new FormData(form);
+
+    // Compress thumbnail before upload
+    const thumbnailFile = formData.get("thumbnail") as File;
+    if (thumbnailFile && thumbnailFile.size > 0) {
+      const compressed = await compressImage(thumbnailFile, 400, 0.75);
+      formData.set("thumbnail", compressed);
+    }
 
     startTransition(async () => {
-      await addVideo({
-        title: data.get("title") as string,
-        href: data.get("href") as string,
-        thumbnail: (data.get("thumbnail") as string) || "/images/NewLogo.png",
-        visible: true,
-      });
+      await addVideo(formData);
       form.reset();
       onDone();
     });
@@ -151,10 +143,10 @@ function AddVideoForm({
       onSubmit={handleSubmit}
       className="mb-4 rounded-lg border border-border bg-surface p-4"
     >
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-xs font-semibold text-text-secondary">
-            Title
+            Title *
           </label>
           <input
             name="title"
@@ -165,7 +157,7 @@ function AddVideoForm({
         </div>
         <div>
           <label className="mb-1 block text-xs font-semibold text-text-secondary">
-            Facebook Video URL
+            Facebook Video URL *
           </label>
           <input
             name="href"
@@ -175,15 +167,20 @@ function AddVideoForm({
             className="h-9 w-full rounded-md border border-border bg-bg px-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
           />
         </div>
-        <div>
+        <div className="md:col-span-2">
           <label className="mb-1 block text-xs font-semibold text-text-secondary">
-            Thumbnail Path (optional)
+            Thumbnail Image *
           </label>
           <input
             name="thumbnail"
-            placeholder="/images/videos/my-video.jpg"
-            className="h-9 w-full rounded-md border border-border bg-bg px-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+            type="file"
+            required
+            accept="image/*"
+            className="w-full text-sm text-text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-brand-accent/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-accent hover:file:bg-brand-accent/20"
           />
+          <p className="mt-1 text-xs text-text-secondary/60">
+            Image will be compressed automatically before upload.
+          </p>
         </div>
       </div>
       <div className="mt-3 flex gap-2">

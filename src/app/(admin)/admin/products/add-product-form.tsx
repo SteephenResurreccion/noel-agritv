@@ -3,16 +3,24 @@
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
 import type { Category } from "@/data/categories";
+import { compressImage } from "@/lib/compress-image";
 import { addProduct } from "../actions";
 
 export function AddProductForm({ categories }: { categories: Category[] }) {
   const [showForm, setShowForm] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+
+    // Compress image before upload
+    const imageFile = formData.get("image") as File;
+    if (imageFile && imageFile.size > 0) {
+      const compressed = await compressImage(imageFile, 800, 0.8);
+      formData.set("image", compressed);
+    }
 
     startTransition(async () => {
       await addProduct(formData);

@@ -117,17 +117,37 @@ export async function saveVideos(videos: AdminVideo[]) {
   revalidatePath("/");
 }
 
-export async function addVideo(video: Omit<AdminVideo, "id">) {
+export async function addVideo(formData: FormData) {
   await requireAuth();
+
+  const title = formData.get("title") as string;
+  const href = formData.get("href") as string;
+  const thumbnailFile = formData.get("thumbnail") as File;
+
+  // Upload thumbnail to Vercel Blob
+  let thumbnailUrl = "/images/NewLogo.png";
+  if (thumbnailFile && thumbnailFile.size > 0) {
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const ext = thumbnailFile.name.split(".").pop() || "webp";
+    const blob = await put(`videos/${slug}.${ext}`, thumbnailFile, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: thumbnailFile.type,
+    });
+    thumbnailUrl = blob.url;
+  }
+
   const config = await getAdminConfig();
 
   const newVideo: AdminVideo = {
-    ...video,
     id: crypto.randomUUID(),
+    title,
+    href,
+    thumbnail: thumbnailUrl,
+    visible: true,
   };
 
   if (!config.videos) {
-    // Initialize from default static list — caller should pass the defaults
     config.videos = [newVideo];
   } else {
     config.videos.push(newVideo);
