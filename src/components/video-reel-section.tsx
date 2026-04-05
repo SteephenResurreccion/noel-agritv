@@ -103,40 +103,45 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree leaning in from left edge */}
+      {/* Upright tree at top-left corner — trunk goes down, canopy up, partially cropped by edge */}
       <svg
-        className="pointer-events-none absolute -left-[80px] top-4 h-[160px] w-[220px] min-[741px]:-left-[70px] min-[741px]:top-2 min-[741px]:h-[220px] min-[741px]:w-[300px]"
-        viewBox="0 0 300 200"
+        className="pointer-events-none absolute -left-[60px] -top-[30px] h-[250px] w-[180px] min-[741px]:-left-[50px] min-[741px]:-top-[20px] min-[741px]:h-[320px] min-[741px]:w-[220px]"
+        viewBox="0 0 220 360"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk extends from left edge horizontally */}
-        <rect x="0" y="100" width="120" height="16" rx="4" fill="#2A4038" />
-        {/* Canopy cluster at the end of trunk */}
-        <ellipse cx="160" cy="90" rx="70" ry="60" fill="#2A4038" />
-        <ellipse cx="135" cy="70" rx="50" ry="40" fill="#172621" />
-        <ellipse cx="190" cy="80" rx="45" ry="38" fill="#2A4038" />
-        <ellipse cx="160" cy="55" rx="35" ry="28" fill="#172621" />
-        {/* Small accent circle */}
-        <circle cx="230" cy="42" r="9" fill="#4D734C" fillOpacity="0.5" />
+        {/* Trunk — vertical, rooted at bottom */}
+        <rect x="100" y="200" width="18" height="160" rx="4" fill="#2A4038" />
+        {/* Branch extending right */}
+        <path d="M118 240 Q150 220 165 195" stroke="#2A4038" strokeWidth="6" fill="none" strokeLinecap="round" />
+        {/* Main canopy — large organic mass */}
+        <ellipse cx="115" cy="140" rx="85" ry="75" fill="#2A4038" />
+        <ellipse cx="85" cy="115" rx="60" ry="48" fill="#172621" />
+        <ellipse cx="150" cy="125" rx="55" ry="45" fill="#2A4038" />
+        <ellipse cx="115" cy="85" rx="50" ry="40" fill="#172621" />
+        <ellipse cx="155" cy="95" rx="30" ry="25" fill="#2A4038" />
+        {/* Small accent dot */}
+        <circle cx="195" cy="68" r="10" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Tree leaning in from right edge */}
+      {/* Upright tree at bottom-right corner — partially cropped by edge */}
       <svg
-        className="pointer-events-none absolute -right-[80px] bottom-4 h-[150px] w-[210px] min-[741px]:-right-[70px] min-[741px]:bottom-2 min-[741px]:h-[200px] min-[741px]:w-[280px]"
-        viewBox="0 0 280 190"
+        className="pointer-events-none absolute -bottom-[60px] -right-[55px] h-[230px] w-[170px] min-[741px]:-bottom-[50px] min-[741px]:-right-[45px] min-[741px]:h-[300px] min-[741px]:w-[210px]"
+        viewBox="0 0 210 340"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk extends from right edge horizontally */}
-        <rect x="160" y="100" width="120" height="14" rx="4" fill="#2A4038" />
-        {/* Canopy cluster at the end of trunk */}
-        <ellipse cx="120" cy="85" rx="65" ry="55" fill="#2A4038" />
-        <ellipse cx="145" cy="65" rx="45" ry="36" fill="#172621" />
-        <ellipse cx="90" cy="75" rx="42" ry="35" fill="#2A4038" />
-        <ellipse cx="120" cy="48" rx="32" ry="26" fill="#172621" />
-        {/* Small leaf accent */}
-        <path d="M50 60 Q60 40 55 20 Q70 38 58 58Z" fill="#3B593F" fillOpacity="0.5" />
+        {/* Trunk */}
+        <rect x="95" y="190" width="16" height="150" rx="4" fill="#2A4038" />
+        {/* Branch extending left */}
+        <path d="M95 230 Q65 215 50 190" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
+        {/* Canopy */}
+        <ellipse cx="105" cy="130" rx="78" ry="68" fill="#2A4038" />
+        <ellipse cx="130" cy="108" rx="55" ry="44" fill="#172621" />
+        <ellipse cx="75" cy="118" rx="48" ry="40" fill="#2A4038" />
+        <ellipse cx="105" cy="80" rx="42" ry="35" fill="#172621" />
+        {/* Small leaf */}
+        <path d="M38 165 Q48 145 42 122 Q58 140 46 162Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
