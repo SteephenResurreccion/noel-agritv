@@ -102,7 +102,7 @@ export function Footer() {
             </p>
             <nav className="mt-4 flex flex-col gap-2.5" aria-label="Footer company links">
               <Link href="/about" className="text-sm text-white/70 transition-colors hover:text-white">
-                About Noel
+                About Noel AgriTV
               </Link>
               <Link href="/contact" className="text-sm text-white/70 transition-colors hover:text-white">
                 Contact Us

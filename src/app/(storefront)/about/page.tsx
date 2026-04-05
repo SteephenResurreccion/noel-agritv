@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-import { products } from "@/data/products";
 import { FACEBOOK_URL, YOUTUBE_URL, MESSENGER_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -14,8 +13,6 @@ export const metadata: Metadata = {
 const stats = [
   { value: "250k+", label: "Facebook Followers" },
   { value: "2021", label: "Founded" },
-  { value: `${products.length}+`, label: "Products" },
-  { value: "81", label: "Provinces Reached" },
 ];
 
 export default function AboutPage() {
