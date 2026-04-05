@@ -5,7 +5,9 @@ import {
   getAdminConfig,
   saveAdminConfig,
   type AdminVideo,
+  type AdminProduct,
 } from "@/lib/admin-store";
+import { put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 
 async function requireAuth() {
@@ -27,6 +29,78 @@ export async function toggleProductVisibility(slug: string) {
   }
 
   await saveAdminConfig(config);
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  revalidatePath("/products");
+}
+
+export async function addProduct(formData: FormData) {
+  await requireAuth();
+
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+  const categorySlug = formData.get("categorySlug") as string;
+  const imageFile = formData.get("image") as File;
+
+  // Upload image to Vercel Blob
+  let imageUrl = "/images/NewLogo.png"; // fallback
+  if (imageFile && imageFile.size > 0) {
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const ext = imageFile.name.split(".").pop() || "jpg";
+    const blob = await put(`products/${slug}.${ext}`, imageFile, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: imageFile.type,
+    });
+    imageUrl = blob.url;
+  }
+
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const newProduct: AdminProduct = {
+    id: crypto.randomUUID(),
+    slug,
+    name,
+    description,
+    image: imageUrl,
+    categorySlug,
+    visible: true,
+  };
+
+  const config = await getAdminConfig();
+  config.customProducts = [...(config.customProducts ?? []), newProduct];
+  await saveAdminConfig(config);
+
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  revalidatePath("/products");
+}
+
+export async function removeProduct(id: string) {
+  await requireAuth();
+  const config = await getAdminConfig();
+
+  if (config.customProducts) {
+    config.customProducts = config.customProducts.filter((p) => p.id !== id);
+    await saveAdminConfig(config);
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  revalidatePath("/products");
+}
+
+export async function toggleCustomProductVisibility(id: string) {
+  await requireAuth();
+  const config = await getAdminConfig();
+
+  if (config.customProducts) {
+    config.customProducts = config.customProducts.map((p) =>
+      p.id === id ? { ...p, visible: !p.visible } : p
+    );
+    await saveAdminConfig(config);
+  }
+
   revalidatePath("/admin/products");
   revalidatePath("/");
   revalidatePath("/products");

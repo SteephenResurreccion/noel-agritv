@@ -1,4 +1,4 @@
-import { put, list } from "@vercel/blob";
+import { put, get } from "@vercel/blob";
 
 const CONFIG_PATH = "admin/config.json";
 
@@ -7,6 +7,8 @@ export interface AdminConfig {
   hiddenProducts: string[];
   /** Video list — if set, overrides the default static list */
   videos: AdminVideo[] | null;
+  /** Admin-created products */
+  customProducts: AdminProduct[] | null;
 }
 
 export interface AdminVideo {
@@ -17,18 +19,28 @@ export interface AdminVideo {
   visible: boolean;
 }
 
+export interface AdminProduct {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  image: string;
+  categorySlug: string;
+  visible: boolean;
+}
+
 const DEFAULT_CONFIG: AdminConfig = {
   hiddenProducts: [],
   videos: null,
+  customProducts: null,
 };
 
 export async function getAdminConfig(): Promise<AdminConfig> {
   try {
-    const { blobs } = await list({ prefix: CONFIG_PATH, limit: 1 });
-    if (blobs.length === 0) return DEFAULT_CONFIG;
-    const res = await fetch(blobs[0].url, { next: { revalidate: 30 } });
-    if (!res.ok) return DEFAULT_CONFIG;
-    const data = await res.json();
+    const result = await get(CONFIG_PATH, { access: "private" });
+    if (!result) return DEFAULT_CONFIG;
+    const text = await new Response(result.stream).text();
+    const data = JSON.parse(text);
     return { ...DEFAULT_CONFIG, ...data };
   } catch {
     return DEFAULT_CONFIG;
@@ -37,7 +49,7 @@ export async function getAdminConfig(): Promise<AdminConfig> {
 
 export async function saveAdminConfig(config: AdminConfig): Promise<void> {
   await put(CONFIG_PATH, JSON.stringify(config, null, 2), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
     contentType: "application/json",
   });

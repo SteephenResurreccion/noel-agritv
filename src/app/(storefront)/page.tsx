@@ -6,7 +6,7 @@ import { SocialProofStrip } from "@/components/social-proof-strip";
 import { ProductCard } from "@/components/product-card";
 import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
-import { products } from "@/data/products";
+import { products, type Product } from "@/data/products";
 import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { defaultVideos } from "@/data/videos";
@@ -18,14 +18,33 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  let visibleProducts = products;
+  let visibleProducts: Product[] = products;
   let videoItems = defaultVideos.filter((v) => v.visible);
 
   try {
     const config = await getAdminConfig();
-    visibleProducts = products.filter(
+    const builtIn = products.filter(
       (p) => !config.hiddenProducts.includes(p.slug)
     );
+    // Add custom products as full Product objects
+    const custom: Product[] = (config.customProducts ?? [])
+      .filter((p) => p.visible)
+      .map((p) => ({
+        slug: p.slug,
+        name: p.name,
+        categorySlug: p.categorySlug,
+        oneLiner: p.description,
+        description: p.description,
+        specs: [],
+        variants: [{ packSize: "", price: 0 }],
+        image: p.image,
+        imageLarge: p.image,
+        youtubeId: null,
+        compatibleCrops: [],
+        howToApply: null,
+        safetyNotes: null,
+      }));
+    visibleProducts = [...builtIn, ...custom];
     if (config.videos) {
       videoItems = config.videos.filter((v) => v.visible);
     }
