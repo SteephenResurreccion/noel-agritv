@@ -19,6 +19,11 @@ export interface AdminVideo {
   visible: boolean;
 }
 
+export interface AdminProductSpec {
+  label: string;
+  value: string;
+}
+
 export interface AdminProduct {
   id: string;
   slug: string;
@@ -27,6 +32,10 @@ export interface AdminProduct {
   image: string;
   categorySlug: string;
   visible: boolean;
+  specs?: AdminProductSpec[];
+  howToApply?: string | null;
+  compatibleCrops?: string[];
+  safetyNotes?: string | null;
 }
 
 const DEFAULT_CONFIG: AdminConfig = {

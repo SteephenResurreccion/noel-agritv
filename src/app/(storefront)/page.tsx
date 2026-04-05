@@ -9,6 +9,7 @@ import { VideoReelSection } from "@/components/video-reel-section";
 import { products, type Product } from "@/data/products";
 import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
+import { adminToProduct } from "@/lib/admin-to-product";
 import { defaultVideos } from "@/data/videos";
 
 export const dynamic = "force-dynamic";
@@ -28,24 +29,9 @@ export default async function HomePage() {
     const builtIn = products.filter(
       (p) => !config.hiddenProducts.includes(p.slug)
     );
-    // Add custom products as full Product objects
     const custom: Product[] = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map((p) => ({
-        slug: p.slug,
-        name: p.name,
-        categorySlug: p.categorySlug,
-        oneLiner: p.description,
-        description: p.description,
-        specs: [],
-        variants: [{ packSize: "", price: 0 }],
-        image: p.image,
-        imageLarge: p.image,
-        youtubeId: null,
-        compatibleCrops: [],
-        howToApply: null,
-        safetyNotes: null,
-      }));
+      .map(adminToProduct);
     visibleProducts = [...builtIn, ...custom];
     if (config.videos) {
       videoItems = config.videos.filter((v) => v.visible);

@@ -4,6 +4,7 @@ import { products, type Product } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { CategoryFilter } from "@/components/category-filter";
 import { getAdminConfig } from "@/lib/admin-store";
+import { adminToProduct } from "@/lib/admin-to-product";
 
 export const dynamic = "force-dynamic";
 
@@ -30,21 +31,7 @@ export default async function ProductsPage({
     );
     const custom: Product[] = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map((p) => ({
-        slug: p.slug,
-        name: p.name,
-        categorySlug: p.categorySlug,
-        oneLiner: p.description,
-        description: p.description,
-        specs: [],
-        variants: [{ packSize: "", price: 0 }],
-        image: p.image,
-        imageLarge: p.image,
-        youtubeId: null,
-        compatibleCrops: [],
-        howToApply: null,
-        safetyNotes: null,
-      }));
+      .map(adminToProduct);
     allProducts = [...builtIn, ...custom];
   } catch {
     // Blob not configured — use defaults

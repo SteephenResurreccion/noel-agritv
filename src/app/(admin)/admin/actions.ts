@@ -52,6 +52,13 @@ export async function addProduct(formData: FormData) {
     const description = formData.get("description") as string;
     const categorySlug = formData.get("categorySlug") as string;
     const imageFile = formData.get("image") as File;
+    const howToApply = (formData.get("howToApply") as string) || null;
+    const safetyNotes = (formData.get("safetyNotes") as string) || null;
+    const specsJson = formData.get("specs") as string | null;
+    const cropsJson = formData.get("compatibleCrops") as string | null;
+
+    const specs = specsJson ? JSON.parse(specsJson) : [];
+    const compatibleCrops = cropsJson ? JSON.parse(cropsJson) : [];
 
     // Upload image to Vercel Blob
     let imageUrl = "/images/NewLogo.png"; // fallback
@@ -77,6 +84,10 @@ export async function addProduct(formData: FormData) {
       image: imageUrl,
       categorySlug,
       visible: true,
+      specs,
+      howToApply,
+      compatibleCrops,
+      safetyNotes,
     };
 
     const config = await getAdminConfig();

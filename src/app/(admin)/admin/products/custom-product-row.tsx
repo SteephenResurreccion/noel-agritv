@@ -4,9 +4,11 @@ import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 import type { AdminProduct } from "@/lib/admin-store";
+import { getCategoryBySlug } from "@/data/categories";
 import { toggleCustomProductVisibility, removeProduct } from "../actions";
 
 export function CustomProductRow({ product }: { product: AdminProduct }) {
+  const category = getCategoryBySlug(product.categorySlug);
   const [isPending, startTransition] = useTransition();
   const [optimisticVisible, setOptimisticVisible] = useOptimistic(
     product.visible
@@ -46,7 +48,7 @@ export function CustomProductRow({ product }: { product: AdminProduct }) {
         </p>
       </td>
       <td className="hidden px-4 py-3 text-text-secondary md:table-cell">
-        {product.categorySlug}
+        {category?.name ?? product.categorySlug}
       </td>
       <td className="px-4 py-3 text-right">
         <div className="inline-flex items-center gap-2">
