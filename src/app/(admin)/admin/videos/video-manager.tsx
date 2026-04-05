@@ -7,10 +7,26 @@ import {
   EyeOff,
   Trash2,
   Plus,
-  ChevronUp,
-  ChevronDown,
+  GripVertical,
   Loader2,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import type { AdminVideo } from "@/lib/admin-store";
 import { compressImage } from "@/lib/compress-image";
 import {
@@ -18,7 +34,6 @@ import {
   removeVideo,
   toggleVideoVisibility,
   addVideo,
-  moveVideo,
 } from "../actions";
 
 export function VideoManager({
@@ -26,18 +41,53 @@ export function VideoManager({
 }: {
   initialVideos: AdminVideo[];
 }) {
+  const [videos, setVideos] = useState(initialVideos);
   const [showAddForm, setShowAddForm] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = videos.findIndex((v) => v.id === active.id);
+    const newIndex = videos.findIndex((v) => v.id === over.id);
+    const reordered = arrayMove(videos, oldIndex, newIndex);
+
+    // Optimistic update
+    setVideos(reordered);
+    setIsSaving(true);
+
+    // Save to server
+    startTransition(async () => {
+      await saveVideos(reordered);
+      router.refresh();
+      setIsSaving(false);
+    });
+  }
 
   return (
     <div className="mt-6">
-      {/* Add button */}
+      {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-text-secondary">
-          {initialVideos.filter((v) => v.visible).length} of{" "}
-          {initialVideos.length} videos visible
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-text-secondary">
+            {videos.filter((v) => v.visible).length} of {videos.length} visible
+          </p>
+          {isSaving && (
+            <span className="inline-flex items-center gap-1 text-xs text-brand-accent">
+              <Loader2 className="h-3 w-3 animate-spin" /> Saving order...
+            </span>
+          )}
+        </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="inline-flex items-center gap-1.5 rounded-md bg-brand-darkest px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-dark"
@@ -50,8 +100,8 @@ export function VideoManager({
       {/* Add form */}
       {showAddForm && <AddVideoForm onDone={() => setShowAddForm(false)} />}
 
-      {/* Initialize button — shown only when Blob has no videos yet */}
-      {initialVideos[0]?.id === "v1" && (
+      {/* Initialize button */}
+      {videos[0]?.id === "v1" && (
         <div className="mb-4 rounded-lg border border-brand-accent/30 bg-brand-accent/5 p-4">
           <p className="text-sm text-text-primary">
             Video list is using defaults. Click below to save them to your admin
@@ -61,7 +111,7 @@ export function VideoManager({
             disabled={isPending}
             onClick={() =>
               startTransition(async () => {
-                await saveVideos(initialVideos);
+                await saveVideos(videos);
                 router.refresh();
               })
             }
@@ -72,81 +122,80 @@ export function VideoManager({
         </div>
       )}
 
-      {/* Video list */}
+      {/* Drag hint */}
       <p className="mb-2 text-xs text-text-secondary">
-        Use arrows to reorder. Videos display left-to-right on the storefront.
+        Drag to reorder. Top = leftmost on storefront.
       </p>
-      <div className="space-y-2">
-        {initialVideos.map((video, index) => (
-          <VideoRow
-            key={video.id}
-            video={video}
-            index={index}
-            isFirst={index === 0}
-            isLast={index === initialVideos.length - 1}
-          />
-        ))}
-      </div>
+
+      {/* Sortable video list */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={videos.map((v) => v.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-2">
+            {videos.map((video, index) => (
+              <SortableVideoRow key={video.id} video={video} index={index} />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
 
-function VideoRow({
+function SortableVideoRow({
   video,
   index,
-  isFirst,
-  isLast,
 }: {
   video: AdminVideo;
   index: number;
-  isFirst: boolean;
-  isLast: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  function handleMove(direction: "up" | "down") {
-    if (isPending) return;
-    startTransition(async () => {
-      await moveVideo(video.id, direction);
-      router.refresh();
-    });
-  }
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: video.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   return (
     <div
-      className={`flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 ${
-        !video.visible ? "opacity-50" : ""
-      } ${isPending ? "pointer-events-none opacity-30" : ""}`}
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 rounded-lg border bg-surface px-4 py-3 ${
+        isDragging
+          ? "z-50 border-brand-accent shadow-lg"
+          : "border-border"
+      } ${!video.visible ? "opacity-50" : ""} ${
+        isPending ? "pointer-events-none opacity-30" : ""
+      }`}
     >
-      {/* Position number */}
-      <span className="w-6 shrink-0 text-center text-xs font-bold text-text-secondary">
-        {index + 1}
-      </span>
-
-      {/* Up/Down arrows */}
-      <div className="flex shrink-0 flex-col gap-0.5">
-        <button
-          disabled={isPending || isFirst}
-          onClick={() => handleMove("up")}
-          className={`flex h-5 w-5 items-center justify-center rounded text-text-secondary transition-colors hover:bg-bg hover:text-text-primary ${
-            isFirst ? "invisible" : ""
-          }`}
-          title="Move up"
-        >
-          <ChevronUp className="h-3.5 w-3.5" />
-        </button>
-        <button
-          disabled={isPending || isLast}
-          onClick={() => handleMove("down")}
-          className={`flex h-5 w-5 items-center justify-center rounded text-text-secondary transition-colors hover:bg-bg hover:text-text-primary ${
-            isLast ? "invisible" : ""
-          }`}
-          title="Move down"
-        >
-          <ChevronDown className="h-3.5 w-3.5" />
-        </button>
-      </div>
+      {/* Drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="flex shrink-0 cursor-grab items-center gap-1 touch-none active:cursor-grabbing"
+        tabIndex={0}
+      >
+        <span className="w-5 text-center text-xs font-bold text-text-secondary">
+          {index + 1}
+        </span>
+        <GripVertical className="h-4 w-4 text-text-secondary/50" />
+      </button>
 
       {/* Title + URL */}
       <div className="min-w-0 flex-1">
@@ -209,7 +258,6 @@ function AddVideoForm({ onDone }: { onDone: () => void }) {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Compress thumbnail before upload
     const thumbnailFile = formData.get("thumbnail") as File;
     if (thumbnailFile && thumbnailFile.size > 0) {
       const compressed = await compressImage(thumbnailFile, 400, 0.75);
