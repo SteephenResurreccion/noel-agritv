@@ -19,8 +19,8 @@
   --color-brand-black: #0D0D0D;
 
   /* Brand neutrals — Google Material opacity system */
-  --color-bg: #faf7ee;
-  --color-surface: #ffffff;
+  --color-bg: #F5F0E8;
+  --color-surface: #EDEAE3;
   --color-text-primary: rgba(0, 0, 0, 0.87);
   --color-text-secondary: rgba(0, 0, 0, 0.60);
   --color-text-disabled: rgba(0, 0, 0, 0.38);
@@ -64,14 +64,14 @@
 
 :root {
   /* Brand-overridden semantic colors */
-  /* #faf7ee warm cream → oklch approx */
-  --background: oklch(0.978 0.012 90);
+  /* #F5F0E8 warm linen → oklch approx */
+  --background: oklch(0.955 0.012 80);
   /* Black at 87% opacity → oklch approx */
   --foreground: oklch(0.195 0 0 / 87%);
-  /* white surface */
-  --card: oklch(1 0 0);
+  /* #EDEAE3 stone white surface */
+  --card: oklch(0.935 0.01 80);
   --card-foreground: oklch(0.195 0 0);
-  --popover: oklch(1 0 0);
+  --popover: oklch(0.935 0.01 80);
   --popover-foreground: oklch(0.195 0 0);
   /* #4D734C brand accent green → oklch approx */
   --primary: oklch(0.468 0.088 141);
