@@ -1,4 +1,4 @@
-import { put, get } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 
 const CONFIG_PATH = "admin/config.json";
 
@@ -37,19 +37,28 @@ const DEFAULT_CONFIG: AdminConfig = {
 
 export async function getAdminConfig(): Promise<AdminConfig> {
   try {
-    const result = await get(CONFIG_PATH, { access: "private" });
-    if (!result) return DEFAULT_CONFIG;
-    const text = await new Response(result.stream).text();
-    const data = JSON.parse(text);
+    // List blobs to find config file
+    const { blobs } = await list({ prefix: CONFIG_PATH, limit: 1 });
+    if (blobs.length === 0) return DEFAULT_CONFIG;
+
+    // Fetch with token for private store
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    const res = await fetch(blobs[0].url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      cache: "no-store",
+    });
+    if (!res.ok) return DEFAULT_CONFIG;
+    const data = await res.json();
     return { ...DEFAULT_CONFIG, ...data };
-  } catch {
+  } catch (e) {
+    console.error("Failed to read admin config:", e);
     return DEFAULT_CONFIG;
   }
 }
 
 export async function saveAdminConfig(config: AdminConfig): Promise<void> {
   await put(CONFIG_PATH, JSON.stringify(config, null, 2), {
-    access: "private",
+    access: "public",
     addRandomSuffix: false,
     contentType: "application/json",
   });
