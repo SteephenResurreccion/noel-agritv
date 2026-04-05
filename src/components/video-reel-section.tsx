@@ -103,48 +103,48 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree top-left — translated off left edge, overflow-hidden crops it */}
+      {/* Tree poking in from left — trunk goes horizontal into left edge, canopy inside */}
       <svg
-        className="pointer-events-none absolute left-0 top-0 h-[220px] w-[160px] -translate-x-[45%] min-[741px]:h-[300px] min-[741px]:w-[200px]"
-        viewBox="0 0 200 340"
+        className="pointer-events-none absolute left-0 top-4 h-[180px] w-[150px] -translate-x-[30%] min-[741px]:top-2 min-[741px]:h-[240px] min-[741px]:w-[200px]"
+        viewBox="0 0 200 180"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk */}
-        <rect x="90" y="200" width="16" height="140" rx="4" fill="#2A4038" />
-        {/* Canopy — natural rounded tree shape */}
+        {/* Horizontal trunk — goes from left edge to canopy */}
+        <rect x="0" y="95" width="100" height="14" rx="4" fill="#2A4038" />
+        {/* Canopy at the right end of trunk */}
         <path
-          d="M98 210 Q40 190 25 140 Q10 90 40 50 Q65 15 100 10 Q140 5 165 40 Q190 75 178 125 Q168 170 130 195 Q110 208 98 210Z"
+          d="M85 102 Q75 60 95 35 Q115 10 145 15 Q175 20 185 55 Q195 90 175 120 Q155 148 125 145 Q95 142 85 102Z"
           fill="#2A4038"
         />
         <path
-          d="M98 185 Q55 170 42 130 Q30 90 55 60 Q75 35 100 30 Q130 25 150 50 Q170 75 160 115 Q152 150 125 172 Q110 185 98 185Z"
+          d="M95 98 Q88 65 105 45 Q120 28 145 32 Q168 36 174 62 Q180 88 165 110 Q148 130 128 128 Q105 125 95 98Z"
           fill="#172621"
         />
         {/* Accent dot */}
-        <circle cx="170" cy="38" r="9" fill="#4D734C" fillOpacity="0.45" />
+        <circle cx="178" cy="28" r="7" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Tree bottom-right — translated off right edge, overflow-hidden crops it */}
+      {/* Tree poking in from right — trunk goes horizontal into right edge, canopy inside */}
       <svg
-        className="pointer-events-none absolute bottom-0 right-0 h-[200px] w-[150px] translate-x-[45%] min-[741px]:h-[270px] min-[741px]:w-[185px]"
-        viewBox="0 0 185 310"
+        className="pointer-events-none absolute bottom-6 right-0 h-[170px] w-[140px] translate-x-[30%] min-[741px]:bottom-4 min-[741px]:h-[220px] min-[741px]:w-[180px]"
+        viewBox="0 0 180 170"
         fill="none"
         aria-hidden="true"
       >
-        {/* Trunk */}
-        <rect x="82" y="190" width="15" height="120" rx="4" fill="#2A4038" />
-        {/* Canopy */}
+        {/* Horizontal trunk — goes from right edge to canopy */}
+        <rect x="85" y="88" width="95" height="13" rx="4" fill="#2A4038" />
+        {/* Canopy at the left end of trunk */}
         <path
-          d="M90 200 Q145 180 162 135 Q178 88 150 50 Q125 18 90 12 Q50 6 28 38 Q5 68 15 115 Q24 158 60 182 Q78 195 90 200Z"
+          d="M100 94 Q110 55 90 30 Q70 8 42 12 Q14 18 5 50 Q-4 82 14 110 Q32 136 58 134 Q88 130 100 94Z"
           fill="#2A4038"
         />
         <path
-          d="M90 175 Q132 160 145 125 Q158 88 135 58 Q115 35 90 30 Q60 24 42 48 Q25 70 32 108 Q38 142 65 165 Q80 175 90 175Z"
+          d="M90 90 Q98 58 82 40 Q66 22 44 26 Q22 32 16 55 Q10 78 24 100 Q40 120 58 118 Q80 114 90 90Z"
           fill="#172621"
         />
         {/* Leaf accent */}
-        <path d="M20 55 Q30 35 25 15 Q40 32 28 52Z" fill="#3B593F" fillOpacity="0.45" />
+        <path d="M8 22 Q18 8 14 -8 Q26 6 14 20Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
