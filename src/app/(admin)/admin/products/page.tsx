@@ -40,6 +40,22 @@ export default async function AdminProductsPage() {
           </h2>
           <div className="overflow-hidden rounded-lg border border-border bg-surface">
             <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border bg-bg">
+                  <th className="px-4 py-3 font-semibold text-text-secondary">
+                    Product
+                  </th>
+                  <th className="hidden px-4 py-3 font-semibold text-text-secondary md:table-cell">
+                    Category
+                  </th>
+                  <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                    Visible
+                  </th>
+                  <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                    Delete
+                  </th>
+                </tr>
+              </thead>
               <tbody>
                 {customProducts.map((product) => (
                   <CustomProductRow key={product.id} product={product} />
@@ -68,6 +84,9 @@ export default async function AdminProductsPage() {
                 <th className="px-4 py-3 text-right font-semibold text-text-secondary">
                   Visible
                 </th>
+                <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                  Delete
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -93,6 +112,9 @@ export default async function AdminProductsPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <ProductToggle slug={product.slug} visible={isVisible} />
+                    </td>
+                    <td className="px-4 py-3 text-right text-xs text-text-secondary/40">
+                      —
                     </td>
                   </tr>
                 );

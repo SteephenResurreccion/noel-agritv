@@ -113,13 +113,22 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
             >
               {/* Video thumbnail */}
               <div className="relative aspect-[9/16] w-full overflow-hidden">
-                <Image
-                  src={video.thumbnail}
-                  alt={video.title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="170px"
-                />
+                {video.thumbnail.startsWith("/api/blob-image") ? (
+                  <img
+                    src={video.thumbnail}
+                    alt={video.title}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <Image
+                    src={video.thumbnail}
+                    alt={video.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="170px"
+                  />
+                )}
                 {/* Title overlay at top */}
                 <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/60 via-black/30 to-transparent px-3 pb-10 pt-3">
                   <p className="line-clamp-3 text-[11px] font-bold uppercase leading-tight tracking-wide text-white drop-shadow-sm">

@@ -2,7 +2,7 @@
 
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toggleProductVisibility } from "../actions";
 
 export function ProductToggle({
@@ -43,21 +43,6 @@ export function ProductToggle({
             optimisticVisible ? "translate-x-6" : "translate-x-1"
           }`}
         />
-      </button>
-      <button
-        disabled={isPending}
-        onClick={() => {
-          if (isPending) return;
-          if (confirm("Hide this product permanently?")) {
-            handleToggle();
-          }
-        }}
-        className={`flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600 ${
-          isPending ? "cursor-wait opacity-60" : ""
-        }`}
-        title="Delete"
-      >
-        <Trash2 className="h-4 w-4" />
       </button>
     </div>
   );

@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { products } from "@/data/products";
+import { products, type Product } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { CategoryFilter } from "@/components/category-filter";
+import { getAdminConfig } from "@/lib/admin-store";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "All Products",
@@ -17,9 +20,39 @@ export default async function ProductsPage({
 }) {
   const params = await searchParams;
   const category = params.category;
+
+  let allProducts: Product[] = products;
+
+  try {
+    const config = await getAdminConfig();
+    const builtIn = products.filter(
+      (p) => !config.hiddenProducts.includes(p.slug)
+    );
+    const custom: Product[] = (config.customProducts ?? [])
+      .filter((p) => p.visible)
+      .map((p) => ({
+        slug: p.slug,
+        name: p.name,
+        categorySlug: p.categorySlug,
+        oneLiner: p.description,
+        description: p.description,
+        specs: [],
+        variants: [{ packSize: "", price: 0 }],
+        image: p.image,
+        imageLarge: p.image,
+        youtubeId: null,
+        compatibleCrops: [],
+        howToApply: null,
+        safetyNotes: null,
+      }));
+    allProducts = [...builtIn, ...custom];
+  } catch {
+    // Blob not configured — use defaults
+  }
+
   const filtered = category
-    ? products.filter((p) => p.categorySlug === category)
-    : products;
+    ? allProducts.filter((p) => p.categorySlug === category)
+    : allProducts;
 
   return (
     <div className="bg-bg py-[var(--spacing-section)]">

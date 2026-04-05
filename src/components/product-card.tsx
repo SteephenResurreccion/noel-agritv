@@ -11,17 +11,28 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const category = getCategoryBySlug(product.categorySlug);
 
+  const isBlobImage = product.image.startsWith("/api/blob-image");
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-md bg-surface shadow-sm">
       <Link href={`/products/${product.slug}`} className="block overflow-hidden">
-        <Image
-          src={product.image}
-          alt={product.name}
-          width={500}
-          height={500}
-          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 374px) 100vw, (max-width: 740px) 50vw, (max-width: 999px) 33vw, 25vw"
-        />
+        {isBlobImage ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <Image
+            src={product.image}
+            alt={product.name}
+            width={500}
+            height={500}
+            className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 374px) 100vw, (max-width: 740px) 50vw, (max-width: 999px) 33vw, 25vw"
+          />
+        )}
       </Link>
       <div className="flex flex-1 flex-col gap-1.5 px-4 py-4">
         <Link href={`/products/${product.slug}`} className="hover:underline">
