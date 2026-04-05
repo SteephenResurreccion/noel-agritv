@@ -2,7 +2,7 @@
 
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { toggleProductVisibility } from "../actions";
 
 export function ProductToggle({
@@ -17,6 +17,7 @@ export function ProductToggle({
   const router = useRouter();
 
   function handleToggle() {
+    if (isPending) return;
     startTransition(async () => {
       setOptimisticVisible(!optimisticVisible);
       await toggleProductVisibility(slug);
@@ -26,12 +27,15 @@ export function ProductToggle({
 
   return (
     <div className="inline-flex items-center gap-2">
+      {isPending && (
+        <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-accent" />
+      )}
       <button
         disabled={isPending}
         onClick={handleToggle}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
           optimisticVisible ? "bg-brand-accent" : "bg-gray-300"
-        } ${isPending ? "opacity-70" : ""}`}
+        } ${isPending ? "cursor-wait opacity-60" : "cursor-pointer"}`}
         aria-label={optimisticVisible ? "Hide product" : "Show product"}
       >
         <span
@@ -43,11 +47,14 @@ export function ProductToggle({
       <button
         disabled={isPending}
         onClick={() => {
+          if (isPending) return;
           if (confirm("Hide this product permanently?")) {
             handleToggle();
           }
         }}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600"
+        className={`flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600 ${
+          isPending ? "cursor-wait opacity-60" : ""
+        }`}
         title="Delete"
       >
         <Trash2 className="h-4 w-4" />
