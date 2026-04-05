@@ -103,32 +103,34 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree poking in from left edge — only canopy visible */}
+      {/* Tree poking in from left edge — half the canopy visible */}
       <svg
-        className="pointer-events-none absolute -left-12 top-8 h-[120px] w-[100px] min-[741px]:-left-10 min-[741px]:top-6 min-[741px]:h-[160px] min-[741px]:w-[130px]"
-        viewBox="0 0 130 180"
+        className="pointer-events-none absolute -left-[60px] top-0 h-[220px] w-[160px] min-[741px]:-left-[50px] min-[741px]:h-[300px] min-[741px]:w-[200px]"
+        viewBox="0 0 200 320"
         fill="none"
         aria-hidden="true"
       >
-        <rect x="70" y="110" width="12" height="60" rx="3" fill="#2A4038" />
-        <ellipse cx="76" cy="72" rx="52" ry="46" fill="#2A4038" />
-        <ellipse cx="56" cy="58" rx="34" ry="28" fill="#172621" />
-        <ellipse cx="98" cy="64" rx="30" ry="26" fill="#2A4038" />
-        <circle cx="115" cy="32" r="7" fill="#4D734C" fillOpacity="0.5" />
+        <rect x="110" y="180" width="16" height="140" rx="4" fill="#2A4038" />
+        <ellipse cx="118" cy="120" rx="80" ry="70" fill="#2A4038" />
+        <ellipse cx="90" cy="95" rx="55" ry="45" fill="#172621" />
+        <ellipse cx="150" cy="105" rx="50" ry="40" fill="#2A4038" />
+        <ellipse cx="118" cy="70" rx="40" ry="32" fill="#172621" />
+        <circle cx="178" cy="50" r="10" fill="#4D734C" fillOpacity="0.5" />
       </svg>
 
-      {/* Tree poking in from right edge — only canopy visible */}
+      {/* Tree poking in from right edge — half the canopy visible */}
       <svg
-        className="pointer-events-none absolute -right-10 bottom-6 h-[110px] w-[90px] min-[741px]:-right-8 min-[741px]:bottom-4 min-[741px]:h-[150px] min-[741px]:w-[120px]"
-        viewBox="0 0 120 170"
+        className="pointer-events-none absolute -right-[50px] bottom-0 h-[200px] w-[150px] min-[741px]:-right-[40px] min-[741px]:h-[280px] min-[741px]:w-[190px]"
+        viewBox="0 0 190 300"
         fill="none"
         aria-hidden="true"
       >
-        <rect x="50" y="100" width="11" height="60" rx="3" fill="#2A4038" />
-        <ellipse cx="55" cy="65" rx="48" ry="42" fill="#2A4038" />
-        <ellipse cx="36" cy="52" rx="30" ry="24" fill="#2A4038" />
-        <ellipse cx="74" cy="56" rx="32" ry="26" fill="#172621" />
-        <path d="M10 130 Q18 112 14 92 Q24 108 16 128Z" fill="#3B593F" fillOpacity="0.6" />
+        <rect x="80" y="170" width="14" height="130" rx="4" fill="#2A4038" />
+        <ellipse cx="87" cy="110" rx="75" ry="65" fill="#2A4038" />
+        <ellipse cx="60" cy="85" rx="50" ry="40" fill="#2A4038" />
+        <ellipse cx="120" cy="95" rx="52" ry="42" fill="#172621" />
+        <ellipse cx="87" cy="62" rx="36" ry="28" fill="#172621" />
+        <path d="M15 230 Q30 195 22 160 Q40 190 28 225Z" fill="#3B593F" fillOpacity="0.5" />
       </svg>
 
       {/* Heading */}
