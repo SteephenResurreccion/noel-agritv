@@ -262,3 +262,31 @@ export async function toggleVideoVisibility(id: string) {
     throw new Error("Failed to toggle video visibility. Please try again.");
   }
 }
+
+export async function moveVideo(id: string, direction: "up" | "down") {
+  await requireAuth();
+  try {
+    const config = await getAdminConfig({ strict: true });
+
+    if (!config.videos) return;
+
+    const idx = config.videos.findIndex((v) => v.id === id);
+    if (idx === -1) return;
+
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= config.videos.length) return;
+
+    // Swap
+    [config.videos[idx], config.videos[targetIdx]] = [
+      config.videos[targetIdx],
+      config.videos[idx],
+    ];
+
+    await saveAdminConfig(config);
+    revalidatePath("/admin/videos");
+    revalidateStorefront();
+  } catch (e) {
+    console.error("moveVideo failed:", e);
+    throw new Error("Failed to reorder video. Please try again.");
+  }
+}

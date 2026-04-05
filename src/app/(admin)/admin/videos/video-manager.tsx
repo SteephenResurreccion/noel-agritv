@@ -2,7 +2,15 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Trash2, Plus } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Trash2,
+  Plus,
+  ChevronUp,
+  ChevronDown,
+  Loader2,
+} from "lucide-react";
 import type { AdminVideo } from "@/lib/admin-store";
 import { compressImage } from "@/lib/compress-image";
 import {
@@ -10,6 +18,7 @@ import {
   removeVideo,
   toggleVideoVisibility,
   addVideo,
+  moveVideo,
 } from "../actions";
 
 export function VideoManager({
@@ -64,18 +73,45 @@ export function VideoManager({
       )}
 
       {/* Video list */}
+      <p className="mb-2 text-xs text-text-secondary">
+        Use arrows to reorder. Videos display left-to-right on the storefront.
+      </p>
       <div className="space-y-2">
-        {initialVideos.map((video) => (
-          <VideoRow key={video.id} video={video} />
+        {initialVideos.map((video, index) => (
+          <VideoRow
+            key={video.id}
+            video={video}
+            index={index}
+            isFirst={index === 0}
+            isLast={index === initialVideos.length - 1}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function VideoRow({ video }: { video: AdminVideo }) {
+function VideoRow({
+  video,
+  index,
+  isFirst,
+  isLast,
+}: {
+  video: AdminVideo;
+  index: number;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  function handleMove(direction: "up" | "down") {
+    if (isPending) return;
+    startTransition(async () => {
+      await moveVideo(video.id, direction);
+      router.refresh();
+    });
+  }
 
   return (
     <div
@@ -83,6 +119,36 @@ function VideoRow({ video }: { video: AdminVideo }) {
         !video.visible ? "opacity-50" : ""
       } ${isPending ? "pointer-events-none opacity-30" : ""}`}
     >
+      {/* Position number */}
+      <span className="w-6 shrink-0 text-center text-xs font-bold text-text-secondary">
+        {index + 1}
+      </span>
+
+      {/* Up/Down arrows */}
+      <div className="flex shrink-0 flex-col gap-0.5">
+        <button
+          disabled={isPending || isFirst}
+          onClick={() => handleMove("up")}
+          className={`flex h-5 w-5 items-center justify-center rounded text-text-secondary transition-colors hover:bg-bg hover:text-text-primary ${
+            isFirst ? "invisible" : ""
+          }`}
+          title="Move up"
+        >
+          <ChevronUp className="h-3.5 w-3.5" />
+        </button>
+        <button
+          disabled={isPending || isLast}
+          onClick={() => handleMove("down")}
+          className={`flex h-5 w-5 items-center justify-center rounded text-text-secondary transition-colors hover:bg-bg hover:text-text-primary ${
+            isLast ? "invisible" : ""
+          }`}
+          title="Move down"
+        >
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Title + URL */}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-text-primary">
           {video.title}
@@ -90,7 +156,11 @@ function VideoRow({ video }: { video: AdminVideo }) {
         <p className="truncate text-xs text-text-secondary">{video.href}</p>
       </div>
 
+      {/* Actions */}
       <div className="flex shrink-0 items-center gap-1">
+        {isPending && (
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-accent" />
+        )}
         <button
           disabled={isPending}
           onClick={() => {
