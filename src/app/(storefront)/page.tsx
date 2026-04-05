@@ -35,8 +35,8 @@ export default function HomePage() {
             <div className="relative z-[1] min-[741px]:mb-[-100px] min-[741px]:max-w-[80%]">
               <div className="overflow-hidden rounded-2xl">
                 <Image
-                  src="/images/New-Found-Hero.png"
-                  alt="Noel Tolentino holding fresh harvested vegetables"
+                  src="/images/mission.jpg"
+                  alt="Noel Tolentino standing in a rice paddy"
                   width={720}
                   height={960}
                   priority
@@ -225,8 +225,8 @@ export default function HomePage() {
             <div className="relative min-[741px]:self-stretch">
               <div className="overflow-hidden rounded-2xl min-[741px]:h-full">
                 <Image
-                  src="/images/mission.jpg"
-                  alt="Noel Tolentino standing in a rice paddy"
+                  src="/images/New-Found-Hero.png"
+                  alt="Noel Tolentino holding fresh harvested vegetables"
                   width={640}
                   height={960}
                   className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:min-h-[480px]"
