@@ -33,7 +33,7 @@ export function HomeProductFilter({
             key={pill.slug}
             onClick={() => setActive(pill.slug)}
             className={cn(
-              "shrink-0 rounded-[4px] px-8 py-3 text-[15px] font-bold transition-colors",
+              "shrink-0 rounded-[4px] px-10 py-3.5 text-[15px] font-bold transition-colors",
               active === pill.slug
                 ? "bg-brand-darkest text-white"
                 : "bg-brand-accent text-white hover:bg-brand-dark"
