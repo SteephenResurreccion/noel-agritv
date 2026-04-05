@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { toggleProductVisibility } from "../actions";
@@ -13,10 +13,12 @@ export function ProductToggle({
   visible: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
+  const [optimisticVisible, setOptimisticVisible] = useOptimistic(visible);
   const router = useRouter();
 
   function handleToggle() {
     startTransition(async () => {
+      setOptimisticVisible(!optimisticVisible);
       await toggleProductVisibility(slug);
       router.refresh();
     });
@@ -28,13 +30,13 @@ export function ProductToggle({
         disabled={isPending}
         onClick={handleToggle}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          visible ? "bg-brand-accent" : "bg-gray-300"
-        } ${isPending ? "opacity-50" : ""}`}
-        aria-label={visible ? "Hide product" : "Show product"}
+          optimisticVisible ? "bg-brand-accent" : "bg-gray-300"
+        } ${isPending ? "opacity-70" : ""}`}
+        aria-label={optimisticVisible ? "Hide product" : "Show product"}
       >
         <span
           className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-            visible ? "translate-x-6" : "translate-x-1"
+            optimisticVisible ? "translate-x-6" : "translate-x-1"
           }`}
         />
       </button>

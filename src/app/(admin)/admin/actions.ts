@@ -31,8 +31,6 @@ export async function toggleProductVisibility(slug: string) {
 
     await saveAdminConfig(config);
     revalidatePath("/admin/products");
-    revalidatePath("/");
-    revalidatePath("/products");
   } catch (e) {
     console.error("toggleProductVisibility failed:", e);
     throw new Error("Failed to toggle product visibility. Please try again.");
@@ -79,8 +77,6 @@ export async function addProduct(formData: FormData) {
     await saveAdminConfig(config);
 
     revalidatePath("/admin/products");
-    revalidatePath("/");
-    revalidatePath("/products");
   } catch (e) {
     console.error("addProduct failed:", e);
     throw new Error("Failed to add product. Please try again.");
@@ -98,8 +94,6 @@ export async function removeProduct(id: string) {
     }
 
     revalidatePath("/admin/products");
-    revalidatePath("/");
-    revalidatePath("/products");
   } catch (e) {
     console.error("removeProduct failed:", e);
     throw new Error("Failed to remove product. Please try again.");
@@ -119,8 +113,6 @@ export async function toggleCustomProductVisibility(id: string) {
     }
 
     revalidatePath("/admin/products");
-    revalidatePath("/");
-    revalidatePath("/products");
   } catch (e) {
     console.error("toggleCustomProductVisibility failed:", e);
     throw new Error("Failed to toggle product visibility. Please try again.");
@@ -136,7 +128,6 @@ export async function saveVideos(videos: AdminVideo[]) {
     config.videos = videos;
     await saveAdminConfig(config);
     revalidatePath("/admin/videos");
-    revalidatePath("/");
   } catch (e) {
     console.error("saveVideos failed:", e);
     throw new Error("Failed to save videos. Please try again.");
@@ -182,7 +173,6 @@ export async function addVideo(formData: FormData) {
 
     await saveAdminConfig(config);
     revalidatePath("/admin/videos");
-    revalidatePath("/");
   } catch (e) {
     console.error("addVideo failed:", e);
     throw new Error("Failed to add video. Please try again.");
@@ -200,7 +190,6 @@ export async function removeVideo(id: string) {
     }
 
     revalidatePath("/admin/videos");
-    revalidatePath("/");
   } catch (e) {
     console.error("removeVideo failed:", e);
     throw new Error("Failed to remove video. Please try again.");
@@ -220,7 +209,6 @@ export async function toggleVideoVisibility(id: string) {
     }
 
     revalidatePath("/admin/videos");
-    revalidatePath("/");
   } catch (e) {
     console.error("toggleVideoVisibility failed:", e);
     throw new Error("Failed to toggle video visibility. Please try again.");
