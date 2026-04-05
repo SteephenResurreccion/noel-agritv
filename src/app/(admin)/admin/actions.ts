@@ -48,11 +48,11 @@ export async function addProduct(formData: FormData) {
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     const ext = imageFile.name.split(".").pop() || "jpg";
     const blob = await put(`products/${slug}.${ext}`, imageFile, {
-      access: "public",
+      access: "private",
       addRandomSuffix: false,
       contentType: imageFile.type,
     });
-    imageUrl = blob.url;
+    imageUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
   }
 
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -130,11 +130,11 @@ export async function addVideo(formData: FormData) {
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     const ext = thumbnailFile.name.split(".").pop() || "webp";
     const blob = await put(`videos/${slug}.${ext}`, thumbnailFile, {
-      access: "public",
+      access: "private",
       addRandomSuffix: false,
       contentType: thumbnailFile.type,
     });
-    thumbnailUrl = blob.url;
+    thumbnailUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
   }
 
   const config = await getAdminConfig();
