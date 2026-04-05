@@ -3,7 +3,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { products, getProductBySlug, type Product } from "@/data/products";
 import { getCategoryBySlug } from "@/data/categories";
-import { formatPrice } from "@/lib/utils";
+import { getAdminConfig } from "@/lib/admin-store";
+import { adminToProduct } from "@/lib/admin-to-product";
 import { MessengerCTA } from "@/components/messenger-cta";
 import { CallCTA } from "@/components/call-cta";
 import { SpecStrip } from "@/components/spec-strip";
@@ -17,8 +18,29 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
+}
+
+async function findProduct(slug: string): Promise<Product | undefined> {
+  // Check built-in products first
+  const builtIn = getProductBySlug(slug);
+  if (builtIn) return builtIn;
+
+  // Check custom products from admin config
+  try {
+    const config = await getAdminConfig();
+    const custom = (config.customProducts ?? []).find(
+      (p) => p.slug === slug && p.visible
+    );
+    if (custom) return adminToProduct(custom);
+  } catch {
+    // Blob not configured
+  }
+
+  return undefined;
 }
 
 export async function generateMetadata({
@@ -27,7 +49,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await findProduct(slug);
   if (!product) return {};
 
   return {
@@ -42,6 +64,12 @@ export async function generateMetadata({
 }
 
 function VariantPriceBlock({ product }: { product: Product }) {
+  // Hide price block if no real variants
+  const hasRealVariants = product.variants.some(
+    (v) => v.packSize && v.price > 0
+  );
+  if (!hasRealVariants) return null;
+
   return (
     <div className="space-y-2 rounded-[var(--radius-card)] border border-border bg-bg p-4">
       {product.variants.map((variant) => (
@@ -51,9 +79,6 @@ function VariantPriceBlock({ product }: { product: Product }) {
         >
           <span className="font-semibold text-text-primary">
             {variant.packSize}
-          </span>
-          <span className="text-lg font-bold text-brand-darkest">
-            {formatPrice(variant.price)}
           </span>
         </div>
       ))}
@@ -67,14 +92,31 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await findProduct(slug);
   if (!product) notFound();
 
   const category = getCategoryBySlug(product.categorySlug);
-  const relatedProducts = products
+
+  // Get all visible products for "related" section
+  let allProducts = products;
+  try {
+    const config = await getAdminConfig();
+    const builtIn = products.filter(
+      (p) => !config.hiddenProducts.includes(p.slug)
+    );
+    const custom = (config.customProducts ?? [])
+      .filter((p) => p.visible)
+      .map(adminToProduct);
+    allProducts = [...builtIn, ...custom];
+  } catch {
+    // use defaults
+  }
+
+  const relatedProducts = allProducts
     .filter((p) => p.slug !== product.slug)
     .slice(0, 3);
 
+  const isBlobImage = product.image.startsWith("/api/blob-image");
   const hasHowToApply = product.howToApply !== null;
   const hasCompatibleCrops =
     product.compatibleCrops && product.compatibleCrops.length > 0;
@@ -88,15 +130,23 @@ export default async function ProductDetailPage({
         <div className="grid grid-cols-1 gap-8 min-[768px]:grid-cols-2 min-[768px]:gap-12">
           {/* Product Image */}
           <div className="overflow-hidden rounded-[var(--radius-card)]">
-            <Image
-              src={product.imageLarge}
-              alt={product.name}
-              width={1000}
-              height={1250}
-              priority
-              className="aspect-[4/5] w-full object-cover"
-              sizes="(max-width: 767px) 100vw, 50vw"
-            />
+            {isBlobImage ? (
+              <img
+                src={product.imageLarge}
+                alt={product.name}
+                className="aspect-[4/5] w-full object-cover"
+              />
+            ) : (
+              <Image
+                src={product.imageLarge}
+                alt={product.name}
+                width={1000}
+                height={1250}
+                priority
+                className="aspect-[4/5] w-full object-cover"
+                sizes="(max-width: 767px) 100vw, 50vw"
+              />
+            )}
           </div>
 
           {/* Product Info */}
@@ -120,7 +170,7 @@ export default async function ProductDetailPage({
             <div className="flex flex-col gap-3">
               <MessengerCTA
                 productName={product.name}
-                packSize={product.variants[0].packSize}
+                packSize={product.variants[0]?.packSize ?? ""}
                 label="Ask on Messenger"
                 variant="default"
                 size="lg"
@@ -139,9 +189,11 @@ export default async function ProductDetailPage({
         </div>
 
         {/* Spec Strip */}
-        <div className="mt-12">
-          <SpecStrip specs={product.specs} />
-        </div>
+        {product.specs.length > 0 && (
+          <div className="mt-12">
+            <SpecStrip specs={product.specs} />
+          </div>
+        )}
 
         {/* What It Does */}
         <div className="mt-10">
