@@ -18,7 +18,7 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
 export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));

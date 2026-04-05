@@ -6,13 +6,14 @@ import { SocialProofStrip } from "@/components/social-proof-strip";
 import { ProductCard } from "@/components/product-card";
 import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
+import { WholesaleBanner } from "@/components/wholesale-banner";
 import { products, type Product } from "@/data/products";
 import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { defaultVideos } from "@/data/videos";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
 export const metadata: Metadata = {
   title: "Noel AgriTV — Natural Solutions for Better Harvests",
@@ -248,7 +249,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 4: Video Reels (TBOF-style carousel) ──────────────── */}
+      {/* ── Section 4: Wholesale CTA ──────────────────────────────────── */}
+      <WholesaleBanner />
+
+      {/* ── Section 5: Video Reels (TBOF-style carousel) ──────────────── */}
       <VideoReelSection videos={videoItems} />
 
       {/* ── Section 5: Featured Video ───────────────────────────────────

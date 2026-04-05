@@ -3,6 +3,8 @@ import { put, get } from "@vercel/blob";
 const CONFIG_PATH = "admin/config.json";
 
 export interface AdminConfig {
+  /** Optimistic lock — incremented on each save to detect concurrent writes */
+  version: number;
   /** Product slugs that are hidden from the storefront */
   hiddenProducts: string[];
   /** Video list — if set, overrides the default static list */
@@ -39,6 +41,7 @@ export interface AdminProduct {
 }
 
 const DEFAULT_CONFIG: AdminConfig = {
+  version: 0,
   hiddenProducts: [],
   videos: null,
   customProducts: null,
@@ -71,7 +74,25 @@ export async function getAdminConfig(
   }
 }
 
-export async function saveAdminConfig(config: AdminConfig): Promise<void> {
+/**
+ * Save admin config with optimistic locking.
+ * Pass expectedVersion (from the config you read) to detect concurrent writes.
+ * If another save happened in between, this throws to prevent data loss.
+ */
+export async function saveAdminConfig(
+  config: AdminConfig,
+  expectedVersion?: number
+): Promise<void> {
+  if (expectedVersion !== undefined) {
+    // Re-read to check version hasn't changed
+    const current = await getAdminConfig({ strict: true });
+    if (current.version !== expectedVersion) {
+      throw new Error(
+        "Config was modified by another request. Please refresh and try again."
+      );
+    }
+  }
+  config.version = (config.version ?? 0) + 1;
   await put(CONFIG_PATH, JSON.stringify(config, null, 2), {
     access: "private",
     addRandomSuffix: false,

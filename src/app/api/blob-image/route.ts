@@ -1,6 +1,14 @@
 import { get } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 
+const ALLOWED_CONTENT_TYPES = [
+  "image/webp",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/avif",
+];
+
 /** Proxy for private Vercel Blob images — serves them publicly via /api/blob-image?url=... */
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get("url");
@@ -8,10 +16,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing url param" }, { status: 400 });
   }
 
-  // Validate URL points to our Vercel Blob store (prevent SSRF)
+  // Validate URL points to OUR Vercel Blob store (prevent SSRF / cross-tenant access)
+  const storeId = process.env.BLOB_STORE_ID;
   try {
     const parsed = new URL(url);
-    if (!parsed.hostname.endsWith(".blob.vercel-storage.com")) {
+    if (storeId) {
+      // Strict: must match our exact store hostname
+      if (parsed.hostname !== `${storeId}.blob.vercel-storage.com`) {
+        return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
+      }
+    } else {
+      // Fallback: at least require the Vercel Blob domain with proper subdomain structure
+      if (
+        !parsed.hostname.endsWith(".blob.vercel-storage.com") ||
+        parsed.hostname === "blob.vercel-storage.com"
+      ) {
+        return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
+      }
+    }
+    if (parsed.protocol !== "https:") {
       return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
     }
   } catch {
@@ -24,9 +47,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    // Only serve known image content types
+    const contentType = result.blob.contentType ?? "image/webp";
+    if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
+      return NextResponse.json({ error: "Invalid content type" }, { status: 403 });
+    }
+
     return new Response(result.stream, {
       headers: {
-        "Content-Type": result.blob.contentType ?? "image/webp",
+        "Content-Type": contentType,
+        "Content-Disposition": "inline",
+        "X-Content-Type-Options": "nosniff",
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });

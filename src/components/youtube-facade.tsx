@@ -12,18 +12,25 @@ interface YouTubeFacadeProps {
 
 export function YouTubeFacade({ videoId, title, className }: YouTubeFacadeProps) {
   const [playing, setPlaying] = useState(false);
-  const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+  // Sanitize videoId — only allow alphanumeric, hyphens, underscores (standard YouTube ID chars)
+  const safeId = /^[\w-]{1,20}$/.test(videoId) ? videoId : "";
+  const thumbnailUrl = safeId
+    ? `https://i.ytimg.com/vi/${safeId}/hqdefault.jpg`
+    : "";
 
   const handlePlay = useCallback(() => {
     setPlaying(true);
     trackVideoPlay(videoId);
   }, [videoId]);
 
+  if (!safeId) return null;
+
   if (playing) {
     return (
       <div className={`relative aspect-video w-full overflow-hidden rounded-lg ${className ?? ""}`}>
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+          src={`https://www.youtube.com/embed/${safeId}?autoplay=1&rel=0`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

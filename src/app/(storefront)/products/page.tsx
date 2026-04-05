@@ -6,7 +6,7 @@ import { CategoryFilter } from "@/components/category-filter";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
 export const metadata: Metadata = {
   title: "All Products",
