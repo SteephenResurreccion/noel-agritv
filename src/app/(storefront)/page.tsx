@@ -167,8 +167,13 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 2: Our Products (TBOF-style: filter pills + product cards) */}
-      <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
-        <div className="container-site mx-auto">
+      <section className="relative overflow-hidden bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
+        {/* Decorative blob — top right */}
+        <svg className="pointer-events-none absolute -right-16 -top-10 h-[180px] w-[260px]" viewBox="0 0 260 180" fill="none" aria-hidden="true">
+          <ellipse cx="140" cy="80" rx="130" ry="90" fill="#4D734C" fillOpacity="0.07" />
+          <ellipse cx="100" cy="110" rx="90" ry="60" fill="#3B593F" fillOpacity="0.05" />
+        </svg>
+        <div className="container-site relative mx-auto">
           <div>
             <h2
               className="font-bold text-brand-darkest"
@@ -195,8 +200,13 @@ export default function HomePage() {
       </section>
 
       {/* ── Section 3: Mission — Brightland-style (text left, image right) ── */}
-      <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
-        <div className="container-site mx-auto">
+      <section className="relative overflow-hidden bg-bg-wheat px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
+        {/* Decorative blob — bottom left */}
+        <svg className="pointer-events-none absolute -bottom-12 -left-14 h-[160px] w-[220px]" viewBox="0 0 220 160" fill="none" aria-hidden="true">
+          <ellipse cx="100" cy="90" rx="110" ry="80" fill="#3B593F" fillOpacity="0.08" />
+          <ellipse cx="140" cy="60" rx="70" ry="50" fill="#4D734C" fillOpacity="0.05" />
+        </svg>
+        <div className="container-site relative mx-auto">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
             {/* Left — Text content */}
             <div>
