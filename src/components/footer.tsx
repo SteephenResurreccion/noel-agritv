@@ -89,9 +89,6 @@ export function Footer() {
               <Link href="/products?category=seeds" className="text-sm text-white/70 transition-colors hover:text-white">
                 Seeds
               </Link>
-              <Link href="/products?category=garden-tools" className="text-sm text-white/70 transition-colors hover:text-white">
-                Garden Tools
-              </Link>
             </nav>
           </div>
 
