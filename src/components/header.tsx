@@ -112,7 +112,7 @@ export function Header() {
             {/* Center — Logo */}
             <Link href="/" className="flex items-center justify-center">
               <Image
-                src="/images/NewLogo.png"
+                src="/images/whitebglogo.png"
                 alt="Noel AgriTV"
                 width={120}
                 height={120}
@@ -327,7 +327,7 @@ export function Header() {
             {/* Panel header */}
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
               <Image
-                src="/images/NewLogo.png"
+                src="/images/whitebglogo.png"
                 alt="Noel AgriTV"
                 width={80}
                 height={80}

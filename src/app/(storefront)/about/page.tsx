@@ -96,7 +96,7 @@ export default function AboutPage() {
           >
             By the Numbers
           </h2>
-          <div className="mt-8 grid grid-cols-2 gap-4 min-[741px]:grid-cols-4">
+          <div className="mx-auto mt-8 grid max-w-md grid-cols-2 gap-4">
             {stats.map((stat) => (
               <div
                 key={stat.label}
