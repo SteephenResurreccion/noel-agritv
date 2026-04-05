@@ -11,6 +11,8 @@ import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { defaultVideos } from "@/data/videos";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Noel AgriTV — Natural Solutions for Better Harvests",
   description:
