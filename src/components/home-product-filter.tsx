@@ -27,16 +27,16 @@ export function HomeProductFilter({
   return (
     <>
       {/* Filter pills — TBOF style: outlined inactive, solid active */}
-      <div className="mt-5 flex gap-2.5 overflow-x-auto pb-2">
+      <div className="mt-6 flex gap-3 overflow-x-auto pb-2">
         {pills.map((pill) => (
           <button
             key={pill.slug}
             onClick={() => setActive(pill.slug)}
             className={cn(
-              "shrink-0 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-semibold transition-colors",
+              "shrink-0 rounded-full px-8 py-3 text-[15px] font-bold transition-colors",
               active === pill.slug
                 ? "bg-brand-darkest text-white"
-                : "border border-brand-darkest/30 bg-transparent text-brand-darkest hover:border-brand-darkest hover:bg-brand-darkest/5"
+                : "bg-brand-accent text-white hover:bg-brand-dark"
             )}
           >
             {pill.name}

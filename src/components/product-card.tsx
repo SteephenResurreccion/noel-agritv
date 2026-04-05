@@ -14,7 +14,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const defaultVariant = product.variants[0];
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-md border border-border/60 bg-surface shadow-sm">
+    <div className="group flex flex-col overflow-hidden rounded-md bg-surface shadow-sm">
       <Link href={`/products/${product.slug}`} className="block overflow-hidden">
         <Image
           src={product.image}
@@ -25,18 +25,18 @@ export function ProductCard({ product }: ProductCardProps) {
           sizes="(max-width: 374px) 100vw, (max-width: 740px) 50vw, (max-width: 999px) 33vw, 25vw"
         />
       </Link>
-      <div className="flex flex-1 flex-col gap-1.5 px-4 py-3">
+      <div className="flex flex-1 flex-col gap-1.5 px-4 py-4">
         <div className="flex items-start justify-between gap-2">
           <Link href={`/products/${product.slug}`} className="hover:underline">
-            <h3 className="text-[15px] font-bold leading-snug text-brand-darkest">
+            <h3 className="text-base font-bold leading-snug text-brand-darkest">
               {product.name}
             </h3>
           </Link>
-          <p className="shrink-0 text-[15px] font-bold text-brand-darkest">
+          <p className="shrink-0 text-base font-bold text-brand-darkest">
             {formatPrice(defaultVariant.price)}
           </p>
         </div>
-        <p className="text-xs text-text-secondary">
+        <p className="text-[13px] text-text-secondary">
           {product.oneLiner}
           {product.variants.length > 1 && (
             <span> · {defaultVariant.packSize}</span>

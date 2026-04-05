@@ -169,7 +169,7 @@ export default function HomePage() {
       {/* ── Section 2: Our Products (TBOF-style: filter pills + product cards) */}
       <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
         <div className="container-site mx-auto">
-          <h2 className="font-heading text-[32px] font-bold italic text-brand-accent min-[741px]:text-[48px]">
+          <h2 className="font-heading text-[38px] font-bold italic text-brand-darkest min-[741px]:text-[54px]">
             Top Picks For You
           </h2>
 
