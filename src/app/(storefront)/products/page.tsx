@@ -52,11 +52,17 @@ export default async function ProductsPage({
             <CategoryFilter />
           </Suspense>
         </div>
-        <div className="grid grid-cols-1 gap-[var(--spacing-grid-gap)] min-[375px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1200px]:grid-cols-4">
-          {filtered.map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))}
-        </div>
+        {filtered.length === 0 ? (
+          <p className="py-12 text-center text-sm text-text-secondary">
+            No products found in this category.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-[var(--spacing-grid-gap)] min-[375px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1200px]:grid-cols-4">
+            {filtered.map((product) => (
+              <ProductCard key={product.slug} product={product} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -14,6 +14,8 @@ interface VideoItem {
 export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  if (videos.length === 0) return null;
+
   function scroll(direction: "left" | "right") {
     if (!scrollRef.current) return;
     const amount = 300;
@@ -103,9 +105,9 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
           ref={scrollRef}
           className="scrollbar-hide flex gap-4 overflow-x-auto pl-[var(--spacing-container-gutter)] pb-2"
         >
-          {videos.map((video, i) => (
+          {videos.map((video) => (
             <a
-              key={i}
+              key={video.title}
               href={video.href}
               target="_blank"
               rel="noopener noreferrer"

@@ -92,13 +92,15 @@ function VideoRow({ video }: { video: AdminVideo }) {
 
       <div className="flex shrink-0 items-center gap-1">
         <button
-          onClick={() =>
+          disabled={isPending}
+          onClick={() => {
+            if (isPending) return;
             startTransition(async () => {
               await toggleVideoVisibility(video.id);
               router.refresh();
-            })
-          }
-          className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
+            });
+          }}
+          className={`flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-bg hover:text-text-primary ${isPending ? "cursor-wait opacity-60" : ""}`}
           title={video.visible ? "Hide" : "Show"}
         >
           {video.visible ? (
@@ -108,7 +110,9 @@ function VideoRow({ video }: { video: AdminVideo }) {
           )}
         </button>
         <button
+          disabled={isPending}
           onClick={() => {
+            if (isPending) return;
             if (confirm("Remove this video?")) {
               startTransition(async () => {
                 await removeVideo(video.id);
@@ -116,7 +120,7 @@ function VideoRow({ video }: { video: AdminVideo }) {
               });
             }
           }}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600"
+          className={`flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600 ${isPending ? "cursor-wait opacity-60" : ""}`}
           title="Remove"
         >
           <Trash2 className="h-4 w-4" />

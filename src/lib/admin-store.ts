@@ -44,7 +44,14 @@ const DEFAULT_CONFIG: AdminConfig = {
   customProducts: null,
 };
 
-export async function getAdminConfig(): Promise<AdminConfig> {
+/**
+ * Read admin config from Blob.
+ * - Default mode: returns DEFAULT_CONFIG on any error (safe for page rendering).
+ * - strict mode: throws on error (use in mutations to prevent overwriting with empty config).
+ */
+export async function getAdminConfig(
+  opts: { strict?: boolean } = {}
+): Promise<AdminConfig> {
   try {
     const result = await get(CONFIG_PATH, {
       access: "private",
@@ -56,6 +63,9 @@ export async function getAdminConfig(): Promise<AdminConfig> {
     const data = JSON.parse(text);
     return { ...DEFAULT_CONFIG, ...data };
   } catch (e) {
+    if (opts.strict) {
+      throw e; // Let mutation callers handle this — don't silently return empty config
+    }
     console.error("Failed to read admin config:", e);
     return DEFAULT_CONFIG;
   }

@@ -8,6 +8,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing url param" }, { status: 400 });
   }
 
+  // Validate URL points to our Vercel Blob store (prevent SSRF)
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.endsWith(".blob.vercel-storage.com")) {
+      return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
+    }
+  } catch {
+    return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+  }
+
   try {
     const result = await get(url, { access: "private" });
     if (!result) {

@@ -7,7 +7,7 @@ export function adminToProduct(p: AdminProduct): Product {
     slug: p.slug,
     name: p.name,
     categorySlug: p.categorySlug,
-    oneLiner: p.description,
+    oneLiner: p.description.length > 100 ? p.description.slice(0, 100) + "..." : p.description,
     description: p.description,
     specs: p.specs ?? [],
     variants: [{ packSize: "", price: 0 }],
