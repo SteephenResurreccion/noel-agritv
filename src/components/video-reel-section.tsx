@@ -103,34 +103,40 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree poking in from left edge — half the canopy visible */}
+      {/* Tree leaning in from left edge */}
       <svg
-        className="pointer-events-none absolute -left-[60px] top-0 h-[220px] w-[160px] min-[741px]:-left-[50px] min-[741px]:h-[300px] min-[741px]:w-[200px]"
-        viewBox="0 0 200 320"
+        className="pointer-events-none absolute -left-[80px] top-4 h-[160px] w-[220px] min-[741px]:-left-[70px] min-[741px]:top-2 min-[741px]:h-[220px] min-[741px]:w-[300px]"
+        viewBox="0 0 300 200"
         fill="none"
         aria-hidden="true"
       >
-        <rect x="110" y="180" width="16" height="140" rx="4" fill="#2A4038" />
-        <ellipse cx="118" cy="120" rx="80" ry="70" fill="#2A4038" />
-        <ellipse cx="90" cy="95" rx="55" ry="45" fill="#172621" />
-        <ellipse cx="150" cy="105" rx="50" ry="40" fill="#2A4038" />
-        <ellipse cx="118" cy="70" rx="40" ry="32" fill="#172621" />
-        <circle cx="178" cy="50" r="10" fill="#4D734C" fillOpacity="0.5" />
+        {/* Trunk extends from left edge horizontally */}
+        <rect x="0" y="100" width="120" height="16" rx="4" fill="#2A4038" />
+        {/* Canopy cluster at the end of trunk */}
+        <ellipse cx="160" cy="90" rx="70" ry="60" fill="#2A4038" />
+        <ellipse cx="135" cy="70" rx="50" ry="40" fill="#172621" />
+        <ellipse cx="190" cy="80" rx="45" ry="38" fill="#2A4038" />
+        <ellipse cx="160" cy="55" rx="35" ry="28" fill="#172621" />
+        {/* Small accent circle */}
+        <circle cx="230" cy="42" r="9" fill="#4D734C" fillOpacity="0.5" />
       </svg>
 
-      {/* Tree poking in from right edge — half the canopy visible */}
+      {/* Tree leaning in from right edge */}
       <svg
-        className="pointer-events-none absolute -right-[50px] bottom-0 h-[200px] w-[150px] min-[741px]:-right-[40px] min-[741px]:h-[280px] min-[741px]:w-[190px]"
-        viewBox="0 0 190 300"
+        className="pointer-events-none absolute -right-[80px] bottom-4 h-[150px] w-[210px] min-[741px]:-right-[70px] min-[741px]:bottom-2 min-[741px]:h-[200px] min-[741px]:w-[280px]"
+        viewBox="0 0 280 190"
         fill="none"
         aria-hidden="true"
       >
-        <rect x="80" y="170" width="14" height="130" rx="4" fill="#2A4038" />
-        <ellipse cx="87" cy="110" rx="75" ry="65" fill="#2A4038" />
-        <ellipse cx="60" cy="85" rx="50" ry="40" fill="#2A4038" />
-        <ellipse cx="120" cy="95" rx="52" ry="42" fill="#172621" />
-        <ellipse cx="87" cy="62" rx="36" ry="28" fill="#172621" />
-        <path d="M15 230 Q30 195 22 160 Q40 190 28 225Z" fill="#3B593F" fillOpacity="0.5" />
+        {/* Trunk extends from right edge horizontally */}
+        <rect x="160" y="100" width="120" height="14" rx="4" fill="#2A4038" />
+        {/* Canopy cluster at the end of trunk */}
+        <ellipse cx="120" cy="85" rx="65" ry="55" fill="#2A4038" />
+        <ellipse cx="145" cy="65" rx="45" ry="36" fill="#172621" />
+        <ellipse cx="90" cy="75" rx="42" ry="35" fill="#2A4038" />
+        <ellipse cx="120" cy="48" rx="32" ry="26" fill="#172621" />
+        {/* Small leaf accent */}
+        <path d="M50 60 Q60 40 55 20 Q70 38 58 58Z" fill="#3B593F" fillOpacity="0.5" />
       </svg>
 
       {/* Heading */}
