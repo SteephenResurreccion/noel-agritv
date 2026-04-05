@@ -60,6 +60,7 @@ export async function saveAdminConfig(config: AdminConfig): Promise<void> {
   await put(CONFIG_PATH, JSON.stringify(config, null, 2), {
     access: "private",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: "application/json",
   });
 }

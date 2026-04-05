@@ -56,6 +56,7 @@ export async function addProduct(formData: FormData) {
       const blob = await put(`products/${slug}.${ext}`, imageFile, {
         access: "private",
         addRandomSuffix: false,
+        allowOverwrite: true,
         contentType: imageFile.type,
       });
       imageUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
