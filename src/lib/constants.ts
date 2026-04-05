@@ -22,3 +22,6 @@ export function messengerProductLink(
   const text = `Hi, I'm interested in ${productName} (${packSize})`;
   return `${MESSENGER_URL}?text=${encodeURIComponent(text)}`;
 }
+
+/** Messenger link with prefilled wholesale inquiry */
+export const MESSENGER_WHOLESALE_URL = `${MESSENGER_URL}?text=${encodeURIComponent("Hi, I'm interested in wholesale pricing")}`;

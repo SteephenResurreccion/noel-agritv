@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Package, Phone } from "lucide-react";
 
 import {
   Accordion,
@@ -13,6 +13,7 @@ import {
   EMAIL,
   FACEBOOK_URL,
   MESSENGER_URL,
+  MESSENGER_WHOLESALE_URL,
   PHONE_NUMBER,
   PHONE_TEL,
 } from "@/lib/constants";
@@ -131,6 +132,27 @@ export function ContactPageClient() {
             <div>
               <p className="font-semibold">Email</p>
               <p className="mt-0.5 text-sm text-text-secondary">{EMAIL}</p>
+            </div>
+          </Link>
+
+          {/* 5. Wholesale Inquiries */}
+          <Link
+            href={MESSENGER_WHOLESALE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-4 rounded-[var(--radius-card)] bg-brand-darkest p-5 text-white transition-opacity hover:opacity-90"
+          >
+            <Package className="mt-0.5 size-6 shrink-0 text-brand-accent" />
+            <div>
+              <p className="font-semibold">Wholesale Inquiries</p>
+              <p className="mt-0.5 text-sm text-white/70">
+                Buying in bulk? We offer volume discounts on all products with
+                nationwide J&T delivery. Message us or call for wholesale
+                pricing.
+              </p>
+              <p className="mt-2 text-sm font-semibold text-brand-accent">
+                Inquire on Messenger →
+              </p>
             </div>
           </Link>
         </div>
