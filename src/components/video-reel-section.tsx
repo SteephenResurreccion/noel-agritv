@@ -103,36 +103,44 @@ export function VideoReelSection() {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree at left edge — half cropped, only right side of canopy visible */}
+      {/* Tree at left edge — trunk flush with left side, canopy extends right */}
       <svg
-        className="pointer-events-none absolute -left-[70px] -top-[20px] h-[240px] w-[160px] min-[741px]:-left-[80px] min-[741px]:-top-[10px] min-[741px]:h-[320px] min-[741px]:w-[200px]"
-        viewBox="0 0 200 360"
+        className="pointer-events-none absolute left-0 top-0 h-[240px] w-[120px] min-[741px]:h-[320px] min-[741px]:w-[150px]"
+        viewBox="0 0 150 360"
         fill="none"
         aria-hidden="true"
       >
-        <rect x="90" y="210" width="16" height="150" rx="4" fill="#2A4038" />
-        <path d="M106 250 Q135 230 148 205" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
-        <ellipse cx="100" cy="140" rx="85" ry="75" fill="#2A4038" />
-        <ellipse cx="75" cy="112" rx="60" ry="48" fill="#172621" />
-        <ellipse cx="135" cy="125" rx="55" ry="45" fill="#2A4038" />
-        <ellipse cx="105" cy="82" rx="48" ry="38" fill="#172621" />
-        <circle cx="175" cy="72" r="9" fill="#4D734C" fillOpacity="0.45" />
+        {/* Trunk at x=0, touching the left edge */}
+        <rect x="-2" y="210" width="16" height="150" rx="4" fill="#2A4038" />
+        {/* Branch */}
+        <path d="M14 248 Q40 228 52 205" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
+        {/* Canopy — left half extends past x=0 (clipped by viewBox), right half visible */}
+        <ellipse cx="10" cy="140" rx="80" ry="72" fill="#2A4038" />
+        <ellipse cx="-10" cy="112" rx="55" ry="45" fill="#172621" />
+        <ellipse cx="50" cy="125" rx="52" ry="44" fill="#2A4038" />
+        <ellipse cx="15" cy="82" rx="45" ry="36" fill="#172621" />
+        {/* Accent dot */}
+        <circle cx="95" cy="72" r="9" fill="#4D734C" fillOpacity="0.45" />
       </svg>
 
-      {/* Tree at right edge — half cropped, only left side of canopy visible */}
+      {/* Tree at right edge — trunk flush with right side, canopy extends left */}
       <svg
-        className="pointer-events-none absolute -bottom-[40px] -right-[65px] h-[220px] w-[150px] min-[741px]:-bottom-[30px] min-[741px]:-right-[75px] min-[741px]:h-[300px] min-[741px]:w-[190px]"
-        viewBox="0 0 190 340"
+        className="pointer-events-none absolute bottom-0 right-0 h-[220px] w-[110px] min-[741px]:h-[300px] min-[741px]:w-[140px]"
+        viewBox="0 0 140 340"
         fill="none"
         aria-hidden="true"
       >
-        <rect x="88" y="195" width="15" height="145" rx="4" fill="#2A4038" />
-        <path d="M88 230 Q58 215 45 190" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
-        <ellipse cx="95" cy="130" rx="80" ry="68" fill="#2A4038" />
-        <ellipse cx="120" cy="105" rx="55" ry="44" fill="#172621" />
-        <ellipse cx="60" cy="118" rx="48" ry="40" fill="#2A4038" />
-        <ellipse cx="90" cy="78" rx="40" ry="34" fill="#172621" />
-        <path d="M22 158 Q32 138 26 115 Q42 133 30 155Z" fill="#3B593F" fillOpacity="0.45" />
+        {/* Trunk at right edge */}
+        <rect x="126" y="195" width="16" height="145" rx="4" fill="#2A4038" />
+        {/* Branch */}
+        <path d="M126 228 Q98 212 85 188" stroke="#2A4038" strokeWidth="5" fill="none" strokeLinecap="round" />
+        {/* Canopy — right half extends past viewBox (clipped), left half visible */}
+        <ellipse cx="130" cy="128" rx="78" ry="66" fill="#2A4038" />
+        <ellipse cx="150" cy="102" rx="52" ry="42" fill="#172621" />
+        <ellipse cx="90" cy="116" rx="48" ry="40" fill="#2A4038" />
+        <ellipse cx="125" cy="76" rx="40" ry="32" fill="#172621" />
+        {/* Leaf accent */}
+        <path d="M42 152 Q52 132 46 110 Q60 128 48 150Z" fill="#3B593F" fillOpacity="0.45" />
       </svg>
 
       {/* Heading */}
