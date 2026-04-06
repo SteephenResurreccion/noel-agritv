@@ -29,7 +29,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
       {/* Tree top-left — diagonal trunk from bottom-left corner, wide flat canopy */}
       <svg
-        className="pointer-events-none absolute left-0 top-0 h-[180px] w-[160px] -translate-x-[20%] min-[741px]:h-[240px] min-[741px]:w-[210px]"
+        className="pointer-events-none absolute left-0 top-0 z-0 h-[180px] w-[160px] -translate-x-[20%] min-[741px]:h-[240px] min-[741px]:w-[210px]"
         viewBox="0 0 210 200"
         fill="none"
         aria-hidden="true"
@@ -52,7 +52,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
 
       {/* Tree bottom-right — diagonal trunk from bottom-right corner, wide flat canopy */}
       <svg
-        className="pointer-events-none absolute bottom-0 right-0 h-[170px] w-[150px] translate-x-[20%] min-[741px]:h-[220px] min-[741px]:w-[195px]"
+        className="pointer-events-none absolute bottom-0 right-0 z-0 h-[170px] w-[150px] translate-x-[20%] min-[741px]:h-[220px] min-[741px]:w-[195px]"
         viewBox="0 0 195 190"
         fill="none"
         aria-hidden="true"
@@ -74,14 +74,14 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
       </svg>
 
       {/* Heading */}
-      <div className="px-[var(--spacing-container-gutter)]">
+      <div className="relative z-10 px-[var(--spacing-container-gutter)]">
         <h2 className="text-center text-[26px] font-bold italic text-brand-darkest min-[741px]:text-[36px]">
           See It From the Farm — Come Take a Peek!
         </h2>
       </div>
 
       {/* Full-bleed carousel */}
-      <div className="relative mt-10">
+      <div className="relative z-10 mt-10">
         {/* Left arrow */}
         <button
           onClick={() => scroll("left")}
@@ -150,7 +150,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
       </div>
 
       {/* CTA to Facebook */}
-      <div className="mt-6 text-center">
+      <div className="relative z-10 mt-6 text-center">
         <a
           href={FACEBOOK_URL}
           target="_blank"
