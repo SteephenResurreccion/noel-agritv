@@ -41,7 +41,7 @@ export function MessengerCTA({
       className={cn(buttonVariants({ variant, size }), className)}
       onClick={() => trackMessengerClick(context ?? productName ?? "general")}
     >
-      <MessageCircle className="mr-2 h-4 w-4" />
+      <MessageCircle className="mr-2 h-4 w-4 shrink-0" />
       {displayLabel}
     </a>
   );

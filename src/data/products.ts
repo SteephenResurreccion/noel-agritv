@@ -29,14 +29,14 @@ export const products: Product[] = [
     slug: "bio-plant-booster",
     name: "Bio Plant Booster",
     categorySlug: "crop-care",
-    oneLiner: "Bio-organic foliar and soil conditioner for healthier crops",
+    oneLiner: "Bio-fertilizer foliar and soil conditioner for healthier crops",
     description:
-      "Bio Plant Booster is a bio-organic growth enhancer formulated to improve soil health and stimulate plant growth. It contains beneficial microorganisms that help break down organic matter, making nutrients more available to plants. Regular application promotes stronger root development, better nutrient uptake, and improved crop yields.",
+      "Bio Plant Booster is a bio-fertilizer growth enhancer formulated to improve soil health and stimulate plant growth. It contains beneficial microorganisms that help break down organic matter, making nutrients more available to plants. Regular application promotes stronger root development, better nutrient uptake, and improved crop yields.",
     specs: [
       { label: "Type", value: "Liquid" },
       { label: "Application", value: "Foliar / Soil Drench" },
       { label: "Suitable For", value: "Rice, Corn, Vegetables" },
-      { label: "Active Ingredient", value: "Bio-organic microorganisms" },
+      { label: "Active Ingredient", value: "Bio-fertilizer microorganisms" },
     ],
     variants: [
       { packSize: "250ml", price: 350 },

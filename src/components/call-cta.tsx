@@ -27,7 +27,7 @@ export function CallCTA({
       className={cn(buttonVariants({ variant, size }), className)}
       onClick={() => trackCallClick(context ?? "general")}
     >
-      <Phone className="mr-2 h-4 w-4" />
+      <Phone className="mr-2 h-4 w-4 shrink-0" />
       {label}
     </a>
   );

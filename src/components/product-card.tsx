@@ -47,11 +47,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <MessengerCTA
             productName={product.name}
             packSize=""
-            label="ASK ON MESSENGER"
+            label="Ask on Messenger"
             variant="default"
             size="default"
             context="catalog"
-            className="w-full rounded-[4px] bg-brand-darkest text-xs font-bold uppercase tracking-wider hover:bg-brand-dark"
+            className="w-full rounded-[4px] bg-brand-darkest text-sm font-semibold hover:bg-brand-dark"
           />
         </div>
       </div>

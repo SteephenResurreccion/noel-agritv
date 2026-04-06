@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Menu,
@@ -25,24 +25,43 @@ const OWNER_NAV_ITEMS = [
 export function AdminMobileNav({ role }: { role?: string }) {
   const [open, setOpen] = useState(false);
 
+  // Close on outside tap
+  useEffect(() => {
+    if (!open) return;
+    function handleClick() {
+      setOpen(false);
+    }
+    // Delay to avoid closing from the same tap that opened it
+    const id = setTimeout(() => {
+      document.addEventListener("click", handleClick);
+    }, 0);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener("click", handleClick);
+    };
+  }, [open]);
+
   return (
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-9 w-9 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-bg hover:text-text-primary md:hidden"
+        className="flex h-10 w-10 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-bg hover:text-text-primary md:hidden"
         aria-label={open ? "Close menu" : "Open menu"}
       >
         {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {open && (
-        <nav className="absolute left-0 right-0 top-14 z-50 border-b border-border bg-surface p-2 md:hidden">
+        <nav
+          onClick={(e) => e.stopPropagation()}
+          className="absolute left-0 right-0 top-14 z-50 max-h-[70vh] overflow-y-auto border-b border-border bg-surface p-2 shadow-lg md:hidden"
+        >
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
+              className="flex items-center gap-2.5 rounded-md px-3 py-3 text-sm font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
             >
               <item.icon className="h-4 w-4" />
               {item.label}
@@ -54,7 +73,7 @@ export function AdminMobileNav({ role }: { role?: string }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
+                className="flex items-center gap-2.5 rounded-md px-3 py-3 text-sm font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
@@ -64,7 +83,7 @@ export function AdminMobileNav({ role }: { role?: string }) {
             <Link
               href="/"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-md px-3 py-2.5 text-xs font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
+              className="flex items-center gap-2 rounded-md px-3 py-3 text-xs font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               View Store

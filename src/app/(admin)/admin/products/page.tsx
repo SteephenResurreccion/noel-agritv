@@ -38,7 +38,7 @@ export default async function AdminProductsPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-text-secondary">
             Custom Products
           </h2>
-          <div className="overflow-hidden rounded-lg border border-border bg-surface">
+          <div className="overflow-x-auto rounded-lg border border-border bg-surface">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-border bg-bg">

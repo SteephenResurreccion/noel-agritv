@@ -95,22 +95,22 @@ export async function AdminShell({ children }: { children: React.ReactNode }) {
             <span className="text-sm font-bold text-brand-darkest">Admin</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 md:gap-3">
             {session?.user?.image && (
               <Image
                 src={session.user.image}
                 alt=""
                 width={32}
                 height={32}
-                className="h-7 w-7 rounded-full"
+                className="h-7 w-7 shrink-0 rounded-full"
               />
             )}
-            <span className="text-sm text-text-secondary">
+            <span className="hidden truncate text-sm text-text-secondary md:inline">
               {session?.user?.name}
             </span>
             {session?.user?.role && (
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                   session.user.role === "owner"
                     ? "bg-amber-50 text-amber-700"
                     : "bg-brand-accent/10 text-brand-accent"
@@ -127,7 +127,7 @@ export async function AdminShell({ children }: { children: React.ReactNode }) {
             >
               <button
                 type="submit"
-                className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
+                className="shrink-0 rounded-md border border-border px-2.5 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-bg hover:text-text-primary"
               >
                 Sign Out
               </button>

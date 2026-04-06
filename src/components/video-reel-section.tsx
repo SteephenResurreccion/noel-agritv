@@ -103,7 +103,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
         {/* Scrollable track — full bleed */}
         <div
           ref={scrollRef}
-          className="scrollbar-hide flex gap-4 overflow-x-auto pl-[var(--spacing-container-gutter)] pb-2"
+          className="scrollbar-hide flex gap-4 overflow-x-auto pl-[var(--spacing-container-gutter)] pr-[var(--spacing-container-gutter)] pb-2"
         >
           {videos.map((video) => (
             <a

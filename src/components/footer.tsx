@@ -12,7 +12,7 @@ import {
 
 export function Footer() {
   return (
-    <footer className="bg-brand-darkest text-white">
+    <footer className="bg-brand-darkest pb-20 text-white md:pb-0">
       <div className="container-site py-12">
         {/* Main grid — stacks on mobile, 4 columns on desktop */}
         <div className="grid gap-10 min-[741px]:grid-cols-[1.4fr_1fr_1fr_1fr] min-[741px]:gap-8">
@@ -44,7 +44,7 @@ export function Footer() {
                 href={FACEBOOK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-brand-accent hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-brand-accent hover:text-white"
                 aria-label="Facebook"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -55,7 +55,7 @@ export function Footer() {
                 href={YOUTUBE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-brand-accent hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-brand-accent hover:text-white"
                 aria-label="YouTube"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -66,7 +66,7 @@ export function Footer() {
                 href={MESSENGER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-brand-accent hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-brand-accent hover:text-white"
                 aria-label="Messenger"
               >
                 <MessageCircle className="h-4 w-4" />
@@ -115,14 +115,14 @@ export function Footer() {
             <div className="mt-4 flex flex-col gap-2.5">
               <a
                 href={PHONE_TEL}
-                className="flex items-center gap-2 text-sm text-white/70 transition-colors hover:text-white"
+                className="flex items-center gap-2 py-1.5 text-sm text-white/70 transition-colors hover:text-white"
               >
                 <Phone className="h-4 w-4 shrink-0" />
                 {PHONE_NUMBER}
               </a>
               <a
                 href={`mailto:${EMAIL}`}
-                className="flex items-center gap-2 text-sm text-white/70 transition-colors hover:text-white"
+                className="flex items-center gap-2 py-1.5 text-sm text-white/70 transition-colors hover:text-white"
               >
                 <Mail className="h-4 w-4 shrink-0" />
                 {EMAIL}
@@ -131,7 +131,7 @@ export function Footer() {
                 href={MESSENGER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-white/70 transition-colors hover:text-white"
+                className="flex items-center gap-2 py-1.5 text-sm text-white/70 transition-colors hover:text-white"
               >
                 <MessageCircle className="h-4 w-4 shrink-0" />
                 Message us on Facebook

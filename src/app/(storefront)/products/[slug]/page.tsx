@@ -264,7 +264,7 @@ export default async function ProductDetailPage({
             <h2 className="mb-4 text-[length:var(--font-size-h2)] font-bold text-brand-darkest">
               You May Also Like
             </h2>
-            <div className="flex gap-[var(--spacing-grid-gap)] overflow-x-auto pb-2">
+            <div className="flex gap-[var(--spacing-grid-gap)] overflow-x-auto pb-4">
               {relatedProducts.map((rp) => (
                 <div
                   key={rp.slug}

@@ -17,7 +17,7 @@ export function MobileBottomBar() {
           href="/products"
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
-          <ShoppingBag className="h-5 w-5" />
+          <ShoppingBag className="h-5 w-5 shrink-0" />
           <span className="text-[11px] font-semibold">Products</span>
         </Link>
         <a
@@ -27,7 +27,7 @@ export function MobileBottomBar() {
           onClick={() => trackMessengerClick("bottom-bar")}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
-          <MessageCircle className="h-5 w-5" />
+          <MessageCircle className="h-5 w-5 shrink-0" />
           <span className="text-[11px] font-semibold">Message</span>
         </a>
         <a
@@ -35,7 +35,7 @@ export function MobileBottomBar() {
           onClick={() => trackCallClick("bottom-bar")}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
-          <Phone className="h-5 w-5" />
+          <Phone className="h-5 w-5 shrink-0" />
           <span className="text-[11px] font-semibold">Call</span>
         </a>
       </div>
