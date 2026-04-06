@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Users,
 } from "lucide-react";
+import { AdminMobileNav } from "./admin-mobile-nav";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -80,9 +81,10 @@ export async function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Top bar */}
-        <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4 md:justify-end">
-          {/* Mobile logo */}
+        <header className="relative flex h-14 items-center justify-between border-b border-border bg-surface px-4 md:justify-end">
+          {/* Mobile nav */}
           <div className="flex items-center gap-2 md:hidden">
+            <AdminMobileNav role={session?.user?.role} />
             <Image
               src="/images/NewLogo.png"
               alt="Noel AgriTV"

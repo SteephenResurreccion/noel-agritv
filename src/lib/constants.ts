@@ -1,5 +1,6 @@
 /** Client's Facebook Messenger deep link */
-export const MESSENGER_URL = "https://m.me/noeltolentino2728";
+export const MESSENGER_URL =
+  "https://www.facebook.com/messages/t/noeltolentino2728";
 
 /** Facebook page URL */
 export const FACEBOOK_URL = "https://www.facebook.com/noeltolentino2728/";
