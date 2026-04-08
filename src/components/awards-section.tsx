@@ -132,6 +132,13 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
 
         {/* Scrollable track — user can also swipe/scroll manually */}
         <div
+          className="relative"
+          style={{
+            maskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+          }}
+        >
+        <div
           ref={trackRef}
           onTouchStart={() => { pausedRef.current = true; }}
           onTouchEnd={() => {
@@ -179,6 +186,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
               </div>
             );
           })}
+        </div>
         </div>
 
         {/* Dots */}
