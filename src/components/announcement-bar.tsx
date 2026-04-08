@@ -8,8 +8,8 @@ const announcements = [
 ];
 
 export function AnnouncementBar() {
-  // Duplicate items for seamless infinite scroll
-  const items = [...announcements, ...announcements];
+  // Duplicate 4x for seamless loop on wide screens
+  const items = [...announcements, ...announcements, ...announcements, ...announcements];
 
   return (
     <div className="overflow-hidden bg-brand-darkest text-white">
