@@ -60,6 +60,11 @@ const DEFAULT_CONFIG: AdminConfig = {
 export async function getAdminConfig(
   opts: { strict?: boolean } = {}
 ): Promise<AdminConfig> {
+  // If blob token isn't configured, skip blob entirely
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    if (opts.strict) throw new Error("BLOB_READ_WRITE_TOKEN not configured");
+    return DEFAULT_CONFIG;
+  }
   try {
     const result = await get(CONFIG_PATH, {
       access: "private",

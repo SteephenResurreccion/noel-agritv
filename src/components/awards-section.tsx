@@ -143,16 +143,16 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
           className="scrollbar-hide flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pl-[var(--spacing-container-gutter)] pr-[var(--spacing-container-gutter)] min-[741px]:gap-6"
         >
           {awards.map((award, i) => {
-            const dist = Math.min(
-              Math.abs(i - current),
-              awards.length - Math.abs(i - current)
-            );
-            const opacity = dist <= 1 ? 1 : 0.35;
+            // Highlight current, next, and the one after next
+            const next1 = (current + 1) % awards.length;
+            const next2 = (current + 2) % awards.length;
+            const isHighlighted = i === current || i === next1 || i === next2;
+            const opacity = isHighlighted ? 1 : 0.35;
 
             return (
               <div
                 key={i}
-                className="w-[42%] shrink-0 snap-start min-[741px]:w-[38%]"
+                className="w-[36%] shrink-0 snap-start min-[741px]:w-[30%]"
                 style={{
                   opacity,
                   transition: "opacity 0.8s cubic-bezier(0.33, 0, 0.2, 1)",
@@ -164,7 +164,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
                     alt={award.label}
                     width={600}
                     height={400}
-                    className="aspect-[3/4] w-full object-contain"
+                    className="aspect-[4/5] w-full object-cover"
                     sizes="(max-width: 740px) 40vw, 38vw"
                   />
                 </div>
