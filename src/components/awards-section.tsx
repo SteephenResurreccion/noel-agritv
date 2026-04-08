@@ -164,7 +164,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
                     alt={award.label}
                     width={600}
                     height={400}
-                    className="aspect-[3/2] w-full object-cover"
+                    className="aspect-[3/4] w-full object-contain"
                     sizes="(max-width: 740px) 40vw, 38vw"
                   />
                 </div>
