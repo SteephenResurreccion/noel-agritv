@@ -20,7 +20,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <img
             src={product.image}
             alt={product.name}
-            className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="aspect-[4/5] w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         ) : (
@@ -29,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
             alt={product.name}
             width={500}
             height={500}
-            className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="aspect-[4/5] w-full object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 374px) 100vw, (max-width: 740px) 50vw, (max-width: 999px) 33vw, 25vw"
           />
         )}
