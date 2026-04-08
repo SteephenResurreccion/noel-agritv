@@ -28,13 +28,17 @@ export default async function HomePage() {
 
   try {
     const config = await getAdminConfig();
-    const builtIn = products.filter(
-      (p) => !config.hiddenProducts.includes(p.slug)
-    );
     const custom: Product[] = (config.customProducts ?? [])
       .filter((p) => p.visible)
       .map(adminToProduct);
-    visibleProducts = [...builtIn, ...custom];
+
+    if (custom.length > 0) {
+      visibleProducts = custom;
+    } else {
+      visibleProducts = products.filter(
+        (p) => !config.hiddenProducts.includes(p.slug)
+      );
+    }
     if (config.videos) {
       videoItems = config.videos.filter((v) => v.visible);
     }

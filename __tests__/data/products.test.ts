@@ -19,15 +19,6 @@ describe("products data", () => {
     }
   });
 
-  it("every product has at least one variant with price > 0", () => {
-    for (const product of products) {
-      expect(product.variants.length).toBeGreaterThan(0);
-      for (const variant of product.variants) {
-        expect(variant.price).toBeGreaterThan(0);
-      }
-    }
-  });
-
   it("every product slug is unique", () => {
     const slugs = products.map((p) => p.slug);
     expect(new Set(slugs).size).toBe(slugs.length);

@@ -297,12 +297,6 @@ export function Header() {
                         <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
                           {product.name}
                         </p>
-                        <p className="mt-0.5 text-sm font-bold text-brand-accent">
-                          ₱{product.variants[0].price.toLocaleString()}
-                        </p>
-                        <p className="mt-0.5 text-xs text-text-secondary">
-                          {product.variants[0].packSize}
-                        </p>
                       </Link>
                     ))}
                   </div>

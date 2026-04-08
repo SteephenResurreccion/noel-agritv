@@ -25,11 +25,7 @@ export async function generateStaticParams() {
 }
 
 async function findProduct(slug: string): Promise<Product | undefined> {
-  // Check built-in products first
-  const builtIn = getProductBySlug(slug);
-  if (builtIn) return builtIn;
-
-  // Check custom products from admin config
+  // Check custom products first (includes seeded built-in products)
   try {
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? []).find(
@@ -40,7 +36,8 @@ async function findProduct(slug: string): Promise<Product | undefined> {
     // Blob not configured
   }
 
-  return undefined;
+  // Fallback to hardcoded built-in products (before admin seeds them)
+  return getProductBySlug(slug);
 }
 
 export async function generateMetadata({
@@ -63,29 +60,6 @@ export async function generateMetadata({
   };
 }
 
-function VariantPriceBlock({ product }: { product: Product }) {
-  // Hide price block if no real variants
-  const hasRealVariants = product.variants.some(
-    (v) => v.packSize && v.price > 0
-  );
-  if (!hasRealVariants) return null;
-
-  return (
-    <div className="space-y-2 rounded-[var(--radius-card)] border border-border bg-bg p-4">
-      {product.variants.map((variant) => (
-        <div
-          key={variant.packSize}
-          className="flex items-center justify-between"
-        >
-          <span className="font-semibold text-text-primary">
-            {variant.packSize}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default async function ProductDetailPage({
   params,
 }: {
@@ -101,13 +75,17 @@ export default async function ProductDetailPage({
   let allProducts = products;
   try {
     const config = await getAdminConfig();
-    const builtIn = products.filter(
-      (p) => !config.hiddenProducts.includes(p.slug)
-    );
     const custom = (config.customProducts ?? [])
       .filter((p) => p.visible)
       .map(adminToProduct);
-    allProducts = [...builtIn, ...custom];
+
+    if (custom.length > 0) {
+      allProducts = custom;
+    } else {
+      allProducts = products.filter(
+        (p) => !config.hiddenProducts.includes(p.slug)
+      );
+    }
   } catch {
     // use defaults
   }
@@ -165,12 +143,10 @@ export default async function ProductDetailPage({
               {product.oneLiner}
             </p>
 
-            <VariantPriceBlock product={product} />
-
             <div className="flex flex-col gap-3">
               <MessengerCTA
                 productName={product.name}
-                packSize={product.variants[0]?.packSize ?? ""}
+                packSize=""
                 label="Ask on Messenger"
                 variant="default"
                 size="lg"

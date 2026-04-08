@@ -76,6 +76,53 @@ function revalidateStorefront() {
   revalidatePath("/products");
 }
 
+// ── Product Seeding ──
+
+/** Seed the 4 built-in products into customProducts if they don't exist yet */
+export async function seedBuiltInProducts() {
+  await requireAuth();
+  try {
+    const { products: builtInProducts } = await import("@/data/products");
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+
+    const existingSlugs = new Set(
+      (config.customProducts ?? []).map((p) => p.slug)
+    );
+
+    const newProducts: AdminProduct[] = builtInProducts
+      .filter((p) => !existingSlugs.has(p.slug))
+      .map((p) => ({
+        id: crypto.randomUUID(),
+        slug: p.slug,
+        name: p.name,
+        description: p.oneLiner,
+        image: p.image,
+        categorySlug: p.categorySlug,
+        visible: true,
+        specs: p.specs,
+        howToApply: p.howToApply,
+        compatibleCrops: p.compatibleCrops,
+        safetyNotes: p.safetyNotes,
+      }));
+
+    if (newProducts.length === 0) return;
+
+    config.customProducts = [
+      ...newProducts,
+      ...(config.customProducts ?? []),
+    ];
+    // Clear the built-in hidden list since they're now custom
+    config.hiddenProducts = [];
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/products");
+    revalidateStorefront();
+  } catch (e) {
+    console.error("seedBuiltInProducts failed:", e);
+    throw new Error("Failed to seed products. Please try again.");
+  }
+}
+
 // ── Products ──
 
 export async function toggleProductVisibility(slug: string) {

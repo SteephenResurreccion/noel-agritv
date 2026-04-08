@@ -46,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="mt-auto pt-3">
           <MessengerCTA
             productName={product.name}
-            packSize={product.variants[0]?.packSize ?? ""}
+            packSize=""
             label="Message Us"
             variant="default"
             size="default"

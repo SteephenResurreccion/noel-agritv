@@ -8,15 +8,21 @@ import { getAdminConfig } from "@/lib/admin-store";
 export default async function AdminDashboardPage() {
   const session = await auth();
 
+  let totalProducts = products.length;
   let visibleProducts = products.length;
   let videoCount = 0;
   try {
     const config = await getAdminConfig();
-    visibleProducts = products.length - config.hiddenProducts.length;
+    const custom = config.customProducts ?? [];
+    if (custom.length > 0) {
+      totalProducts = custom.length;
+      visibleProducts = custom.filter((p) => p.visible).length;
+    } else {
+      visibleProducts = products.length - config.hiddenProducts.length;
+    }
     videoCount = config.videos?.filter((v) => v.visible).length ?? 0;
   } catch {
     // Blob not configured yet — show defaults
-    visibleProducts = products.length;
   }
 
   return (
@@ -43,7 +49,7 @@ export default async function AdminDashboardPage() {
                 {visibleProducts}
                 <span className="text-sm font-normal text-text-secondary">
                   {" "}
-                  / {products.length} visible
+                  / {totalProducts} visible
                 </span>
               </p>
             </div>

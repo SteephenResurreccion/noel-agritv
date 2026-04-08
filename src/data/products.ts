@@ -3,11 +3,6 @@ export interface ProductSpec {
   value: string;
 }
 
-export interface ProductVariant {
-  packSize: string;
-  price: number;
-}
-
 export interface Product {
   slug: string;
   name: string;
@@ -15,7 +10,6 @@ export interface Product {
   oneLiner: string;
   description: string;
   specs: ProductSpec[];
-  variants: ProductVariant[];
   image: string;
   imageLarge: string;
   youtubeId: string | null;
@@ -38,11 +32,6 @@ export const products: Product[] = [
       { label: "Suitable For", value: "Rice, Corn, Vegetables" },
       { label: "Active Ingredient", value: "Bio-fertilizer microorganisms" },
     ],
-    variants: [
-      { packSize: "250ml", price: 350 },
-      { packSize: "500ml", price: 600 },
-      { packSize: "1L", price: 1000 },
-    ],
     image: "/images/products/bio-plant-booster.webp",
     imageLarge: "/images/products/bio-plant-booster-lg.webp",
     youtubeId: null,
@@ -62,11 +51,6 @@ export const products: Product[] = [
       { label: "Application", value: "Soil Drench" },
       { label: "Suitable For", value: "Rice, Corn, Vegetables" },
       { label: "Active Ingredient", value: "Natural enzymes" },
-    ],
-    variants: [
-      { packSize: "250ml", price: 350 },
-      { packSize: "500ml", price: 600 },
-      { packSize: "1L", price: 1000 },
     ],
     image: "/images/products/bio-enzyme.webp",
     imageLarge: "/images/products/bio-enzyme-lg.webp",
@@ -88,7 +72,6 @@ export const products: Product[] = [
       { label: "Days to Maturity", value: "110–120 days" },
       { label: "Seed Rate", value: "40–60 kg/ha" },
     ],
-    variants: [{ packSize: "1kg", price: 450 }],
     image: "/images/products/jasmine-479-rice-seeds.webp",
     imageLarge: "/images/products/jasmine-479-rice-seeds-lg.webp",
     youtubeId: null,
@@ -109,7 +92,6 @@ export const products: Product[] = [
       { label: "Days to Maturity", value: "105–115 days" },
       { label: "Seed Rate", value: "40–60 kg/ha" },
     ],
-    variants: [{ packSize: "1kg", price: 400 }],
     image: "/images/products/mayumi-rice-seeds.webp",
     imageLarge: "/images/products/mayumi-rice-seeds-lg.webp",
     youtubeId: null,

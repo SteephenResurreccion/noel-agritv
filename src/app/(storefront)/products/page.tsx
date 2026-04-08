@@ -26,13 +26,19 @@ export default async function ProductsPage({
 
   try {
     const config = await getAdminConfig();
-    const builtIn = products.filter(
-      (p) => !config.hiddenProducts.includes(p.slug)
-    );
-    const custom: Product[] = (config.customProducts ?? [])
+    const custom = (config.customProducts ?? [])
       .filter((p) => p.visible)
       .map(adminToProduct);
-    allProducts = [...builtIn, ...custom];
+
+    if (custom.length > 0) {
+      // Custom products exist (seeded or admin-created) — use them as source of truth
+      allProducts = custom;
+    } else {
+      // Fallback to built-in products (before admin seeds them)
+      allProducts = products.filter(
+        (p) => !config.hiddenProducts.includes(p.slug)
+      );
+    }
   } catch {
     // Blob not configured — use defaults
   }
