@@ -4,6 +4,7 @@ import { MessageCircle } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { MESSENGER_URL, messengerProductLink } from "@/lib/constants";
 import { trackMessengerClick } from "@/lib/analytics";
+import { isFacebookIAB } from "@/lib/facebook-iab";
 import { cn } from "@/lib/utils";
 
 interface MessengerCTAProps {
@@ -36,7 +37,7 @@ export function MessengerCTA({
   return (
     <a
       href={href}
-      target="_blank"
+      target={isFacebookIAB() ? "_self" : "_blank"}
       rel="noopener noreferrer"
       className={cn(buttonVariants({ variant, size }), className)}
       onClick={() => trackMessengerClick(context ?? productName ?? "general")}

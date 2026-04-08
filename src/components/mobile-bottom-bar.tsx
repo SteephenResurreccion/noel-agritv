@@ -22,6 +22,7 @@ export function MobileBottomBar() {
         </Link>
         <a
           href="https://m.me/noeltolentino2728"
+          rel="noopener noreferrer"
           onClick={() => trackMessengerClick("bottom-bar")}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >

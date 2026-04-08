@@ -9,12 +9,12 @@ interface AwardsSectionProps {
 }
 
 const awards = [
-  { src: "/images/awards/certificates.png", label: "Certificates of Recognition & Appreciation" },
-  { src: "/images/awards/magazine-noelagritv.png", label: "Noel AgriTV — The Art of Helping Others" },
-  { src: "/images/awards/magazine-stela.png", label: "STELA Magazine — Sustainable Farming & Humanitarian Advocate" },
-  { src: "/images/awards/plaque-2024.png", label: "2024 Excellent Filipino Awards — Outstanding Leadership in Agri Business" },
-  { src: "/images/awards/plaque-recognition.png", label: "2024 Philippines Choice Award — Humanitarian Service in Agri Business" },
-  { src: "/images/awards/stela-trophy.png", label: "STELA 2024 — Most Outstanding Agri Business Leader of the Year" },
+  { src: "/images/awards/certificates.webp", label: "Certificates of Recognition & Appreciation" },
+  { src: "/images/awards/magazine-noelagritv.webp", label: "Noel AgriTV — The Art of Helping Others" },
+  { src: "/images/awards/magazine-stela.webp", label: "STELA Magazine — Sustainable Farming & Humanitarian Advocate" },
+  { src: "/images/awards/plaque-2024.webp", label: "2024 Excellent Filipino Awards — Outstanding Leadership in Agri Business" },
+  { src: "/images/awards/plaque-recognition.webp", label: "2024 Philippines Choice Award — Humanitarian Service in Agri Business" },
+  { src: "/images/awards/stela-trophy.webp", label: "STELA 2024 — Most Outstanding Agri Business Leader of the Year" },
 ];
 
 export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
