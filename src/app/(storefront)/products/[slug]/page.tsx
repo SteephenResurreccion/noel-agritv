@@ -112,16 +112,16 @@ export default async function ProductDetailPage({
               <img
                 src={product.imageLarge}
                 alt={product.name}
-                className="aspect-[4/5] w-full object-cover"
+                className="aspect-square w-full object-cover"
               />
             ) : (
               <Image
                 src={product.imageLarge}
                 alt={product.name}
                 width={1000}
-                height={1250}
+                height={1000}
                 priority
-                className="aspect-[4/5] w-full object-cover"
+                className="aspect-square w-full object-cover"
                 sizes="(max-width: 767px) 100vw, 50vw"
               />
             )}

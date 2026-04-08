@@ -4,8 +4,14 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
-import { products } from "@/data/products";
 import { categories } from "@/data/categories";
+
+interface SearchProduct {
+  slug: string;
+  name: string;
+  oneLiner: string;
+  image: string;
+}
 
 const TRENDING_SEARCHES = [
   "Bio Plant Booster",
@@ -15,7 +21,7 @@ const TRENDING_SEARCHES = [
   "Mayumi",
 ];
 
-export function Header() {
+export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct[] }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,7 +31,7 @@ export function Header() {
   // Filter products based on query
   const results =
     query.length >= 2
-      ? products.filter(
+      ? searchProducts.filter(
           (p) =>
             p.name.toLowerCase().includes(query.toLowerCase()) ||
             p.oneLiner.toLowerCase().includes(query.toLowerCase())
@@ -208,13 +214,21 @@ export function Header() {
                           className="group rounded-lg border border-border bg-bg p-3 transition-shadow hover:shadow-md"
                         >
                           <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-md">
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              fill
-                              className="object-cover transition-transform group-hover:scale-105"
-                              sizes="150px"
-                            />
+                            {product.image.startsWith("/api/blob-image") || product.image.startsWith("http") ? (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                              />
+                            ) : (
+                              <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                className="object-cover transition-transform group-hover:scale-105"
+                                sizes="150px"
+                              />
+                            )}
                           </div>
                           <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
                             {product.name}
@@ -278,7 +292,7 @@ export function Header() {
                     Top Products
                   </p>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    {products.slice(0, 5).map((product) => (
+                    {searchProducts.slice(0, 5).map((product) => (
                       <Link
                         key={product.slug}
                         href={`/products/${product.slug}`}
@@ -286,13 +300,21 @@ export function Header() {
                         className="group rounded-lg border border-border bg-bg p-3 transition-shadow hover:shadow-md"
                       >
                         <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-md">
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform group-hover:scale-105"
-                            sizes="150px"
-                          />
+                          {product.image.startsWith("/api/blob-image") || product.image.startsWith("http") ? (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                            />
+                          ) : (
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              fill
+                              className="object-cover transition-transform group-hover:scale-105"
+                              sizes="150px"
+                            />
+                          )}
                         </div>
                         <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
                           {product.name}
