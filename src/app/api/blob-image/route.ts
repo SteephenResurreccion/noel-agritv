@@ -1,4 +1,4 @@
-import { get } from "@vercel/blob";
+import { head } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_CONTENT_TYPES = [
@@ -21,12 +21,10 @@ export async function GET(request: NextRequest) {
   try {
     const parsed = new URL(url);
     if (storeId) {
-      // Strict: must match our exact store hostname
       if (parsed.hostname !== `${storeId}.blob.vercel-storage.com`) {
         return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
       }
     } else {
-      // Fallback: at least require the Vercel Blob domain with proper subdomain structure
       if (
         !parsed.hostname.endsWith(".blob.vercel-storage.com") ||
         parsed.hostname === "blob.vercel-storage.com"
@@ -42,18 +40,25 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await get(url, { access: "private" });
-    if (!result) {
+    // Verify the blob exists and get metadata
+    const meta = await head(url);
+    if (!meta) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Only serve known image content types
-    const contentType = result.blob.contentType ?? "image/webp";
+    const contentType = meta.contentType ?? "image/webp";
     if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
       return NextResponse.json({ error: "Invalid content type" }, { status: 403 });
     }
 
-    return new Response(result.stream, {
+    // Fetch the actual blob content using the downloadUrl (works for private blobs)
+    const downloadUrl = meta.downloadUrl;
+    const response = await fetch(downloadUrl);
+    if (!response.ok) {
+      return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+    }
+
+    return new Response(response.body, {
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": "inline",
