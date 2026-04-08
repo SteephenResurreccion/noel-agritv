@@ -31,7 +31,7 @@ export function MessengerCTA({
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     trackMessengerClick(context ?? productName ?? "general");
-    openMessenger();
+    openMessenger(productName);
   }
 
   return (
