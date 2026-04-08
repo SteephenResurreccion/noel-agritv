@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag, MessageCircle, Phone } from "lucide-react";
-import { MESSENGER_URL, PHONE_TEL } from "@/lib/constants";
+import { ShoppingBag, MessageCircle, Phone, Send } from "lucide-react";
+import { MESSENGER_URL, PHONE_NUMBER, PHONE_TEL } from "@/lib/constants";
 import { trackMessengerClick, trackCallClick } from "@/lib/analytics";
 
 export function MobileBottomBar() {
@@ -28,7 +28,14 @@ export function MobileBottomBar() {
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
           <MessageCircle className="h-5 w-5 shrink-0" />
-          <span className="text-[11px] font-semibold">Message</span>
+          <span className="text-[11px] font-semibold">Messenger</span>
+        </a>
+        <a
+          href={`sms:${PHONE_NUMBER.replace(/-/g, "")}`}
+          className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
+        >
+          <Send className="h-5 w-5 shrink-0" />
+          <span className="text-[11px] font-semibold">SMS</span>
         </a>
         <a
           href={PHONE_TEL}
