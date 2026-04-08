@@ -21,9 +21,7 @@ export function MobileBottomBar() {
           <span className="text-[11px] font-semibold">Products</span>
         </Link>
         <a
-          href={MESSENGER_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="https://m.me/noeltolentino2728"
           onClick={() => trackMessengerClick("bottom-bar")}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
