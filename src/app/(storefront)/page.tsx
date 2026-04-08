@@ -8,6 +8,7 @@ import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
 import { WholesaleBanner } from "@/components/wholesale-banner";
 import { AwardsSection } from "@/components/awards-section";
+import { AnnouncementBar } from "@/components/announcement-bar";
 import { products, type Product } from "@/data/products";
 import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
@@ -272,6 +273,16 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Divider strip ─────────────────────────────────────────────── */}
+      <AnnouncementBar
+        announcements={[
+          { text: "Healthy soil, healthy harvest — go bio-organic", href: "/products" },
+          { text: "Proven effective in Philippine climate and soil conditions", href: "/about" },
+          { text: "Quality seeds for every growing season", href: "/products" },
+        ]}
+        direction="right"
+      />
 
       {/* ── Section 5: Wholesale CTA ──────────────────────────────────── */}
       <WholesaleBanner />

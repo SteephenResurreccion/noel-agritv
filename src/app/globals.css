@@ -213,6 +213,23 @@
   animation-play-state: paused;
 }
 
+.announcement-track-reverse {
+  animation: announcement-scroll-reverse 30s linear infinite;
+}
+
+@keyframes announcement-scroll-reverse {
+  0% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.announcement-track-reverse:hover {
+  animation-play-state: paused;
+}
+
 
 /* Hide scrollbar but keep scroll functional */
 .scrollbar-hide {
