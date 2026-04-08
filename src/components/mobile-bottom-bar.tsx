@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShoppingBag, MessageCircle, Phone, Send } from "lucide-react";
 import { MESSENGER_URL, PHONE_NUMBER, PHONE_TEL } from "@/lib/constants";
 import { trackMessengerClick, trackCallClick } from "@/lib/analytics";
+import { openMessenger } from "@/lib/open-messenger";
 
 export function MobileBottomBar() {
   return (
@@ -21,9 +22,9 @@ export function MobileBottomBar() {
           <span className="text-[11px] font-semibold">Products</span>
         </Link>
         <a
-          href="https://m.me/noeltolentino2728"
+          href={MESSENGER_URL}
           rel="noopener noreferrer"
-          onClick={() => trackMessengerClick("bottom-bar")}
+          onClick={(e) => { e.preventDefault(); trackMessengerClick("bottom-bar"); openMessenger(); }}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
           <MessageCircle className="h-5 w-5 shrink-0" />

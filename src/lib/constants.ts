@@ -14,16 +14,5 @@ export const YOUTUBE_URL = "https://www.youtube.com/@noelagritv";
 /** Email */
 export const EMAIL = "noelagritv@gmail.com";
 
-/** Messenger link with prefilled product inquiry */
-export function messengerProductLink(
-  productName: string,
-  packSize?: string
-): string {
-  const text = packSize
-    ? `Hi, I'm interested in ${productName} (${packSize})`
-    : `Hi, I'm interested in ${productName}`;
-  return `${MESSENGER_URL}?text=${encodeURIComponent(text)}`;
-}
-
-/** Messenger link with prefilled wholesale inquiry */
-export const MESSENGER_WHOLESALE_URL = `${MESSENGER_URL}?text=${encodeURIComponent("Hi, I'm interested in wholesale pricing")}`;
+/** Messenger link for wholesale — same as base since prefilled text isn't supported by Messenger */
+export const MESSENGER_WHOLESALE_URL = MESSENGER_URL;

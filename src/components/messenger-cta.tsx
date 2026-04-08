@@ -2,18 +2,10 @@
 
 import { MessageCircle } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { MESSENGER_URL, messengerProductLink } from "@/lib/constants";
+import { MESSENGER_URL } from "@/lib/constants";
 import { trackMessengerClick } from "@/lib/analytics";
+import { openMessenger } from "@/lib/open-messenger";
 import { cn } from "@/lib/utils";
-
-/** On mobile/tablet, use _self so iOS Universal Links open Messenger directly.
- *  _blank forces a new Safari tab which bypasses Universal Link handling. */
-function messengerTarget(): "_self" | "_blank" {
-  if (typeof navigator === "undefined") return "_blank";
-  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    ? "_self"
-    : "_blank";
-}
 
 interface MessengerCTAProps {
   productName?: string;
@@ -27,27 +19,27 @@ interface MessengerCTAProps {
 
 export function MessengerCTA({
   productName,
-  packSize,
   label,
   variant = "default",
   size = "default",
   className,
   context,
 }: MessengerCTAProps) {
-  const href = productName
-    ? messengerProductLink(productName, packSize)
-    : MESSENGER_URL;
-
   const displayLabel =
     label ?? (productName ? "Message Us About This Product" : "Message Us");
 
+  function handleClick(e: React.MouseEvent) {
+    e.preventDefault();
+    trackMessengerClick(context ?? productName ?? "general");
+    openMessenger();
+  }
+
   return (
     <a
-      href={href}
-      target={messengerTarget()}
+      href={MESSENGER_URL}
       rel="noopener noreferrer"
       className={cn(buttonVariants({ variant, size }), className)}
-      onClick={() => trackMessengerClick(context ?? productName ?? "general")}
+      onClick={handleClick}
     >
       <MessageCircle className="mr-2 h-4 w-4 shrink-0" />
       {displayLabel}
