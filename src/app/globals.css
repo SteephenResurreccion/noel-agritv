@@ -11,17 +11,17 @@
   --font-mono: monospace;
   --font-heading: var(--font-source-serif), Georgia, serif;
 
-  /* Brand greens */
-  --color-brand-darkest: #172621;
-  --color-brand-dark: #2A4038;
-  --color-brand-mid: #3B593F;
-  --color-brand-accent: #4D734C;
+  /* Brand — Modern Botanical palette */
+  --color-brand-darkest: #1C2920;
+  --color-brand-dark: #283D2E;
+  --color-brand-mid: #4A6741;
+  --color-brand-accent: #8A6F3A;
   --color-brand-black: #0D0D0D;
 
   /* Brand neutrals — Google Material opacity system */
-  --color-bg: #E8E3D9;
-  --color-surface: #F5F0E8;
-  --color-bg-wheat: #F0E8D4;
+  --color-bg: #F2EDE3;
+  --color-surface: #FAF7F2;
+  --color-bg-wheat: #EBE3D0;
   --color-text-primary: rgba(0, 0, 0, 0.87);
   --color-text-secondary: rgba(0, 0, 0, 0.60);
   --color-text-disabled: rgba(0, 0, 0, 0.38);
@@ -65,17 +65,17 @@
 
 :root {
   /* Brand-overridden semantic colors */
-  /* #E8E3D9 warm sand → oklch approx */
-  --background: oklch(0.91 0.012 80);
-  /* Black at 87% opacity → oklch approx */
+  /* #F2EDE3 lighter warm sand */
+  --background: oklch(0.935 0.014 82);
+  /* Black at 87% opacity */
   --foreground: oklch(0.195 0 0 / 87%);
-  /* #F5F0E8 warm linen surface */
-  --card: oklch(0.955 0.012 80);
+  /* #FAF7F2 near-white linen surface */
+  --card: oklch(0.975 0.008 82);
   --card-foreground: oklch(0.195 0 0);
-  --popover: oklch(0.955 0.012 80);
+  --popover: oklch(0.975 0.008 82);
   --popover-foreground: oklch(0.195 0 0);
-  /* #4D734C brand accent green → oklch approx */
-  --primary: oklch(0.468 0.088 141);
+  /* #4A6741 brand fern — interactive green */
+  --primary: oklch(0.44 0.078 145);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -83,12 +83,12 @@
   --muted-foreground: oklch(0 0 0 / 60%);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  /* #de2a2a error red → oklch approx */
-  --destructive: oklch(0.533 0.195 27);
-  /* #dcdbd9 border → oklch approx */
-  --border: oklch(0.883 0.004 91);
-  --input: oklch(0.883 0.004 91);
-  --ring: oklch(0.468 0.088 141);
+  /* #C0392B error red */
+  --destructive: oklch(0.49 0.19 27);
+  /* warm gray-cream border */
+  --border: oklch(0.895 0.010 82);
+  --input: oklch(0.895 0.010 82);
+  --ring: oklch(0.44 0.078 145);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -97,12 +97,12 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.468 0.088 141);
+  --sidebar-primary: oklch(0.44 0.078 145);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.883 0.004 91);
-  --sidebar-ring: oklch(0.468 0.088 141);
+  --sidebar-border: oklch(0.895 0.010 82);
+  --sidebar-ring: oklch(0.44 0.078 145);
 
   /* Font sizes — mobile defaults */
   --font-size-meta: 13px;
