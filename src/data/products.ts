@@ -47,7 +47,7 @@ export const products: Product[] = [
     description:
       "Bio Enzyme is a concentrated enzymatic formula designed to enhance soil fertility and plant health. It accelerates the decomposition of organic residues in the soil, releasing locked nutrients for plant uptake. Ideal for use alongside Bio Plant Booster for maximum results.",
     specs: [
-      { label: "Type", value: "Liquid" },
+      { label: "Type", value: "Solid" },
       { label: "Application", value: "Soil Drench" },
       { label: "Suitable For", value: "Rice, Corn, Vegetables" },
       { label: "Active Ingredient", value: "Natural enzymes" },

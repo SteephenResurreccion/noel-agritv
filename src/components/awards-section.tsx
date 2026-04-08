@@ -44,6 +44,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
   }, []);
 
   // Sync scroll position with current index when auto-advancing
+  const programmaticScroll = useRef(false);
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -52,8 +53,39 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
     const cardW = card.offsetWidth;
     const gap = parseFloat(getComputedStyle(el).gap) || 0;
     const target = current * (cardW + gap);
+    programmaticScroll.current = true;
     el.scrollTo({ left: target, behavior: "smooth" });
   }, [current]);
+
+  // Detect manual swipe/scroll and sync current index
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    let scrollTimer: ReturnType<typeof setTimeout>;
+    function onScroll() {
+      if (programmaticScroll.current) {
+        programmaticScroll.current = false;
+        return;
+      }
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        if (!trackRef.current) return;
+        const card = trackRef.current.children[0] as HTMLElement | undefined;
+        if (!card) return;
+        const cardW = card.offsetWidth;
+        const gap = parseFloat(getComputedStyle(trackRef.current).gap) || 0;
+        const idx = Math.round(trackRef.current.scrollLeft / (cardW + gap));
+        const clamped = Math.max(0, Math.min(idx, awards.length - 1));
+        setCurrent(clamped);
+        pausedRef.current = false;
+        if (timerRef.current) clearTimeout(timerRef.current);
+        startAutoPlay();
+      }, 150);
+    }
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleManual(dir: "left" | "right") {
     if (timerRef.current) clearTimeout(timerRef.current);
