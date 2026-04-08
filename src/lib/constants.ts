@@ -17,9 +17,11 @@ export const EMAIL = "noelagritv@gmail.com";
 /** Messenger link with prefilled product inquiry */
 export function messengerProductLink(
   productName: string,
-  packSize: string
+  packSize?: string
 ): string {
-  const text = `Hi, I'm interested in ${productName} (${packSize})`;
+  const text = packSize
+    ? `Hi, I'm interested in ${productName} (${packSize})`
+    : `Hi, I'm interested in ${productName}`;
   return `${MESSENGER_URL}?text=${encodeURIComponent(text)}`;
 }
 

@@ -26,10 +26,9 @@ export function MessengerCTA({
   className,
   context,
 }: MessengerCTAProps) {
-  const href =
-    productName && packSize
-      ? messengerProductLink(productName, packSize)
-      : MESSENGER_URL;
+  const href = productName
+    ? messengerProductLink(productName, packSize)
+    : MESSENGER_URL;
 
   const displayLabel =
     label ?? (productName ? "Message Us About This Product" : "Message Us");
