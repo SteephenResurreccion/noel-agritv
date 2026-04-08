@@ -336,16 +336,16 @@ export function CustomProductRow({
       <td className="hidden px-4 py-3 text-text-secondary md:table-cell">
         {category?.name ?? product.categorySlug}
       </td>
-      <td className="px-4 py-3 text-right">
+      <td className="w-16 px-2 py-3 text-center">
         <button
           onClick={openEdit}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-brand-accent/10 hover:text-brand-accent"
+          className="mx-auto flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-brand-accent/10 hover:text-brand-accent"
           title="Edit"
         >
           <Pencil className="h-4 w-4" />
         </button>
       </td>
-      <td className="px-4 py-3 text-right">
+      <td className="w-20 px-2 py-3 text-center">
         <div className="inline-flex items-center gap-2">
           {isPending && (
             <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-accent" />
@@ -366,11 +366,11 @@ export function CustomProductRow({
           </button>
         </div>
       </td>
-      <td className="px-4 py-3 text-right">
+      <td className="w-16 px-2 py-3 text-center">
         <button
           disabled={isPending}
           onClick={handleDelete}
-          className={`flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600 ${
+          className={`mx-auto flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-red-50 hover:text-red-600 ${
             isPending ? "cursor-wait opacity-60" : ""
           }`}
           title="Delete"

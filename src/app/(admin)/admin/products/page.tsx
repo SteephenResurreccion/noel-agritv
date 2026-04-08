@@ -56,13 +56,13 @@ export default async function AdminProductsPage() {
                   <th className="hidden px-4 py-3 font-semibold text-text-secondary md:table-cell">
                     Category
                   </th>
-                  <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">
                     Edit
                   </th>
-                  <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                  <th className="w-20 px-2 py-3 text-center font-semibold text-text-secondary">
                     Visible
                   </th>
-                  <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">
                     Delete
                   </th>
                 </tr>
