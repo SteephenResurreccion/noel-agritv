@@ -221,6 +221,87 @@ export async function addProduct(formData: FormData) {
   }
 }
 
+export async function updateProduct(id: string, formData: FormData) {
+  await requireAuth();
+
+  try {
+    const name = z.string().trim().min(1).max(200).parse(formData.get("name"));
+    const description = z.string().trim().min(1).max(2000).parse(formData.get("description"));
+    const categorySlug = z.string().trim().min(1).max(100).parse(formData.get("categorySlug"));
+    const imageFile = formData.get("image") as File | null;
+    const howToApply = z.string().trim().max(2000).optional().nullable()
+      .transform((v) => v || null)
+      .parse(formData.get("howToApply") || null);
+    const safetyNotes = z.string().trim().max(2000).optional().nullable()
+      .transform((v) => v || null)
+      .parse(formData.get("safetyNotes") || null);
+    const specsJson = formData.get("specs") as string | null;
+    const cropsJson = formData.get("compatibleCrops") as string | null;
+
+    const specs = specsJson
+      ? z.array(productSpecSchema).max(20).parse(JSON.parse(specsJson))
+      : [];
+    const compatibleCrops = cropsJson
+      ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
+      : [];
+
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+
+    const idx = (config.customProducts ?? []).findIndex((p) => p.id === id);
+    if (idx === -1) throw new Error("Product not found");
+
+    const existing = config.customProducts![idx];
+
+    // Re-derive slug from new name
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    if (!slug) throw new Error("Product name must contain at least one letter or number.");
+
+    // Check slug uniqueness (excluding this product)
+    const otherSlugs = config.customProducts!
+      .filter((p) => p.id !== id)
+      .map((p) => p.slug);
+    if (otherSlugs.includes(slug)) {
+      throw new Error(`A product with a similar name already exists (slug: ${slug}).`);
+    }
+
+    // Upload new image if provided, otherwise keep existing
+    let imageUrl = existing.image;
+    if (imageFile && imageFile.size > 0) {
+      validateImageFile(imageFile);
+      const ext = imageFile.name.split(".").pop() || "jpg";
+      const blob = await put(`products/${slug}-${Date.now()}.${ext}`, imageFile, {
+        access: "private",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        contentType: imageFile.type,
+      });
+      imageUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
+    }
+
+    config.customProducts![idx] = {
+      ...existing,
+      slug,
+      name,
+      description,
+      image: imageUrl,
+      categorySlug,
+      specs,
+      howToApply,
+      compatibleCrops,
+      safetyNotes,
+    };
+
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/products");
+    revalidateStorefront();
+  } catch (e) {
+    console.error("updateProduct failed:", e);
+    if (e instanceof Error && e.message.includes("already exists")) throw e;
+    throw new Error("Failed to update product. Please try again.");
+  }
+}
+
 export async function removeProduct(id: string) {
   await requireAuth();
   try {

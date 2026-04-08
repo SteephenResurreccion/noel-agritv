@@ -57,6 +57,9 @@ export default async function AdminProductsPage() {
                     Category
                   </th>
                   <th className="px-4 py-3 text-right font-semibold text-text-secondary">
+                    Edit
+                  </th>
+                  <th className="px-4 py-3 text-right font-semibold text-text-secondary">
                     Visible
                   </th>
                   <th className="px-4 py-3 text-right font-semibold text-text-secondary">
@@ -66,7 +69,7 @@ export default async function AdminProductsPage() {
               </thead>
               <tbody>
                 {customProducts.map((product) => (
-                  <CustomProductRow key={product.id} product={product} />
+                  <CustomProductRow key={product.id} product={product} categories={categories} />
                 ))}
               </tbody>
             </table>
