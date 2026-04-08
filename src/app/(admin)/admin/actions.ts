@@ -342,6 +342,55 @@ export async function toggleCustomProductVisibility(id: string) {
   }
 }
 
+// ── Featured Products ──
+
+export async function toggleFeaturedProduct(id: string) {
+  await requireAuth();
+  try {
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+
+    if (config.featuredProductIds.includes(id)) {
+      config.featuredProductIds = config.featuredProductIds.filter((fid) => fid !== id);
+    } else {
+      config.featuredProductIds = [...config.featuredProductIds, id];
+    }
+
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/products");
+    revalidateStorefront();
+  } catch (e) {
+    console.error("toggleFeaturedProduct failed:", e);
+    throw new Error("Failed to update featured products. Please try again.");
+  }
+}
+
+export async function moveFeaturedProduct(id: string, direction: "up" | "down") {
+  await requireAuth();
+  try {
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+
+    const idx = config.featuredProductIds.indexOf(id);
+    if (idx === -1) return;
+
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= config.featuredProductIds.length) return;
+
+    [config.featuredProductIds[idx], config.featuredProductIds[targetIdx]] = [
+      config.featuredProductIds[targetIdx],
+      config.featuredProductIds[idx],
+    ];
+
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/products");
+    revalidateStorefront();
+  } catch (e) {
+    console.error("moveFeaturedProduct failed:", e);
+    throw new Error("Failed to reorder featured products. Please try again.");
+  }
+}
+
 // ── Videos ──
 
 export async function saveVideos(videos: AdminVideo[]) {

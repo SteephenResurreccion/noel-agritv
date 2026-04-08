@@ -4,24 +4,31 @@ import { categories } from "@/data/categories";
 import { products as builtInProducts } from "@/data/products";
 import { AddProductForm } from "./add-product-form";
 import { CustomProductRow } from "./custom-product-row";
+import { FeaturedProductRow } from "./featured-product-row";
 import { SeedButton } from "./seed-button";
 
 export default async function AdminProductsPage() {
   let customProducts: AdminConfig["customProducts"] = null;
+  let featuredProductIds: string[] = [];
   let needsSeed = false;
 
   try {
     const config = await getAdminConfig();
     customProducts = config.customProducts;
-    // Check if built-in products haven't been seeded yet
+    featuredProductIds = config.featuredProductIds ?? [];
     const customSlugs = new Set(
       (customProducts ?? []).map((p) => p.slug)
     );
     needsSeed = builtInProducts.some((p) => !customSlugs.has(p.slug));
   } catch {
-    // Blob not configured yet
     needsSeed = true;
   }
+
+  // Build featured products list in order
+  const allProducts = customProducts ?? [];
+  const featuredProducts = featuredProductIds
+    .map((id) => allProducts.find((p) => p.id === id))
+    .filter(Boolean) as NonNullable<AdminConfig["customProducts"]>;
 
   return (
     <AdminShell>
@@ -34,17 +41,49 @@ export default async function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Seed prompt if built-in products haven't been imported */}
       {needsSeed && <SeedButton />}
 
-      {/* Add Product Form */}
       <AddProductForm categories={categories} />
 
+      {/* Featured / Top Picks */}
+      {featuredProducts.length > 0 && (
+        <div className="mt-6">
+          <h2 className="mb-1 text-sm font-semibold uppercase tracking-widest text-text-secondary">
+            Homepage Top Picks
+          </h2>
+          <p className="mb-3 text-xs text-text-secondary">
+            These products appear in the &ldquo;Top Picks For You&rdquo; section on the homepage. Drag to reorder.
+          </p>
+          <div className="overflow-x-auto rounded-lg border border-brand-accent/30 bg-brand-accent/5">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-brand-accent/20">
+                  <th className="w-10 px-2 py-3" />
+                  <th className="px-4 py-3 font-semibold text-text-secondary">Product</th>
+                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">Move</th>
+                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                {featuredProducts.map((product, i) => (
+                  <FeaturedProductRow
+                    key={product.id}
+                    product={product}
+                    index={i}
+                    total={featuredProducts.length}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* All products */}
-      {customProducts && customProducts.length > 0 && (
+      {allProducts.length > 0 && (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-text-secondary">
-            Products
+            All Products
           </h2>
           <div className="overflow-x-auto rounded-lg border border-border bg-surface">
             <table className="w-full text-left text-sm">
@@ -55,6 +94,9 @@ export default async function AdminProductsPage() {
                   </th>
                   <th className="hidden px-4 py-3 font-semibold text-text-secondary md:table-cell">
                     Category
+                  </th>
+                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">
+                    Featured
                   </th>
                   <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">
                     Edit
@@ -68,8 +110,13 @@ export default async function AdminProductsPage() {
                 </tr>
               </thead>
               <tbody>
-                {customProducts.map((product) => (
-                  <CustomProductRow key={product.id} product={product} categories={categories} />
+                {allProducts.map((product) => (
+                  <CustomProductRow
+                    key={product.id}
+                    product={product}
+                    categories={categories}
+                    isFeatured={featuredProductIds.includes(product.id)}
+                  />
                 ))}
               </tbody>
             </table>

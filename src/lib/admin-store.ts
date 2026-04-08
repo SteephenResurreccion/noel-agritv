@@ -13,6 +13,8 @@ export interface AdminConfig {
   videos: AdminVideo[] | null;
   /** Admin-created products */
   customProducts: AdminProduct[] | null;
+  /** Ordered list of product IDs to feature on the homepage "Top Picks" */
+  featuredProductIds: string[];
   /** Manager emails — these users can manage products/videos but not team */
   managers: string[];
 }
@@ -49,6 +51,7 @@ const DEFAULT_CONFIG: AdminConfig = {
   hiddenProducts: [],
   videos: null,
   customProducts: null,
+  featuredProductIds: [],
   managers: [],
 };
 

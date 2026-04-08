@@ -2,7 +2,7 @@
 
 import { useState, useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Loader2, Pencil, X, Plus } from "lucide-react";
+import { Trash2, Loader2, Pencil, X, Plus, Star } from "lucide-react";
 import type { AdminProduct } from "@/lib/admin-store";
 import type { Category } from "@/data/categories";
 import { getCategoryBySlug } from "@/data/categories";
@@ -11,13 +11,16 @@ import {
   toggleCustomProductVisibility,
   removeProduct,
   updateProduct,
+  toggleFeaturedProduct,
 } from "../actions";
 
 export function CustomProductRow({
   product,
   categories,
+  isFeatured = false,
 }: {
   product: AdminProduct;
+  isFeatured?: boolean;
   categories: Category[];
 }) {
   const category = getCategoryBySlug(product.categorySlug);
@@ -36,6 +39,14 @@ export function CustomProductRow({
     startTransition(async () => {
       setOptimisticVisible(!optimisticVisible);
       await toggleCustomProductVisibility(product.id);
+      router.refresh();
+    });
+  }
+
+  function handleFeatured() {
+    if (isPending) return;
+    startTransition(async () => {
+      await toggleFeaturedProduct(product.id);
       router.refresh();
     });
   }
@@ -335,6 +346,22 @@ export function CustomProductRow({
       </td>
       <td className="hidden px-4 py-3 text-text-secondary md:table-cell">
         {category?.name ?? product.categorySlug}
+      </td>
+      <td className="w-16 px-2 py-3 text-center">
+        <button
+          onClick={handleFeatured}
+          disabled={isPending}
+          className="mx-auto flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-brand-accent/10"
+          title={isFeatured ? "Remove from Top Picks" : "Add to Top Picks"}
+        >
+          <Star
+            className={`h-4 w-4 ${
+              isFeatured
+                ? "fill-brand-accent text-brand-accent"
+                : "text-text-secondary/40"
+            }`}
+          />
+        </button>
       </td>
       <td className="w-16 px-2 py-3 text-center">
         <button

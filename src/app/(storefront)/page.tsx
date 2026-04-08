@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   let visibleProducts: Product[] = products;
+  let featuredProducts: Product[] = [];
   let videoItems = defaultVideos.filter((v) => v.visible);
 
   try {
@@ -39,12 +40,27 @@ export default async function HomePage() {
         (p) => !config.hiddenProducts.includes(p.slug)
       );
     }
+
+    // Featured products for "Top Picks" — ordered by admin
+    const featuredIds = config.featuredProductIds ?? [];
+    if (featuredIds.length > 0) {
+      featuredProducts = featuredIds
+        .map((id) => {
+          const cp = (config.customProducts ?? []).find((p) => p.id === id && p.visible);
+          return cp ? adminToProduct(cp) : undefined;
+        })
+        .filter(Boolean) as Product[];
+    }
+
     if (config.videos) {
       videoItems = config.videos.filter((v) => v.visible);
     }
   } catch {
     // Blob not configured — use defaults
   }
+
+  // If no featured products set, fall back to first 4 visible
+  const topPicks = featuredProducts.length > 0 ? featuredProducts : visibleProducts.slice(0, 4);
 
   return (
     <>
@@ -196,7 +212,7 @@ export default async function HomePage() {
           </h2>
 
           {/* Category filter pills */}
-          <HomeProductFilter categories={categories} products={visibleProducts} />
+          <HomeProductFilter categories={categories} products={topPicks} />
 
           {/* "View all" link */}
           <div className="mt-4 text-right">
