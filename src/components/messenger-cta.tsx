@@ -4,8 +4,16 @@ import { MessageCircle } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { MESSENGER_URL, messengerProductLink } from "@/lib/constants";
 import { trackMessengerClick } from "@/lib/analytics";
-import { isFacebookIAB } from "@/lib/facebook-iab";
 import { cn } from "@/lib/utils";
+
+/** On mobile/tablet, use _self so iOS Universal Links open Messenger directly.
+ *  _blank forces a new Safari tab which bypasses Universal Link handling. */
+function messengerTarget(): "_self" | "_blank" {
+  if (typeof navigator === "undefined") return "_blank";
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    ? "_self"
+    : "_blank";
+}
 
 interface MessengerCTAProps {
   productName?: string;
@@ -36,7 +44,7 @@ export function MessengerCTA({
   return (
     <a
       href={href}
-      target={isFacebookIAB() ? "_self" : "_blank"}
+      target={messengerTarget()}
       rel="noopener noreferrer"
       className={cn(buttonVariants({ variant, size }), className)}
       onClick={() => trackMessengerClick(context ?? productName ?? "general")}
