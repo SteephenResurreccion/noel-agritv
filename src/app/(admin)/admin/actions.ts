@@ -365,28 +365,17 @@ export async function toggleFeaturedProduct(id: string) {
   }
 }
 
-export async function moveFeaturedProduct(id: string, direction: "up" | "down") {
+export async function saveFeaturedOrder(orderedIds: string[]) {
   await requireAuth();
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
-
-    const idx = config.featuredProductIds.indexOf(id);
-    if (idx === -1) return;
-
-    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (targetIdx < 0 || targetIdx >= config.featuredProductIds.length) return;
-
-    [config.featuredProductIds[idx], config.featuredProductIds[targetIdx]] = [
-      config.featuredProductIds[targetIdx],
-      config.featuredProductIds[idx],
-    ];
-
+    config.featuredProductIds = orderedIds;
     await saveAdminConfig(config, ver);
     revalidatePath("/admin/products");
     revalidateStorefront();
   } catch (e) {
-    console.error("moveFeaturedProduct failed:", e);
+    console.error("saveFeaturedOrder failed:", e);
     throw new Error("Failed to reorder featured products. Please try again.");
   }
 }

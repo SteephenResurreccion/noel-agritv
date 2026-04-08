@@ -4,7 +4,7 @@ import { categories } from "@/data/categories";
 import { products as builtInProducts } from "@/data/products";
 import { AddProductForm } from "./add-product-form";
 import { CustomProductRow } from "./custom-product-row";
-import { FeaturedProductRow } from "./featured-product-row";
+import { FeaturedProductList } from "./featured-product-row";
 import { SeedButton } from "./seed-button";
 
 export default async function AdminProductsPage() {
@@ -51,31 +51,7 @@ export default async function AdminProductsPage() {
           <h2 className="mb-1 text-sm font-semibold uppercase tracking-widest text-text-secondary">
             Homepage Top Picks
           </h2>
-          <p className="mb-3 text-xs text-text-secondary">
-            These products appear in the &ldquo;Top Picks For You&rdquo; section on the homepage. Drag to reorder.
-          </p>
-          <div className="overflow-x-auto rounded-lg border border-brand-accent/30 bg-brand-accent/5">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-brand-accent/20">
-                  <th className="w-10 px-2 py-3" />
-                  <th className="px-4 py-3 font-semibold text-text-secondary">Product</th>
-                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">Move</th>
-                  <th className="w-16 px-2 py-3 text-center font-semibold text-text-secondary">Remove</th>
-                </tr>
-              </thead>
-              <tbody>
-                {featuredProducts.map((product, i) => (
-                  <FeaturedProductRow
-                    key={product.id}
-                    product={product}
-                    index={i}
-                    total={featuredProducts.length}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <FeaturedProductList products={featuredProducts} />
         </div>
       )}
 
