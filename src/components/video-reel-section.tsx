@@ -115,7 +115,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
             >
               {/* Video thumbnail */}
               <div className="relative aspect-[9/16] w-full overflow-hidden">
-                {video.thumbnail.startsWith("/api/blob-image") ? (
+                {video.thumbnail.startsWith("http") || video.thumbnail.startsWith("/api/blob-image") ? (
                   <img
                     src={video.thumbnail}
                     alt={video.title}

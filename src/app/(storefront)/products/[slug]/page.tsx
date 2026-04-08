@@ -116,7 +116,7 @@ export default async function ProductDetailPage({
     .filter((p) => p.slug !== product.slug)
     .slice(0, 3);
 
-  const isBlobImage = product.image.startsWith("/api/blob-image");
+  const isExternal = product.image.startsWith("http") || product.image.startsWith("/api/blob-image");
   const hasHowToApply = product.howToApply !== null;
   const hasCompatibleCrops =
     product.compatibleCrops && product.compatibleCrops.length > 0;
@@ -130,7 +130,7 @@ export default async function ProductDetailPage({
         <div className="grid grid-cols-1 gap-8 min-[768px]:grid-cols-2 min-[768px]:gap-12">
           {/* Product Image */}
           <div className="overflow-hidden rounded-[var(--radius-card)]">
-            {isBlobImage ? (
+            {isExternal ? (
               <img
                 src={product.imageLarge}
                 alt={product.name}

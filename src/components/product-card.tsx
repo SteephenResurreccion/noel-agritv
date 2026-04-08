@@ -11,12 +11,12 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const category = getCategoryBySlug(product.categorySlug);
 
-  const isBlobImage = product.image.startsWith("/api/blob-image");
+  const isExternal = product.image.startsWith("http") || product.image.startsWith("/api/blob-image");
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-md bg-surface shadow-sm">
       <Link href={`/products/${product.slug}`} className="block overflow-hidden">
-        {isBlobImage ? (
+        {isExternal ? (
           <img
             src={product.image}
             alt={product.name}

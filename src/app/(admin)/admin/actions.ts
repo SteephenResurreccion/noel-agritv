@@ -141,12 +141,12 @@ export async function addProduct(formData: FormData) {
       validateImageFile(imageFile);
       const ext = imageFile.name.split(".").pop() || "jpg";
       const blob = await put(`products/${slug}-${Date.now()}.${ext}`, imageFile, {
-        access: "private",
+        access: "public",
         addRandomSuffix: false,
         allowOverwrite: true,
         contentType: imageFile.type,
       });
-      imageUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
+      imageUrl = blob.url;
     }
 
     const newProduct: AdminProduct = {
@@ -259,12 +259,12 @@ export async function addVideo(formData: FormData) {
       const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
       const ext = thumbnailFile.name.split(".").pop() || "webp";
       const blob = await put(`videos/${slug}.${ext}`, thumbnailFile, {
-        access: "private",
+        access: "public",
         addRandomSuffix: false,
         allowOverwrite: true,
         contentType: thumbnailFile.type,
       });
-      thumbnailUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
+      thumbnailUrl = blob.url;
     }
 
     const config = await getAdminConfig({ strict: true });
