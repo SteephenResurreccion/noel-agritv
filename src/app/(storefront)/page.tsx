@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/product-card";
 import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
 import { WholesaleBanner } from "@/components/wholesale-banner";
+import { AwardsSection } from "@/components/awards-section";
 import { products, type Product } from "@/data/products";
 import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
@@ -205,7 +206,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 3: Mission — Brightland-style (text left, image right) ── */}
+      {/* ── Section 3: Awards & Recognition ─────────────────────────── */}
+      <AwardsSection variant="compact" />
+
+      {/* ── Section 4: Mission — Brightland-style (text left, image right) ── */}
       <section className="bg-bg-wheat px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
         <div className="container-site mx-auto">
           <div className="grid items-center gap-8 min-[741px]:grid-cols-[1fr_1fr] min-[741px]:gap-16">
@@ -249,7 +253,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Section 4: Wholesale CTA ──────────────────────────────────── */}
+      {/* ── Section 5: Wholesale CTA ──────────────────────────────────── */}
       <WholesaleBanner />
 
       {/* ── Section 5: Video Reels (TBOF-style carousel) ──────────────── */}

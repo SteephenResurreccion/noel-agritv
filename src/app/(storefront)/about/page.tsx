@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { FACEBOOK_URL, YOUTUBE_URL, MESSENGER_URL } from "@/lib/constants";
+import { AwardsSection } from "@/components/awards-section";
 
 export const metadata: Metadata = {
   title: "About Noel | Noel AgriTV",
@@ -113,6 +114,9 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Awards & Recognition ─────────────────────────────────────── */}
+      <AwardsSection variant="full" />
 
       {/* ── What We Believe ────────────────────────────────────────────── */}
       <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">

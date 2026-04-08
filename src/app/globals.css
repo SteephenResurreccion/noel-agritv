@@ -213,6 +213,7 @@
   animation-play-state: paused;
 }
 
+
 /* Hide scrollbar but keep scroll functional */
 .scrollbar-hide {
   -ms-overflow-style: none;
