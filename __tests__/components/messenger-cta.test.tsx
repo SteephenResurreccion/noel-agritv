@@ -10,27 +10,23 @@ describe("MessengerCTA", () => {
     expect(screen.getByRole("link")).toHaveTextContent("Message Us");
   });
 
-  it("generates prefilled Messenger link for product inquiry", () => {
-    render(
-      <MessengerCTA productName="Bio Enzyme" packSize="250ml" />
-    );
+  it("renders product-specific label when productName is provided", () => {
+    render(<MessengerCTA productName="Bio Enzyme" />);
     const link = screen.getByRole("link");
-    expect(link).toHaveAttribute(
-      "href",
-      expect.stringContaining("m.me/noeltolentino2728?text=")
-    );
-    expect(link).toHaveAttribute(
-      "href",
-      expect.stringContaining("Bio%20Enzyme")
-    );
+    expect(link).toHaveTextContent("Message Us About This Product");
   });
 
-  it("uses plain Messenger URL when no product specified", () => {
+  it("links to Messenger page", () => {
     render(<MessengerCTA />);
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute(
       "href",
       "https://m.me/noeltolentino2728"
     );
+  });
+
+  it("renders custom label when provided", () => {
+    render(<MessengerCTA label="Ask on Messenger" />);
+    expect(screen.getByRole("link")).toHaveTextContent("Ask on Messenger");
   });
 });

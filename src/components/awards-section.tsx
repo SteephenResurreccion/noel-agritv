@@ -40,7 +40,6 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync scroll position with current index when auto-advancing
@@ -84,7 +83,6 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
     }
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleManual(dir: "left" | "right") {

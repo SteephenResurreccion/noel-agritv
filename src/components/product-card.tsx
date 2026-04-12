@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/data/products";
-import { getCategoryBySlug } from "@/data/categories";
 import { MessengerCTA } from "./messenger-cta";
 
 interface ProductCardProps {
@@ -9,8 +8,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const category = getCategoryBySlug(product.categorySlug);
-
   const isExternal = product.image.startsWith("http") || product.image.startsWith("/api/blob-image");
 
   return (

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { FACEBOOK_URL, YOUTUBE_URL } from "@/lib/constants";
 
 import { SocialProofStrip } from "@/components/social-proof-strip";
-import { ProductCard } from "@/components/product-card";
 import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
 import { WholesaleBanner } from "@/components/wholesale-banner";

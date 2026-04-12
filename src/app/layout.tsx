@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { FACEBOOK_URL, YOUTUBE_URL, PHONE_TEL, EMAIL } from "@/lib/constants";
+import { FACEBOOK_URL, YOUTUBE_URL, EMAIL } from "@/lib/constants";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";

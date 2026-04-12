@@ -30,7 +30,7 @@ export function FeaturedProductList({
   products: AdminProduct[];
 }) {
   const [items, setItems] = useState(products);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
