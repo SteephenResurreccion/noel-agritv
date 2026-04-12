@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { FACEBOOK_URL, YOUTUBE_URL } from "@/lib/constants";
 
 import { SocialProofStrip } from "@/components/social-proof-strip";
 import { ProductCard } from "@/components/product-card";
@@ -20,6 +21,23 @@ export const metadata: Metadata = {
   title: "Noel AgriTV — Natural Solutions for Better Harvests",
   description:
     "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021. Browse our products and message us to order.",
+};
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Noel AgriTV",
+  url: siteUrl,
+  description:
+    "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021.",
+  publisher: {
+    "@type": "Organization",
+    name: "Noel AgriTV",
+    url: siteUrl,
+    sameAs: [FACEBOOK_URL, YOUTUBE_URL],
+  },
 };
 
 export default async function HomePage() {
@@ -64,6 +82,10 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
       {/* ── Section 1: Hero Banner — TBOF style ── */}
       <section className="relative overflow-hidden bg-bg pb-[100px] min-[741px]:pb-[130px]">
 {/* Main content — grid layout with image BEHIND landscape, text ABOVE */}

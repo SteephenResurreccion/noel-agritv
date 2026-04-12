@@ -101,8 +101,28 @@ export default async function ProductDetailPage({
   const hasSafetyNotes = product.safetyNotes !== null;
   const hasAccordions = hasHowToApply || hasCompatibleCrops || hasSafetyNotes;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.oneLiner,
+    image: product.imageLarge.startsWith("http")
+      ? product.imageLarge
+      : `${siteUrl}${product.imageLarge}`,
+    brand: {
+      "@type": "Brand",
+      name: "Noel AgriTV",
+    },
+    ...(category && { category: category.name }),
+  };
+
   return (
     <div className="bg-bg py-[var(--spacing-section)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="container-site">
         {/* Two-column layout: image left, info right */}
         <div className="grid grid-cols-1 gap-8 min-[768px]:grid-cols-2 min-[768px]:gap-12">

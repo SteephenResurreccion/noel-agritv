@@ -2,7 +2,30 @@ import type { Metadata, Viewport } from "next";
 import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { FACEBOOK_URL, YOUTUBE_URL, PHONE_TEL, EMAIL } from "@/lib/constants";
 import "./globals.css";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Noel AgriTV",
+  url: siteUrl,
+  logo: `${siteUrl}/images/whitebglogo.png`,
+  description:
+    "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021.",
+  foundingDate: "2021",
+  founder: { "@type": "Person", name: "Noel Tolentino" },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+639272743281",
+    contactType: "customer service",
+    availableLanguage: ["English", "Filipino"],
+  },
+  email: EMAIL,
+  sameAs: [FACEBOOK_URL, YOUTUBE_URL],
+};
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
@@ -57,6 +80,10 @@ export default function RootLayout({
     <html lang="en" className={`${sourceSans.variable} ${sourceSerif.variable} antialiased`}>
       <head>
         <link rel="preconnect" href="https://i.ytimg.com" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
       </head>
       <body>
         {children}
