@@ -102,19 +102,66 @@ export default async function ProductDetailPage({
   const hasAccordions = hasHowToApply || hasCompatibleCrops || hasSafetyNotes;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
+  const absUrl = (u: string) => (u.startsWith("http") ? u : `${siteUrl}${u}`);
+  const productUrl = `${siteUrl}/products/${product.slug}`;
+
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.oneLiner,
-    image: product.imageLarge.startsWith("http")
-      ? product.imageLarge
-      : `${siteUrl}${product.imageLarge}`,
-    brand: {
-      "@type": "Brand",
-      name: "Noel AgriTV",
-    },
+    description: product.description || product.oneLiner,
+    image: [absUrl(product.imageLarge), absUrl(product.image)].filter(
+      (v, i, a) => a.indexOf(v) === i
+    ),
+    sku: product.slug,
+    url: productUrl,
+    brand: { "@type": "Brand", name: "Noel AgriTV" },
+    manufacturer: { "@type": "Organization", name: "Noel AgriTV" },
     ...(category && { category: category.name }),
+    ...(product.specs.length > 0 && {
+      additionalProperty: product.specs.map((s) => ({
+        "@type": "PropertyValue",
+        name: s.label,
+        value: s.value,
+      })),
+    }),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Products",
+        item: `${siteUrl}/products`,
+      },
+      ...(category
+        ? [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: category.name,
+              item: `${siteUrl}/products?category=${category.slug}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 4,
+              name: product.name,
+              item: productUrl,
+            },
+          ]
+        : [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: product.name,
+              item: productUrl,
+            },
+          ]),
+    ],
   };
 
   return (
@@ -122,6 +169,10 @@ export default async function ProductDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <div className="container-site">
         {/* Two-column layout: image left, info right */}
