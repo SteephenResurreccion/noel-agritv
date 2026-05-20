@@ -40,6 +40,7 @@ export interface AdminProduct {
   image: string;
   categorySlug: string;
   visible: boolean;
+  priceCentavos?: number; // integer centavos; optional
   specs?: AdminProductSpec[];
   howToApply?: string | null;
   compatibleCrops?: string[];

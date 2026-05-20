@@ -100,6 +100,7 @@ export async function seedBuiltInProducts() {
         image: p.image,
         categorySlug: p.categorySlug,
         visible: true,
+        priceCentavos: p.priceCentavos,
         specs: p.specs,
         howToApply: p.howToApply,
         compatibleCrops: p.compatibleCrops,
@@ -170,6 +171,16 @@ export async function addProduct(formData: FormData) {
       ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
       : [];
 
+    const priceRaw = formData.get("price");
+    const priceCentavos =
+      priceRaw === null || String(priceRaw).trim() === ""
+        ? undefined
+        : z
+            .number()
+            .nonnegative()
+            .int()
+            .parse(Math.round(Number(priceRaw) * 100));
+
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     if (!slug) {
       throw new Error("Product name must contain at least one letter or number.");
@@ -204,6 +215,7 @@ export async function addProduct(formData: FormData) {
       image: imageUrl,
       categorySlug,
       visible: true,
+      priceCentavos,
       specs,
       howToApply,
       compatibleCrops,
@@ -244,6 +256,16 @@ export async function updateProduct(id: string, formData: FormData) {
     const compatibleCrops = cropsJson
       ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
       : [];
+
+    const priceRaw = formData.get("price");
+    const priceCentavos =
+      priceRaw === null || String(priceRaw).trim() === ""
+        ? undefined
+        : z
+            .number()
+            .nonnegative()
+            .int()
+            .parse(Math.round(Number(priceRaw) * 100));
 
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
@@ -286,6 +308,7 @@ export async function updateProduct(id: string, formData: FormData) {
       description,
       image: imageUrl,
       categorySlug,
+      priceCentavos,
       specs,
       howToApply,
       compatibleCrops,

@@ -167,6 +167,19 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
             </div>
             <div className="md:col-span-2">
               <label className="mb-1 block text-xs font-semibold text-text-secondary">
+                Price (₱) — leave blank for inquiry-only
+              </label>
+              <input
+                name="price"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="e.g. 250.00"
+                className="h-9 w-full rounded-md border border-border bg-bg px-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-text-secondary">
                 Product Image *
               </label>
               <input

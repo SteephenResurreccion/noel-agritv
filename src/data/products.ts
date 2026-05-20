@@ -12,6 +12,7 @@ export interface Product {
   specs: ProductSpec[];
   image: string;
   imageLarge: string;
+  priceCentavos?: number; // integer centavos; undefined/absent ⇒ inquiry-only (no Add-to-cart)
   youtubeId: string | null;
   compatibleCrops: string[];
   howToApply: string | null;

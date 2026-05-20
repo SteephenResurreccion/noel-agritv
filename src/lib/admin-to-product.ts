@@ -12,6 +12,7 @@ export function adminToProduct(p: AdminProduct): Product {
     specs: p.specs ?? [],
     image: p.image,
     imageLarge: p.image,
+    priceCentavos: p.priceCentavos,
     youtubeId: null,
     compatibleCrops: p.compatibleCrops ?? [],
     howToApply: p.howToApply ?? null,
