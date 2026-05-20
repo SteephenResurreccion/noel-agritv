@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
 import { categories } from "@/data/categories";
+import { CartBadge } from "@/components/cart-badge";
 
 interface SearchProduct {
   slug: string;
@@ -153,6 +154,9 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   Contact
                 </Link>
               </nav>
+
+              {/* Cart badge */}
+              <CartBadge />
 
               {/* Mobile search icon */}
               <button
