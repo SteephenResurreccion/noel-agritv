@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-store";
 import { formatCentavos } from "@/lib/utils";
 import { resolveShipping } from "@/lib/shipping";
@@ -9,6 +10,8 @@ import type { ShippingConfig } from "@/lib/admin-store";
 import type { PhRegion } from "@/lib/ph-regions";
 import { checkoutSchema, buildCheckoutPayload } from "@/lib/order";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import { MESSENGER_URL } from "@/lib/constants";
+import { submitOrder } from "./actions";
 
 export interface CheckoutFormProps {
   shipping: ShippingConfig;
@@ -72,9 +75,13 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
   const items = useCart((s) => s.items);
   const subtotal = useCart((s) => s.subtotalCentavos());
 
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [fields, setFields] = useState<FormFields>(INITIAL_FIELDS);
   const [token, setToken] = useState<string>("");
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitError, setSubmitError] = useState<string>("");
+  const [sheetsFallback, setSheetsFallback] = useState<string>("");
 
   const estimate = useMemo(
     () => resolveShipping(shipping, fields.region),
@@ -113,7 +120,24 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
       return;
     }
     setErrors({});
-    // Submit network call is wired in Task 6 (submitOrder server action).
+    setSubmitError("");
+    setSheetsFallback("");
+    startTransition(async () => {
+      const res = await submitOrder(payload);
+      if (res.ok) {
+        router.push(
+          `/checkout/confirmation?order=${encodeURIComponent(res.orderNumber)}`
+        );
+        return;
+      }
+      if (res.error === "sheets") {
+        setSheetsFallback(res.message);
+        return;
+      }
+      // validation | turnstile — show inline + reset the token so user re-solves.
+      setSubmitError(res.message);
+      setToken("");
+    });
   }
 
   return (
@@ -390,13 +414,33 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
         </div>
 
         <button
-          type="button"
-          disabled
-          title="Submit wired in Task 6"
-          className="mt-2 block w-full rounded-md bg-brand-darkest px-5 py-3 text-center text-sm font-semibold text-white opacity-60 cursor-not-allowed"
+          type="submit"
+          disabled={isPending || !token}
+          className="mt-2 block w-full rounded-md bg-brand-darkest px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Place order
+          {isPending ? "Placing order…" : "Place order"}
         </button>
+
+        {submitError && (
+          <p className={ERROR_CLASS} role="alert">
+            {submitError}
+          </p>
+        )}
+
+        {sheetsFallback && (
+          <div
+            role="alert"
+            className="mt-3 rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
+          >
+            <p>{sheetsFallback}</p>
+            <a
+              href={MESSENGER_URL}
+              className="mt-2 inline-block font-semibold underline"
+            >
+              Message us to complete your order
+            </a>
+          </div>
+        )}
       </aside>
     </form>
   );
