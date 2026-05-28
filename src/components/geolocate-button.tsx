@@ -299,7 +299,7 @@ export function GeolocateButton({ onPrefill }: GeolocateButtonProps) {
         type="button"
         onClick={handleClick}
         disabled={busy}
-        className="inline-flex items-center gap-2 rounded-md border border-brand-mid bg-surface px-3 py-2 text-sm font-medium text-brand-darkest hover:bg-bg-wheat disabled:opacity-60 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 rounded-md border border-brand-mid bg-surface px-4 py-3 text-sm font-medium text-brand-darkest hover:bg-bg-wheat disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {busy ? STATUS_TEXT[status.kind] : "Use my location"}
       </button>

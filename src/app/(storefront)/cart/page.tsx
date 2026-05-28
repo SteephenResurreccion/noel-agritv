@@ -44,7 +44,7 @@ export default function CartPage() {
               <button
                 onClick={() => setQty(i.slug, i.qty - 1)}
                 aria-label="Decrease quantity"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-text-primary"
+                className="flex h-11 w-11 items-center justify-center rounded-md border border-border text-text-primary"
               >
                 −
               </button>
@@ -52,7 +52,7 @@ export default function CartPage() {
               <button
                 onClick={() => setQty(i.slug, i.qty + 1)}
                 aria-label="Increase quantity"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-text-primary"
+                className="flex h-11 w-11 items-center justify-center rounded-md border border-border text-text-primary"
               >
                 +
               </button>
@@ -60,7 +60,7 @@ export default function CartPage() {
             <button
               onClick={() => removeItem(i.slug)}
               aria-label={`Remove ${i.name}`}
-              className="flex h-9 w-9 items-center justify-center rounded-md text-text-secondary hover:text-red-600"
+              className="flex h-11 w-11 items-center justify-center rounded-md text-text-secondary hover:text-red-600"
             >
               <Trash2 className="h-4 w-4" />
             </button>

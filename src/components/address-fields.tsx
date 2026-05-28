@@ -128,6 +128,8 @@ export function AddressFields({
             onChange("city", "");
             onChange("barangay", "");
           }}
+          aria-invalid={errors?.region ? "true" : "false"}
+          aria-describedby={errors?.region ? "region-error" : undefined}
           className={INPUT_CLASS}
         >
           <option value="">Select a region…</option>
@@ -138,7 +140,13 @@ export function AddressFields({
           ))}
         </select>
         {errors?.region && (
-          <p className="mt-1 text-sm text-destructive">{errors.region}</p>
+          <p
+            id="region-error"
+            role="alert"
+            className="mt-1 text-sm text-destructive"
+          >
+            {errors.region}
+          </p>
         )}
         {loading && (
           <p className="mt-1 text-sm text-text-secondary">
@@ -167,6 +175,8 @@ export function AddressFields({
             onChange("city", "");
             onChange("barangay", "");
           }}
+          aria-invalid={errors?.province ? "true" : "false"}
+          aria-describedby={errors?.province ? "province-error" : undefined}
           className={INPUT_CLASS}
         >
           <option value="">
@@ -179,7 +189,13 @@ export function AddressFields({
           ))}
         </select>
         {errors?.province && (
-          <p className="mt-1 text-sm text-destructive">{errors.province}</p>
+          <p
+            id="province-error"
+            role="alert"
+            className="mt-1 text-sm text-destructive"
+          >
+            {errors.province}
+          </p>
         )}
       </div>
 
@@ -197,6 +213,8 @@ export function AddressFields({
             onChange("city", e.target.value);
             onChange("barangay", "");
           }}
+          aria-invalid={errors?.city ? "true" : "false"}
+          aria-describedby={errors?.city ? "city-error" : undefined}
           className={INPUT_CLASS}
         >
           <option value="">
@@ -209,7 +227,13 @@ export function AddressFields({
           ))}
         </select>
         {errors?.city && (
-          <p className="mt-1 text-sm text-destructive">{errors.city}</p>
+          <p
+            id="city-error"
+            role="alert"
+            className="mt-1 text-sm text-destructive"
+          >
+            {errors.city}
+          </p>
         )}
       </div>
 
@@ -224,6 +248,8 @@ export function AddressFields({
           value={barangay}
           disabled={barangayDisabled}
           onChange={(e) => onChange("barangay", e.target.value)}
+          aria-invalid={errors?.barangay ? "true" : "false"}
+          aria-describedby={errors?.barangay ? "barangay-error" : undefined}
           className={INPUT_CLASS}
         >
           <option value="">
@@ -236,7 +262,13 @@ export function AddressFields({
           ))}
         </select>
         {errors?.barangay && (
-          <p className="mt-1 text-sm text-destructive">{errors.barangay}</p>
+          <p
+            id="barangay-error"
+            role="alert"
+            className="mt-1 text-sm text-destructive"
+          >
+            {errors.barangay}
+          </p>
         )}
       </div>
 
@@ -251,10 +283,18 @@ export function AddressFields({
           required
           value={street}
           onChange={(e) => onChange("street", e.target.value)}
+          aria-invalid={errors?.street ? "true" : "false"}
+          aria-describedby={errors?.street ? "street-error" : undefined}
           className={INPUT_CLASS}
         />
         {errors?.street && (
-          <p className="mt-1 text-sm text-destructive">{errors.street}</p>
+          <p
+            id="street-error"
+            role="alert"
+            className="mt-1 text-sm text-destructive"
+          >
+            {errors.street}
+          </p>
         )}
       </div>
 
@@ -268,10 +308,18 @@ export function AddressFields({
           type="text"
           value={landmark}
           onChange={(e) => onChange("landmark", e.target.value)}
+          aria-invalid={errors?.landmark ? "true" : "false"}
+          aria-describedby={errors?.landmark ? "landmark-error" : undefined}
           className={INPUT_CLASS}
         />
         {errors?.landmark && (
-          <p className="mt-1 text-sm text-destructive">{errors.landmark}</p>
+          <p
+            id="landmark-error"
+            role="alert"
+            className="mt-1 text-sm text-destructive"
+          >
+            {errors.landmark}
+          </p>
         )}
       </div>
     </div>

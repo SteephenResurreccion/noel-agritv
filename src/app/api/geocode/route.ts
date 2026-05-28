@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createRateLimiter } from "@/lib/rate-limit";
 
 /**
  * Reverse-geocoding proxy for Nominatim (OpenStreetMap).
@@ -11,16 +12,48 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * Rate-limiting safeguard: only the checkout's "Use my location" button
  * triggers this, one request per tap. No auto-trigger on page load.
+ * Per-IP limits below match Nominatim's published policy (1 req/sec).
+ *
+ * IMPORTANT: The limiter state is in-memory and module-scoped — it does NOT
+ * survive Vercel cold starts and does NOT coordinate across serverless
+ * instances. That's acceptable here as a defense against casual abuse from
+ * a single client; for production-grade protection layer a Cloudflare WAF
+ * rule (or Upstash Redis) on top.
  */
 
 const USER_AGENT = "Noel-AgriTV-Checkout/1.0 (https://noelagritv.com)";
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/reverse";
 
+// 1 req/sec/IP, 30 req/min/IP — within Nominatim's usage policy headroom.
+const limiter = createRateLimiter({
+  intervalMs: 1000,
+  windowMs: 60_000,
+  maxPerWindow: 30,
+});
+
 function isValidCoord(v: number, min: number, max: number) {
   return Number.isFinite(v) && v >= min && v <= max;
 }
 
+function clientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown"
+  );
+}
+
 export async function GET(request: NextRequest) {
+  const rl = limiter.check(clientIp(request));
+  if (!rl.allowed) {
+    return new Response(JSON.stringify({ error: "rate_limited" }), {
+      status: 429,
+      headers: {
+        "content-type": "application/json",
+        "retry-after": String(rl.retryAfterSec),
+      },
+    });
+  }
+
   const sp = request.nextUrl.searchParams;
   const latStr = sp.get("lat");
   const lonStr = sp.get("lon");

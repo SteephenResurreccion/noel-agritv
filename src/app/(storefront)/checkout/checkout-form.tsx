@@ -170,9 +170,15 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               autoComplete="name"
               value={fields.name}
               onChange={(e) => updateField("name", e.target.value)}
+              aria-invalid={errors.name?.[0] ? "true" : "false"}
+              aria-describedby={errors.name?.[0] ? "name-error" : undefined}
               className={INPUT_CLASS}
             />
-            {errors.name?.[0] && <p className={ERROR_CLASS}>{errors.name[0]}</p>}
+            {errors.name?.[0] && (
+              <p id="name-error" role="alert" className={ERROR_CLASS}>
+                {errors.name[0]}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="phone" className={LABEL_CLASS}>
@@ -188,10 +194,14 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               placeholder="09XXXXXXXXX"
               value={fields.phone}
               onChange={(e) => updateField("phone", e.target.value)}
+              aria-invalid={errors.phone?.[0] ? "true" : "false"}
+              aria-describedby={errors.phone?.[0] ? "phone-error" : undefined}
               className={INPUT_CLASS}
             />
             {errors.phone?.[0] && (
-              <p className={ERROR_CLASS}>{errors.phone[0]}</p>
+              <p id="phone-error" role="alert" className={ERROR_CLASS}>
+                {errors.phone[0]}
+              </p>
             )}
           </div>
         </section>
@@ -249,10 +259,14 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               rows={3}
               value={fields.notes}
               onChange={(e) => updateField("notes", e.target.value)}
+              aria-invalid={errors.notes?.[0] ? "true" : "false"}
+              aria-describedby={errors.notes?.[0] ? "notes-error" : undefined}
               className={INPUT_CLASS}
             />
             {errors.notes?.[0] && (
-              <p className={ERROR_CLASS}>{errors.notes[0]}</p>
+              <p id="notes-error" role="alert" className={ERROR_CLASS}>
+                {errors.notes[0]}
+              </p>
             )}
           </div>
         </section>
@@ -277,12 +291,18 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               required
               checked={fields.consent}
               onChange={(e) => updateField("consent", e.target.checked)}
+              aria-invalid={errors.consent?.[0] ? "true" : "false"}
+              aria-describedby={
+                errors.consent?.[0] ? "consent-error" : undefined
+              }
               className="mt-1 h-4 w-4 rounded border-border text-brand-mid focus:ring-brand-mid"
             />
             <span>{RA_10173_NOTICE}</span>
           </label>
           {errors.consent?.[0] && (
-            <p className={ERROR_CLASS}>{errors.consent[0]}</p>
+            <p id="consent-error" role="alert" className={ERROR_CLASS}>
+              {errors.consent[0]}
+            </p>
           )}
         </section>
 
