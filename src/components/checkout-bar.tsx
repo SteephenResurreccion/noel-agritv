@@ -57,23 +57,25 @@ export function CheckoutBar(): React.ReactElement | null {
     <div
       role="region"
       aria-label="Cart summary"
-      className="fixed inset-x-0 bottom-16 z-40 border-t border-brand-dark bg-brand-darkest text-white shadow-[0_-2px_10px_rgba(0,0,0,0.15)] md:bottom-0"
+      className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] md:bottom-0"
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="container-site flex items-center justify-between gap-4 px-4 pt-3">
-        <div className="flex items-center gap-2 text-sm">
+      <div className="mx-auto flex max-w-screen-md items-center justify-between gap-4 px-4 pt-3">
+        <div className="flex items-center gap-2 text-text-primary">
           <ShoppingCart className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className="font-medium">
+          <span className="text-sm font-semibold sm:text-base">
             {count === 1 ? "1 item" : `${count} items`}
           </span>
-          <span aria-hidden="true" className="opacity-60">
+          <span aria-hidden="true" className="text-text-secondary">
             ·
           </span>
-          <span className="font-semibold">{formatCentavos(subtotal)}</span>
+          <span className="text-sm font-semibold sm:text-base">
+            {formatCentavos(subtotal)}
+          </span>
         </div>
         <Link
           href="/checkout"
-          className="rounded-md bg-brand-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+          className="rounded-md bg-brand-accent px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent sm:text-base"
         >
           Checkout →
         </Link>
