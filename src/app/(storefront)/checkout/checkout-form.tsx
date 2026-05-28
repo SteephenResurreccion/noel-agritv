@@ -125,6 +125,11 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
     startTransition(async () => {
       const res = await submitOrder(payload);
       if (res.ok) {
+        // Clear cart BEFORE navigating. If the router.push is interrupted
+        // (FB IAB nav glitch, network blip, tab close) the cart is already
+        // empty, so a return visit can't accidentally resubmit the order.
+        // The confirmation page also clears as a defensive safety-net.
+        useCart.getState().clear();
         router.push(
           `/checkout/confirmation?order=${encodeURIComponent(res.orderNumber)}`
         );

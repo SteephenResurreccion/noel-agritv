@@ -35,29 +35,41 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     };
   }
 
-  // 3. Authoritative prices (never trust client)
+  // 3. Authoritative prices AND names (never trust client)
   const config = await getAdminConfig();
-  const priceBySlug = new Map<string, number>();
+  const productBySlug = new Map<
+    string,
+    { name: string; priceCentavos: number }
+  >();
   const custom = (config.customProducts ?? [])
     .filter((p) => p.visible)
     .map(adminToProduct);
   const source = custom.length > 0 ? custom : products;
   for (const p of source) {
-    if (p.priceCentavos !== undefined) priceBySlug.set(p.slug, p.priceCentavos);
+    if (p.priceCentavos !== undefined) {
+      productBySlug.set(p.slug, {
+        name: p.name,
+        priceCentavos: p.priceCentavos,
+      });
+    }
   }
   let subtotalCentavos = 0;
   const items: { name: string; qty: number; priceCentavos: number }[] = [];
   for (const i of data.items) {
-    const price = priceBySlug.get(i.slug);
-    if (price === undefined) {
+    const product = productBySlug.get(i.slug);
+    if (!product) {
       return {
         ok: false,
         error: "validation",
         message: "An item in your cart is no longer available.",
       };
     }
-    subtotalCentavos += price * i.qty;
-    items.push({ name: i.name, qty: i.qty, priceCentavos: price });
+    subtotalCentavos += product.priceCentavos * i.qty;
+    items.push({
+      name: product.name,
+      qty: i.qty,
+      priceCentavos: product.priceCentavos,
+    });
   }
 
   // 4. Order number + shipping + region label + timestamp

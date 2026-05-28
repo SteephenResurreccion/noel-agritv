@@ -82,6 +82,11 @@ describe("checkoutSchema", () => {
       checkoutSchema.safeParse({ ...valid, turnstileToken: "" }).success
     ).toBe(false);
   });
+  it("rejects an unknown region", () => {
+    expect(
+      checkoutSchema.safeParse({ ...valid, region: "ATLANTIS" }).success
+    ).toBe(false);
+  });
 });
 
 describe("buildCheckoutPayload", () => {

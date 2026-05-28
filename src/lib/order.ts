@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { cartItemSchema, type CartItem } from "@/lib/cart-store";
+import { PH_REGIONS } from "@/lib/ph-regions";
 
 /**
  * Normalize a PH mobile number to canonical "+639XXXXXXXXX", or null if invalid.
@@ -39,7 +40,12 @@ export const phoneSchema = z
 export const checkoutSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
   phone: phoneSchema,
-  region: z.string().trim().min(1, "Select a region"),
+  region: z
+    .string()
+    .trim()
+    .refine((v) => PH_REGIONS.some((r) => r.value === v), {
+      message: "Select a valid region",
+    }),
   province: z.string().trim().min(1, "Province is required").max(120),
   city: z.string().trim().min(1, "City/Municipality is required").max(120),
   barangay: z.string().trim().min(1, "Barangay is required").max(120),
