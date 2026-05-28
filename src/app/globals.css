@@ -239,3 +239,19 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/*
+ * Reserve bottom clearance for the sticky CheckoutBar when it is visible.
+ * The bar toggles body[data-cart-active="true"] on mount / when the cart
+ * has items on a non-hidden route. On mobile the CheckoutBar stacks above
+ * the MobileBottomBar (which itself reserves 64px via pb-16 on <main>); on
+ * desktop the MobileBottomBar is hidden, so we only need ~80px.
+ */
+body[data-cart-active="true"] main {
+  padding-bottom: calc(4rem + 5rem); /* 64px mobile-bottom-bar + 80px checkout-bar */
+}
+@media (min-width: 768px) {
+  body[data-cart-active="true"] main {
+    padding-bottom: 5rem; /* 80px checkout-bar only — no mobile-bottom-bar */
+  }
+}
