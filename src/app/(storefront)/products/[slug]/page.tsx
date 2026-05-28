@@ -5,6 +5,8 @@ import { products, getProductBySlug, type Product } from "@/data/products";
 import { getCategoryBySlug } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
+import { formatCentavos } from "@/lib/utils";
+import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "@/components/messenger-cta";
 import { CallCTA } from "@/components/call-cta";
 import { SpecStrip } from "@/components/spec-strip";
@@ -213,6 +215,21 @@ export default async function ProductDetailPage({
             <p className="text-[length:var(--font-size-body)] text-text-secondary">
               {product.oneLiner}
             </p>
+
+            {product.priceCentavos !== undefined && (
+              <>
+                <p className="text-[length:var(--font-size-h2)] font-bold text-brand-darkest">
+                  {formatCentavos(product.priceCentavos)}
+                </p>
+                <AddToCart
+                  slug={product.slug}
+                  name={product.name}
+                  priceCentavos={product.priceCentavos}
+                  image={product.image}
+                  layout="detail"
+                />
+              </>
+            )}
 
             <div className="flex flex-col gap-3">
               <MessengerCTA

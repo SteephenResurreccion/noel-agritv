@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/data/products";
+import { formatCentavos } from "@/lib/utils";
+import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "./messenger-cta";
 
 interface ProductCardProps {
@@ -40,17 +42,32 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-[13px] text-text-secondary">
           {product.oneLiner}
         </p>
-        <div className="mt-auto pt-3">
-          <MessengerCTA
-            productName={product.name}
-            packSize=""
-            label="Message Us"
-            variant="default"
-            size="default"
-            context="catalog"
-            className="w-full truncate rounded-[4px] bg-brand-darkest text-xs font-semibold hover:bg-brand-dark"
-          />
-        </div>
+        {product.priceCentavos !== undefined ? (
+          <div className="mt-auto pt-3">
+            <p className="mb-2 text-base font-bold text-brand-darkest">
+              {formatCentavos(product.priceCentavos)}
+            </p>
+            <AddToCart
+              slug={product.slug}
+              name={product.name}
+              priceCentavos={product.priceCentavos}
+              image={product.image}
+              layout="card"
+            />
+          </div>
+        ) : (
+          <div className="mt-auto pt-3">
+            <MessengerCTA
+              productName={product.name}
+              packSize=""
+              label="Message Us"
+              variant="default"
+              size="default"
+              context="catalog"
+              className="w-full truncate rounded-[4px] bg-brand-darkest text-xs font-semibold hover:bg-brand-dark"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
