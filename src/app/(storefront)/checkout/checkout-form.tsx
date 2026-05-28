@@ -10,6 +10,8 @@ import type { ShippingConfig } from "@/lib/admin-store";
 import type { PhRegion } from "@/lib/ph-regions";
 import { checkoutSchema, buildCheckoutPayload } from "@/lib/order";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import { AddressFields, type AddressField } from "@/components/address-fields";
+import { GeolocateButton } from "@/components/geolocate-button";
 import { MESSENGER_URL } from "@/lib/constants";
 import { submitOrder } from "./actions";
 
@@ -198,111 +200,39 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
           <h2 className="text-[length:var(--font-size-h2)] font-semibold text-brand-darkest">
             Delivery address
           </h2>
-          <div>
-            <label htmlFor="region" className={LABEL_CLASS}>
-              Region
-            </label>
-            <select
-              id="region"
-              name="region"
-              required
-              value={fields.region}
-              onChange={(e) => updateField("region", e.target.value)}
-              className={INPUT_CLASS}
-            >
-              <option value="">Select a region…</option>
-              {regions.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-            {errors.region?.[0] && (
-              <p className={ERROR_CLASS}>{errors.region[0]}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="province" className={LABEL_CLASS}>
-              Province
-            </label>
-            <input
-              id="province"
-              name="province"
-              type="text"
-              required
-              value={fields.province}
-              onChange={(e) => updateField("province", e.target.value)}
-              className={INPUT_CLASS}
-            />
-            {errors.province?.[0] && (
-              <p className={ERROR_CLASS}>{errors.province[0]}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="city" className={LABEL_CLASS}>
-              City / Municipality
-            </label>
-            <input
-              id="city"
-              name="city"
-              type="text"
-              required
-              value={fields.city}
-              onChange={(e) => updateField("city", e.target.value)}
-              className={INPUT_CLASS}
-            />
-            {errors.city?.[0] && <p className={ERROR_CLASS}>{errors.city[0]}</p>}
-          </div>
-          <div>
-            <label htmlFor="barangay" className={LABEL_CLASS}>
-              Barangay
-            </label>
-            <input
-              id="barangay"
-              name="barangay"
-              type="text"
-              required
-              value={fields.barangay}
-              onChange={(e) => updateField("barangay", e.target.value)}
-              className={INPUT_CLASS}
-            />
-            {errors.barangay?.[0] && (
-              <p className={ERROR_CLASS}>{errors.barangay[0]}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="street" className={LABEL_CLASS}>
-              Street / House no.
-            </label>
-            <input
-              id="street"
-              name="street"
-              type="text"
-              required
-              value={fields.street}
-              onChange={(e) => updateField("street", e.target.value)}
-              className={INPUT_CLASS}
-            />
-            {errors.street?.[0] && (
-              <p className={ERROR_CLASS}>{errors.street[0]}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="landmark" className={LABEL_CLASS}>
-              Landmark (optional)
-            </label>
-            <input
-              id="landmark"
-              name="landmark"
-              type="text"
-              value={fields.landmark}
-              onChange={(e) => updateField("landmark", e.target.value)}
-              className={INPUT_CLASS}
-            />
-            {errors.landmark?.[0] && (
-              <p className={ERROR_CLASS}>{errors.landmark[0]}</p>
-            )}
-          </div>
+          <GeolocateButton
+            onPrefill={(p) => {
+              setFields((prev) => ({
+                ...prev,
+                region: p.region,
+                province: p.province,
+                city: p.city,
+                barangay: p.barangay,
+                // Only overwrite street if the geocoder actually found one.
+                street: p.street || prev.street,
+              }));
+            }}
+          />
+          <AddressFields
+            regions={regions}
+            region={fields.region}
+            province={fields.province}
+            city={fields.city}
+            barangay={fields.barangay}
+            street={fields.street}
+            landmark={fields.landmark}
+            onChange={(field, value) =>
+              updateField(field as AddressField, value)
+            }
+            errors={{
+              region: errors.region?.[0],
+              province: errors.province?.[0],
+              city: errors.city?.[0],
+              barangay: errors.barangay?.[0],
+              street: errors.street?.[0],
+              landmark: errors.landmark?.[0],
+            }}
+          />
         </section>
 
         <section className="space-y-4">

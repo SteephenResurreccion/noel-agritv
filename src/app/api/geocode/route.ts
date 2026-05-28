@@ -1,0 +1,79 @@
+import { NextRequest, NextResponse } from "next/server";
+
+/**
+ * Reverse-geocoding proxy for Nominatim (OpenStreetMap).
+ *
+ * Why a proxy? Nominatim's fair-use policy requires a real `User-Agent`
+ * header on every request. Browser `fetch` is forbidden by spec from setting
+ * the UA header — so a server hop is the only correct way to use the API
+ * from a static-ish web app. This route attaches the UA + Referer and
+ * forwards the JSON response unchanged.
+ *
+ * Rate-limiting safeguard: only the checkout's "Use my location" button
+ * triggers this, one request per tap. No auto-trigger on page load.
+ */
+
+const USER_AGENT = "Noel-AgriTV-Checkout/1.0 (https://noelagritv.com)";
+const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/reverse";
+
+function isValidCoord(v: number, min: number, max: number) {
+  return Number.isFinite(v) && v >= min && v <= max;
+}
+
+export async function GET(request: NextRequest) {
+  const sp = request.nextUrl.searchParams;
+  const latStr = sp.get("lat");
+  const lonStr = sp.get("lon");
+  if (!latStr || !lonStr) {
+    return NextResponse.json(
+      { error: "Missing lat or lon" },
+      { status: 400 }
+    );
+  }
+  const lat = Number(latStr);
+  const lon = Number(lonStr);
+  if (!isValidCoord(lat, -90, 90) || !isValidCoord(lon, -180, 180)) {
+    return NextResponse.json(
+      { error: "lat must be in [-90, 90] and lon in [-180, 180]" },
+      { status: 400 }
+    );
+  }
+
+  // Build Nominatim URL with English locale + structured address details.
+  const url =
+    `${NOMINATIM_BASE}?lat=${encodeURIComponent(lat.toString())}` +
+    `&lon=${encodeURIComponent(lon.toString())}` +
+    `&format=jsonv2&addressdetails=1&accept-language=en`;
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        Referer: "https://noelagritv.com/checkout",
+        Accept: "application/json",
+      },
+      // Don't cache — coords change per user.
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: `Upstream geocoder responded ${res.status}` },
+        { status: 502 }
+      );
+    }
+    const data = await res.json();
+    // Pass the response through unchanged — the client maps fields itself.
+    return NextResponse.json(data, {
+      headers: {
+        // Don't let intermediaries cache user locations.
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (e) {
+    console.error("/api/geocode upstream error:", e);
+    return NextResponse.json(
+      { error: "Upstream geocoder unreachable" },
+      { status: 502 }
+    );
+  }
+}
