@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ZodObject, ZodTypeAny } from "zod";
 import { useCart } from "@/lib/cart-store";
 import { formatCentavos } from "@/lib/utils";
 import { resolveShipping } from "@/lib/shipping";
@@ -106,11 +107,46 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
     );
   }
 
+  /**
+   * Re-validate a single top-level field against `checkoutSchema.shape[name]`
+   * and update the `errors` state. Used by `onChange` handlers so a field's
+   * error message clears as soon as the user types a valid value (instead of
+   * waiting for the next submit).
+   *
+   * Gated on "field already has an error" — we don't surface validation
+   * messages before the user has tried to submit at least once.
+   */
+  const validateField = useCallback(
+    (name: keyof FieldErrors, value: unknown) => {
+      // Only re-validate fields that currently have an error visible. This is
+      // the simplest way to avoid showing errors mid-typing on a fresh form.
+      setErrors((prev) => {
+        if (!prev[name]) return prev;
+        const shape = (checkoutSchema as unknown as ZodObject<Record<string, ZodTypeAny>>)
+          .shape;
+        const fieldSchema = shape[name as string];
+        if (!fieldSchema) return prev;
+        const result = fieldSchema.safeParse(value);
+        const next = { ...prev };
+        if (result.success) {
+          delete next[name];
+        } else {
+          next[name] = result.error.issues.map((e) => e.message);
+        }
+        return next;
+      });
+    },
+    []
+  );
+
   function updateField<K extends keyof FormFields>(
     key: K,
     value: FormFields[K]
   ) {
     setFields((prev) => ({ ...prev, [key]: value }));
+    // Live-clear/refresh the per-field error so the user sees the form react
+    // as they fix invalid values — no waiting for the next submit.
+    validateField(key as keyof FieldErrors, value);
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

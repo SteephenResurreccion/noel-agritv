@@ -43,15 +43,20 @@ function clientIp(request: NextRequest): string {
 }
 
 export async function GET(request: NextRequest) {
-  const rl = limiter.check(clientIp(request));
-  if (!rl.allowed) {
-    return new Response(JSON.stringify({ error: "rate_limited" }), {
-      status: 429,
-      headers: {
-        "content-type": "application/json",
-        "retry-after": String(rl.retryAfterSec),
-      },
-    });
+  // Skip rate-limiting in non-production. `x-forwarded-for` is set by Vercel
+  // in production; locally it's absent, so every dev request shares the
+  // `"unknown"` bucket and the 1-req/sec rule trips on the second click.
+  if (process.env.NODE_ENV === "production") {
+    const rl = limiter.check(clientIp(request));
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: "rate_limited" }), {
+        status: 429,
+        headers: {
+          "content-type": "application/json",
+          "retry-after": String(rl.retryAfterSec),
+        },
+      });
+    }
   }
 
   const sp = request.nextUrl.searchParams;
