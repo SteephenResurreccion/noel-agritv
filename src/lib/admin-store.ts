@@ -17,6 +17,23 @@ export interface AdminConfig {
   featuredProductIds: string[];
   /** Manager emails — these users can manage products/videos but not team */
   managers: string[];
+  /** Shipping estimate settings (default OFF). */
+  shipping: ShippingConfig;
+}
+
+/**
+ * Admin-editable shipping settings.
+ * `enabled` toggles the estimate at checkout; `feesCentavos` holds per-zone fees
+ * keyed by the fixed PH_REGIONS zone mapping (`src/lib/ph-regions.ts`).
+ */
+export interface ShippingConfig {
+  enabled: boolean;
+  feesCentavos: {
+    ncr: number;
+    luzon: number;
+    visayas: number;
+    mindanao: number;
+  };
 }
 
 export interface AdminVideo {
@@ -54,6 +71,10 @@ const DEFAULT_CONFIG: AdminConfig = {
   customProducts: null,
   featuredProductIds: [],
   managers: [],
+  shipping: {
+    enabled: false,
+    feesCentavos: { ncr: 0, luzon: 0, visayas: 0, mindanao: 0 },
+  },
 };
 
 /**

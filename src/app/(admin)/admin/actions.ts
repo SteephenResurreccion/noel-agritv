@@ -602,3 +602,30 @@ export async function removeManager(email: string) {
     throw new Error("Failed to remove manager. Please try again.");
   }
 }
+
+// ── Shipping ──
+
+const shippingSchema = z.object({
+  enabled: z.boolean(),
+  feesCentavos: z.object({
+    ncr: z.number().int().nonnegative(),
+    luzon: z.number().int().nonnegative(),
+    visayas: z.number().int().nonnegative(),
+    mindanao: z.number().int().nonnegative(),
+  }),
+});
+
+export async function saveShippingConfig(input: z.infer<typeof shippingSchema>) {
+  await requireAuth();
+  try {
+    const validated = shippingSchema.parse(input);
+    const config = await getAdminConfig({ strict: true });
+    const ver = config.version;
+    config.shipping = validated;
+    await saveAdminConfig(config, ver);
+    revalidatePath("/admin/shipping");
+  } catch (e) {
+    console.error("saveShippingConfig failed:", e);
+    throw new Error("Failed to save shipping settings. Please try again.");
+  }
+}
