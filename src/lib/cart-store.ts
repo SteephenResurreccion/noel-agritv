@@ -1,19 +1,28 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { z } from "zod";
+import { priceForQuantity } from "@/lib/pricing";
 
 export const cartItemSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
   priceCentavos: z.number().int().nonnegative(),
+  priceTiers: z
+    .array(z.object({ minQty: z.number().int().positive(), priceCentavos: z.number().int().nonnegative() }))
+    .optional(),
   qty: z.number().int().min(1).max(99),
   image: z.string().min(1),
 });
 export type CartItem = z.infer<typeof cartItemSchema>;
 
+/** Per-line unit price honoring volume tiers (falls back to flat priceCentavos). */
+export function lineUnitPriceCentavos(item: CartItem): number {
+  return priceForQuantity(item, item.qty) ?? item.priceCentavos;
+}
+
 /** Pure helper — total of all line items in centavos. */
 export function computeSubtotalCentavos(items: CartItem[]): number {
-  return items.reduce((sum, i) => sum + i.priceCentavos * i.qty, 0);
+  return items.reduce((sum, i) => sum + lineUnitPriceCentavos(i) * i.qty, 0);
 }
 
 const clampQty = (q: number) => Math.max(1, Math.min(99, Math.trunc(q)));

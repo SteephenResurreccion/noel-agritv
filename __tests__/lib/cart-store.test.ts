@@ -23,6 +23,36 @@ describe("computeSubtotalCentavos", () => {
   });
 });
 
+describe("computeSubtotalCentavos with tiers", () => {
+  const TIERS = [
+    { minQty: 1, priceCentavos: 54800 },
+    { minQty: 12, priceCentavos: 52000 },
+    { minQty: 24, priceCentavos: 44500 },
+  ];
+  it("applies the per-line tier price for that line's qty", () => {
+    expect(
+      computeSubtotalCentavos([
+        { slug: "bio-enzyme", name: "Bio Enzyme", priceCentavos: 54800, priceTiers: TIERS, qty: 12, image: "/x.png" },
+      ]),
+    ).toBe(12 * 52000);
+  });
+  it("judges tiers per-product in a mixed cart, not by total units", () => {
+    expect(
+      computeSubtotalCentavos([
+        { slug: "bio-enzyme", name: "Bio Enzyme", priceCentavos: 54800, priceTiers: TIERS, qty: 2, image: "/x.png" },
+        { slug: "bio-plant-booster", name: "Bio Plant Booster", priceCentavos: 57500, priceTiers: [{ minQty: 1, priceCentavos: 57500 }, { minQty: 12, priceCentavos: 54000 }], qty: 2, image: "/x.png" },
+      ]),
+    ).toBe(2 * 54800 + 2 * 57500);
+  });
+  it("falls back to flat price for a line with no tiers (old persisted carts)", () => {
+    expect(
+      computeSubtotalCentavos([
+        { slug: "legacy", name: "Legacy", priceCentavos: 30000, qty: 3, image: "/x.png" },
+      ]),
+    ).toBe(90000);
+  });
+});
+
 describe("useCart store", () => {
   beforeEach(() => useCart.getState().clear());
 
