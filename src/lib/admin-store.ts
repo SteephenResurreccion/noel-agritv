@@ -58,6 +58,7 @@ export interface AdminProduct {
   categorySlug: string;
   visible: boolean;
   priceCentavos?: number; // integer centavos; optional
+  priceTiers?: { minQty: number; priceCentavos: number }[];
   specs?: AdminProductSpec[];
   howToApply?: string | null;
   compatibleCrops?: string[];

@@ -10,6 +10,7 @@ import {
 import { put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { priceTierSchema } from "@/lib/price-tiers";
 
 // ── Validation Schemas ──
 
@@ -101,6 +102,7 @@ export async function seedBuiltInProducts() {
         categorySlug: p.categorySlug,
         visible: true,
         priceCentavos: p.priceCentavos,
+        priceTiers: p.priceTiers,
         specs: p.specs,
         howToApply: p.howToApply,
         compatibleCrops: p.compatibleCrops,
@@ -171,6 +173,11 @@ export async function addProduct(formData: FormData) {
       ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
       : [];
 
+    const tiersJson = formData.get("priceTiers") as string | null;
+    const priceTiers = tiersJson
+      ? priceTierSchema.parse(JSON.parse(tiersJson))
+      : undefined;
+
     const priceRaw = formData.get("price");
     const priceCentavos =
       priceRaw === null || String(priceRaw).trim() === ""
@@ -216,6 +223,7 @@ export async function addProduct(formData: FormData) {
       categorySlug,
       visible: true,
       priceCentavos,
+      priceTiers: priceTiers && priceTiers.length > 0 ? priceTiers : undefined,
       specs,
       howToApply,
       compatibleCrops,
@@ -256,6 +264,11 @@ export async function updateProduct(id: string, formData: FormData) {
     const compatibleCrops = cropsJson
       ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
       : [];
+
+    const tiersJson = formData.get("priceTiers") as string | null;
+    const priceTiers = tiersJson
+      ? priceTierSchema.parse(JSON.parse(tiersJson))
+      : undefined;
 
     const priceRaw = formData.get("price");
     const priceCentavos =
@@ -309,6 +322,7 @@ export async function updateProduct(id: string, formData: FormData) {
       image: imageUrl,
       categorySlug,
       priceCentavos,
+      priceTiers: priceTiers && priceTiers.length > 0 ? priceTiers : undefined,
       specs,
       howToApply,
       compatibleCrops,

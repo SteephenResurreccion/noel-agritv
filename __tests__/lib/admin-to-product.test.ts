@@ -20,3 +20,14 @@ describe("adminToProduct priceCentavos", () => {
     expect(adminToProduct(base).priceCentavos).toBeUndefined();
   });
 });
+
+describe("adminToProduct priceTiers", () => {
+  it("carries priceTiers through to the storefront Product", () => {
+    const tiers = [{ minQty: 1, priceCentavos: 57500 }, { minQty: 12, priceCentavos: 54000 }];
+    const p = adminToProduct({ ...base, priceCentavos: 57500, priceTiers: tiers });
+    expect(p.priceTiers).toEqual(tiers);
+  });
+  it("leaves priceTiers undefined when unset", () => {
+    expect(adminToProduct(base).priceTiers).toBeUndefined();
+  });
+});
