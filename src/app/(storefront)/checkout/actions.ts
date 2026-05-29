@@ -12,6 +12,7 @@ import { PH_REGIONS } from "@/lib/ph-regions";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { products } from "@/data/products";
+import { priceForQuantity } from "@/lib/pricing";
 import { appendOrderRow, buildSheetRow } from "@/lib/sheets";
 
 export async function submitOrder(payload: unknown): Promise<SubmitResult> {
@@ -39,7 +40,11 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
   const config = await getAdminConfig();
   const productBySlug = new Map<
     string,
-    { name: string; priceCentavos: number }
+    {
+      name: string;
+      priceCentavos: number;
+      priceTiers?: { minQty: number; priceCentavos: number }[];
+    }
   >();
   const custom = (config.customProducts ?? [])
     .filter((p) => p.visible)
@@ -50,6 +55,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
       productBySlug.set(p.slug, {
         name: p.name,
         priceCentavos: p.priceCentavos,
+        priceTiers: p.priceTiers,
       });
     }
   }
@@ -64,11 +70,14 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
         message: "An item in your cart is no longer available.",
       };
     }
-    subtotalCentavos += product.priceCentavos * i.qty;
+    // Server-authoritative unit price: re-derive the tier from the catalog,
+    // NEVER from the client's snapshot (priceCentavos/priceTiers on the wire).
+    const unit = priceForQuantity(product, i.qty) ?? product.priceCentavos;
+    subtotalCentavos += unit * i.qty;
     items.push({
       name: product.name,
       qty: i.qty,
-      priceCentavos: product.priceCentavos,
+      priceCentavos: unit,
     });
   }
 
