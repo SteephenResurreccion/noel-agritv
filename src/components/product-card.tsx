@@ -44,14 +44,22 @@ export function ProductCard({ product }: ProductCardProps) {
         </p>
         {product.priceCentavos !== undefined ? (
           <div className="mt-auto pt-3">
-            <p className="mb-2 text-base font-bold text-brand-darkest">
-              {formatCentavos(product.priceCentavos)}
-            </p>
+            <div className="mb-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+              <p className="text-base font-bold text-brand-darkest tabular-nums">
+                {formatCentavos(product.priceCentavos)}
+              </p>
+              {product.priceTiers && product.priceTiers.length > 0 && (
+                <span className="rounded-full bg-bg-wheat px-2.5 py-1 text-xs font-semibold text-brand-accent">
+                  Wholesale available
+                </span>
+              )}
+            </div>
             <AddToCart
               slug={product.slug}
               name={product.name}
               priceCentavos={product.priceCentavos}
               image={product.image}
+              priceTiers={product.priceTiers}
               layout="card"
             />
           </div>
