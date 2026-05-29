@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
+import { useHasMounted } from "@/lib/use-has-mounted";
 
 export function CartBadge() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHasMounted();
   const count = useCart((s) => s.totalItems());
-  useEffect(() => setMounted(true), []);
 
   return (
     <Link

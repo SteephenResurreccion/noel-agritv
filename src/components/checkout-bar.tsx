@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
+import { useHasMounted } from "@/lib/use-has-mounted";
 import { formatCentavos } from "@/lib/utils";
 
 /**
@@ -20,12 +21,10 @@ import { formatCentavos } from "@/lib/utils";
  * is actually visible — no wasted bottom padding for empty-cart users.
  */
 export function CheckoutBar(): React.ReactElement | null {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHasMounted();
   const count = useCart((s) => s.totalItems());
   const subtotal = useCart((s) => s.subtotalCentavos());
   const pathname = usePathname();
-
-  useEffect(() => setMounted(true), []);
 
   const hiddenByRoute =
     pathname === "/cart" ||

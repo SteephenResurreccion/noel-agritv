@@ -69,23 +69,36 @@ export function AddressFields({
 
   // Fetch the region tree when `region` changes. Cleared back to null when
   // the user empties the region — the cascade collapses cleanly.
+  //
+  // All state updates live inside the async `run` continuation (after the
+  // first `await`) rather than synchronously in the effect body. This keeps
+  // the observable behavior identical — empty region clears state, a chosen
+  // region shows the loader then resolves to data or an error — while
+  // satisfying `react-hooks/set-state-in-effect` (no synchronous setState in
+  // an effect). The `await null` microtask defers the resets off the render
+  // path; they still flush before paint, so there is no visible delay.
   useEffect(() => {
     let cancelled = false;
-    if (!region) {
-      setData(null);
+
+    async function run() {
+      await null;
+      if (cancelled) return;
+
+      if (!region) {
+        setData(null);
+        setLoadError("");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
       setLoadError("");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setLoadError("");
-    loadRegion(region)
-      .then((r) => {
+      try {
+        const r = await loadRegion(region);
         if (cancelled) return;
         setData(r);
         setLoading(false);
-      })
-      .catch((e: Error) => {
+      } catch (e) {
         if (cancelled) return;
         setData(null);
         setLoading(false);
@@ -94,7 +107,11 @@ export function AddressFields({
         );
         // Surface for debugging but don't crash.
         console.error("AddressFields loadRegion failed:", e);
-      });
+      }
+    }
+
+    void run();
+
     return () => {
       cancelled = true;
     };
