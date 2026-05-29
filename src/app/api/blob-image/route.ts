@@ -15,6 +15,11 @@ import { NextRequest, NextResponse } from "next/server";
  *      form, never the attacker-controlled URL. The library reconstructs the
  *      host from the RW token's own store, so the host can't be steered even if
  *      the suffix/exact checks were somehow bypassed.
+ *
+ * Path allowlist (red-team R3, CRITICAL): the proxy is unauthenticated and
+ * `admin/config.json` (PII) lives at a fixed key in this same store, so the
+ * pathname must start with `products/` or `videos/` — the only prefixes the app
+ * legitimately proxies — before `get()` is called. Path traversal is rejected.
  */
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get("url");
@@ -56,8 +61,18 @@ export async function GET(request: NextRequest) {
   }
 
   // Reconstruct from pathname so the host is the token's store, not the input.
-  const pathname = parsed.pathname.slice(1);
+  const pathname = parsed.pathname.replace(/^\/+/, "");
   if (!pathname) {
+    return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
+  }
+
+  // Path allowlist (red-team R3, CRITICAL): the proxy is unauthenticated and the
+  // private `admin/config.json` (manager emails = PII, shipping, hidden products)
+  // sits at a fixed key in the SAME store. Without a path gate, an anonymous
+  // attacker can request `?url=https://<storeId>.blob.vercel-storage.com/admin/config.json`
+  // and stream the entire admin config. Restrict to the only prefixes the app
+  // legitimately proxies (`products/`, `videos/`) and reject path traversal.
+  if (!/^(products|videos)\//.test(pathname) || pathname.includes("..")) {
     return NextResponse.json({ error: "Invalid URL" }, { status: 403 });
   }
 

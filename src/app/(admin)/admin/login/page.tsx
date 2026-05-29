@@ -9,7 +9,11 @@ export const metadata: Metadata = {
 
 export default async function AdminLoginPage() {
   const session = await auth();
-  if (session) redirect("/admin");
+  // Only redirect role-bearing users to /admin. A bare authenticated Google
+  // session WITHOUT a role (one the signIn callback declined to grant a role)
+  // must stay on this page — otherwise it bounces to /admin, the (admin) layout
+  // sends it back here, and the two loop forever (red-team R3).
+  if (session?.user?.role) redirect("/admin");
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg px-4">

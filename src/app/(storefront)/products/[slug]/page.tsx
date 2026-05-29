@@ -106,6 +106,15 @@ export default async function ProductDetailPage({
   const absUrl = (u: string) => (u.startsWith("http") ? u : `${siteUrl}${u}`);
   const productUrl = `${siteUrl}/products/${product.slug}`;
 
+  // Escape `<`, `>`, `&` in serialized JSON-LD (red-team R3): JSON.stringify does
+  // NOT escape these, so admin-authored name/description/specs containing
+  // `</script>` would break out and inject script into every visitor's page.
+  const safeJsonLd = (o: unknown) =>
+    JSON.stringify(o)
+      .replace(/</g, "\\u003c")
+      .replace(/>/g, "\\u003e")
+      .replace(/&/g, "\\u0026");
+
   const productJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -169,11 +178,11 @@ export default async function ProductDetailPage({
     <div className="bg-bg py-[var(--spacing-section)]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(productJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
       <div className="container-site">
         {/* Two-column layout: image left, info right */}

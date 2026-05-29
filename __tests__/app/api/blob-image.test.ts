@@ -120,4 +120,47 @@ describe("/api/blob-image SSRF hardening", () => {
       access: "private",
     });
   });
+
+  // Path allowlist (red-team R3, CRITICAL): the unauthenticated proxy must NOT
+  // stream the private `admin/config.json` (manager emails = PII) that sits at a
+  // fixed key in this same store, even though the host check passes.
+  it("rejects admin/config.json on the valid store host (403)", async () => {
+    const { GET } = await loadRoute();
+    const res = await GET(
+      makeReq(`https://${STORE_ID}.blob.vercel-storage.com/admin/config.json`)
+    );
+    expect(res.status).toBe(403);
+    expect(getMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts a videos/ path on the valid store host", async () => {
+    const { GET } = await loadRoute();
+    const res = await GET(
+      makeReq(`https://${STORE_ID}.blob.vercel-storage.com/videos/clip.mp4`)
+    );
+    expect(res.status).toBe(200);
+    expect(getMock).toHaveBeenCalledWith("videos/clip.mp4", {
+      access: "private",
+    });
+  });
+
+  it("rejects a non-allowlisted prefix on the valid store host (403)", async () => {
+    const { GET } = await loadRoute();
+    const res = await GET(
+      makeReq(`https://${STORE_ID}.blob.vercel-storage.com/secrets/key.txt`)
+    );
+    expect(res.status).toBe(403);
+    expect(getMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects path traversal even under an allowed prefix (403)", async () => {
+    const { GET } = await loadRoute();
+    const res = await GET(
+      makeReq(
+        `https://${STORE_ID}.blob.vercel-storage.com/products/../admin/config.json`
+      )
+    );
+    expect(res.status).toBe(403);
+    expect(getMock).not.toHaveBeenCalled();
+  });
 });
