@@ -1,4 +1,5 @@
 import { put, get } from "@vercel/blob";
+import type { PriceTier } from "@/lib/pricing";
 
 const CONFIG_PATH = "admin/config.json";
 
@@ -58,7 +59,7 @@ export interface AdminProduct {
   categorySlug: string;
   visible: boolean;
   priceCentavos?: number; // integer centavos; optional
-  priceTiers?: { minQty: number; priceCentavos: number }[];
+  priceTiers?: PriceTier[];
   specs?: AdminProductSpec[];
   howToApply?: string | null;
   compatibleCrops?: string[];

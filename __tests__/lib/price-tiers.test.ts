@@ -17,4 +17,10 @@ describe("priceTierSchema", () => {
   it("rejects negative prices", () => {
     expect(priceTierSchema.safeParse([{ minQty: 1, priceCentavos: -5 }]).success).toBe(false);
   });
+  it("rejects a price that increases with quantity", () => {
+    expect(priceTierSchema.safeParse([{ minQty: 1, priceCentavos: 100 }, { minQty: 12, priceCentavos: 200 }]).success).toBe(false);
+  });
+  it("accepts equal prices across tiers", () => {
+    expect(priceTierSchema.safeParse([{ minQty: 1, priceCentavos: 200 }, { minQty: 12, priceCentavos: 200 }]).success).toBe(true);
+  });
 });
