@@ -99,12 +99,22 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
   }).format(new Date());
 
   // 5. Append to Sheet (failure ⇒ Messenger fallback)
+  // Fail closed: the schema already refines on normalizePhPhone, so this should
+  // be unreachable — but never write a raw, unnormalized phone if it somehow is.
+  const normalizedPhone = normalizePhPhone(data.phone);
+  if (!normalizedPhone) {
+    return {
+      ok: false,
+      error: "validation",
+      message: "Please check the form and try again.",
+    };
+  }
   try {
     const row = buildSheetRow({
       orderNumber,
       timestampManila,
       name: data.name,
-      phone: normalizePhPhone(data.phone) ?? data.phone,
+      phone: normalizedPhone,
       region: regionLabel,
       province: data.province,
       city: data.city,

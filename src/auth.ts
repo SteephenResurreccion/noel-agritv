@@ -15,6 +15,12 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Explicit secret + trustHost. No module-load throw on a missing secret —
+  // provisioning is in flight and a hard throw would take down the storefront.
+  // Auth.js fails closed (no valid session) when AUTH_SECRET is absent, and the
+  // (admin) layout guard denies access on a missing role.
+  secret: process.env.AUTH_SECRET,
+  trustHost: true,
   providers: [Google],
   pages: {
     signIn: "/admin/login",
@@ -23,6 +29,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ profile }) {
       const email = profile?.email;
       if (!email) return false;
+      // Require a Google-verified email before authorizing.
+      if (profile?.email_verified !== true) return false;
 
       const role = await resolveRole(email);
       return role !== null;

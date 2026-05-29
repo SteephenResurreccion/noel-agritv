@@ -77,6 +77,28 @@ describe("checkoutSchema", () => {
       false
     );
   });
+  it("rejects an over-cap items array (>50) — DoS bound", () => {
+    const item = {
+      slug: "x",
+      name: "X",
+      priceCentavos: 25000,
+      qty: 1,
+      image: "/x.png",
+    };
+    const items = Array.from({ length: 51 }, () => ({ ...item }));
+    expect(checkoutSchema.safeParse({ ...valid, items }).success).toBe(false);
+  });
+  it("accepts exactly 50 items (at the cap)", () => {
+    const item = {
+      slug: "x",
+      name: "X",
+      priceCentavos: 25000,
+      qty: 1,
+      image: "/x.png",
+    };
+    const items = Array.from({ length: 50 }, () => ({ ...item }));
+    expect(checkoutSchema.safeParse({ ...valid, items }).success).toBe(true);
+  });
   it("rejects a missing turnstile token", () => {
     expect(
       checkoutSchema.safeParse({ ...valid, turnstileToken: "" }).success

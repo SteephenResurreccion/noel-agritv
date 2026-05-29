@@ -129,16 +129,24 @@ export async function resolveRole(
   email: string
 ): Promise<AdminRole | null> {
   const normalized = email.toLowerCase();
+
+  // Owners come from env (ADMIN_EMAILS) and are resolved BEFORE the Blob read,
+  // so a Blob outage can never lock the owner out.
   const owners = getOwnerEmails();
   if (owners.includes(normalized)) return "owner";
 
+  // Manager resolution uses a STRICT read: a Blob read error must NOT be
+  // silently treated as "no managers" (which would also hide a real outage).
+  // On failure we log and deny (return null) rather than trusting an empty
+  // config. Owners are unaffected (already returned above).
   try {
-    const config = await getAdminConfig();
+    const config = await getAdminConfig({ strict: true });
     if (config.managers.map((e) => e.toLowerCase()).includes(normalized)) {
       return "manager";
     }
-  } catch {
-    // Blob not configured — only owners allowed
+  } catch (e) {
+    console.error("resolveRole: strict admin-config read failed:", e);
+    return null;
   }
   return null;
 }

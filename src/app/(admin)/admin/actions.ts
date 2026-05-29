@@ -46,6 +46,20 @@ const videoSchema = z.object({
   visible: z.boolean(),
 });
 
+/** Max raw length for a JSON form field before parsing (DoS guard). */
+const MAX_JSON_FIELD_CHARS = 20_000;
+
+/**
+ * Parse a JSON form field after capping its raw length, so a multi-MB string
+ * can't spike memory before the downstream Zod `.max()` runs.
+ */
+function parseJsonField(raw: string): unknown {
+  if (raw.length > MAX_JSON_FIELD_CHARS) {
+    throw new Error("Input too large.");
+  }
+  return JSON.parse(raw);
+}
+
 function validateImageFile(file: File): void {
   if (file.size > MAX_FILE_SIZE) {
     throw new Error("Image must be under 5MB.");
@@ -167,15 +181,15 @@ export async function addProduct(formData: FormData) {
     const cropsJson = formData.get("compatibleCrops") as string | null;
 
     const specs = specsJson
-      ? z.array(productSpecSchema).max(20).parse(JSON.parse(specsJson))
+      ? z.array(productSpecSchema).max(20).parse(parseJsonField(specsJson))
       : [];
     const compatibleCrops = cropsJson
-      ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
+      ? z.array(z.string().trim().min(1).max(100)).max(50).parse(parseJsonField(cropsJson))
       : [];
 
     const tiersJson = formData.get("priceTiers") as string | null;
     const priceTiers = tiersJson
-      ? priceTierSchema.parse(JSON.parse(tiersJson))
+      ? priceTierSchema.parse(parseJsonField(tiersJson))
       : undefined;
 
     const priceRaw = formData.get("price");
@@ -260,15 +274,15 @@ export async function updateProduct(id: string, formData: FormData) {
     const cropsJson = formData.get("compatibleCrops") as string | null;
 
     const specs = specsJson
-      ? z.array(productSpecSchema).max(20).parse(JSON.parse(specsJson))
+      ? z.array(productSpecSchema).max(20).parse(parseJsonField(specsJson))
       : [];
     const compatibleCrops = cropsJson
-      ? z.array(z.string().trim().min(1).max(100)).max(50).parse(JSON.parse(cropsJson))
+      ? z.array(z.string().trim().min(1).max(100)).max(50).parse(parseJsonField(cropsJson))
       : [];
 
     const tiersJson = formData.get("priceTiers") as string | null;
     const priceTiers = tiersJson
-      ? priceTierSchema.parse(JSON.parse(tiersJson))
+      ? priceTierSchema.parse(parseJsonField(tiersJson))
       : undefined;
 
     const priceRaw = formData.get("price");
@@ -632,7 +646,8 @@ const shippingSchema = z.object({
 });
 
 export async function saveShippingConfig(input: z.infer<typeof shippingSchema>) {
-  await requireAuth();
+  // Owner-only: shipping fees are a customer-facing financial control.
+  await requireOwner();
   try {
     const validated = shippingSchema.parse(input);
     const config = await getAdminConfig({ strict: true });

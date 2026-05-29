@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/webp"],
     deviceSizes: [375, 750, 1000, 1500],
+    // NOTE: `i.ytimg.com` is intentionally absent here even though it appears in
+    // the CSP `img-src`. YouTube thumbnails render via a raw <img> in
+    // youtube-facade.tsx (not next/image), so they need a CSP allowance but NOT
+    // a next/image optimizer remotePattern. Only hosts passed through next/image
+    // (Google avatar via lh3) belong in remotePatterns.
     remotePatterns: [
       {
         protocol: "https",

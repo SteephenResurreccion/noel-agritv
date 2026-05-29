@@ -55,7 +55,10 @@ export const checkoutSchema = z.object({
   consent: z.literal(true, {
     message: "You must agree to the privacy notice",
   }),
-  items: z.array(cartItemSchema).min(1, "Your cart is empty"),
+  items: z
+    .array(cartItemSchema)
+    .min(1, "Your cart is empty")
+    .max(50, "Too many items in cart"),
   turnstileToken: z
     .string()
     .min(1, "Anti-spam check failed — please retry"),

@@ -4,14 +4,16 @@ import { z } from "zod";
 import { priceForQuantity } from "@/lib/pricing";
 
 export const cartItemSchema = z.object({
-  slug: z.string().min(1),
-  name: z.string().min(1),
+  slug: z.string().min(1).max(200),
+  name: z.string().min(1).max(200),
   priceCentavos: z.number().int().nonnegative(),
   priceTiers: z
     .array(z.object({ minQty: z.number().int().positive(), priceCentavos: z.number().int().nonnegative() }))
     .optional(),
   qty: z.number().int().min(1).max(99),
-  image: z.string().min(1),
+  // Generous cap: proxied blob images ("/api/blob-image?url=<encoded blob url>")
+  // run ~130 chars; 500 bounds DoS without rejecting long-slug product images.
+  image: z.string().min(1).max(500),
 });
 export type CartItem = z.infer<typeof cartItemSchema>;
 
