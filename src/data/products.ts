@@ -13,6 +13,7 @@ export interface Product {
   image: string;
   imageLarge: string;
   priceCentavos?: number; // integer centavos; undefined/absent ⇒ inquiry-only (no Add-to-cart)
+  priceTiers?: import("@/lib/pricing").PriceTier[]; // ascending by minQty; first minQty = 1
   youtubeId: string | null;
   compatibleCrops: string[];
   howToApply: string | null;
@@ -36,6 +37,12 @@ export const products: Product[] = [
     image: "/images/products/bio-plant-booster.webp",
     imageLarge: "/images/products/bio-plant-booster-lg.webp",
     priceCentavos: 57500,
+    priceTiers: [
+      { minQty: 1, priceCentavos: 57500 },
+      { minQty: 12, priceCentavos: 54000 },
+      { minQty: 24, priceCentavos: 46000 },
+      { minQty: 36, priceCentavos: 42000 },
+    ],
     youtubeId: null,
     compatibleCrops: ["Rice", "Corn", "Vegetables", "Fruit Trees", "Root Crops"],
     howToApply: null,
@@ -57,6 +64,12 @@ export const products: Product[] = [
     image: "/images/products/bio-enzyme.webp",
     imageLarge: "/images/products/bio-enzyme-lg.webp",
     priceCentavos: 54800,
+    priceTiers: [
+      { minQty: 1, priceCentavos: 54800 },
+      { minQty: 12, priceCentavos: 52000 },
+      { minQty: 24, priceCentavos: 44500 },
+      { minQty: 36, priceCentavos: 39800 },
+    ],
     youtubeId: null,
     compatibleCrops: ["Rice", "Corn", "Vegetables", "Fruit Trees", "Root Crops"],
     howToApply: null,
