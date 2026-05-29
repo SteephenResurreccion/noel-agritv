@@ -72,7 +72,12 @@ export async function appendOrderRow(row: string[]): Promise<void> {
 
   const url =
     `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}` +
-    `/values/${encodeURIComponent(TAB)}!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+    // RAW (not USER_ENTERED): store every cell as a literal string so a
+    // buyer-supplied value beginning with = + - @ is never evaluated as a
+    // formula when staff open the sheet (CSV/formula injection → PII exfil).
+    // All 17 columns are display strings; none relied on USER_ENTERED coercion,
+    // and RAW also keeps the "+639…" phone as text instead of a number.
+    `/values/${encodeURIComponent(TAB)}!A1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
 
   const res = await fetch(url, {
     method: "POST",

