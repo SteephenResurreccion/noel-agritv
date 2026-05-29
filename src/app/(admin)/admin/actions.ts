@@ -223,6 +223,7 @@ export async function addProduct(formData: FormData) {
       categorySlug,
       visible: true,
       priceCentavos,
+      // Absent/empty priceTiers intentionally CLEARS the ladder — the edit form must always resubmit current tiers.
       priceTiers: priceTiers && priceTiers.length > 0 ? priceTiers : undefined,
       specs,
       howToApply,
@@ -322,6 +323,7 @@ export async function updateProduct(id: string, formData: FormData) {
       image: imageUrl,
       categorySlug,
       priceCentavos,
+      // Absent/empty priceTiers intentionally CLEARS the ladder — the edit form must always resubmit current tiers.
       priceTiers: priceTiers && priceTiers.length > 0 ? priceTiers : undefined,
       specs,
       howToApply,

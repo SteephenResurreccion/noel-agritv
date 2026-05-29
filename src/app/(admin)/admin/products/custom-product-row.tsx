@@ -19,6 +19,8 @@ import {
 export interface TierRow {
   minQty: number;
   pricePesos: number;
+  /** Stable React key for this row; never serialized to the server. */
+  uid: string;
 }
 
 /** Existing centavos tiers -> editable peso rows for the form. */
@@ -26,12 +28,15 @@ export function tiersToPesos(tiers: PriceTier[] | undefined): TierRow[] {
   return (tiers ?? []).map((t) => ({
     minQty: t.minQty,
     pricePesos: t.priceCentavos / 100,
+    uid: crypto.randomUUID(),
   }));
 }
 
 /**
  * Serialize the peso tier rows back to the centavos JSON the server action
  * parses. Same rounding as the Price field (`Math.round(pesos * 100)`).
+ * Emits ONLY { minQty, priceCentavos } — the client-only `uid` row key is
+ * dropped here so it never reaches the server.
  * ALWAYS produce a value (possibly "[]") so handleSave can submit it on every
  * save — never omit the field, or updateProduct would silently clear tiers.
  */
@@ -117,9 +122,12 @@ export function CustomProductRow({
     // ALWAYS submit tiers — even when untouched — so a routine edit preserves
     // the existing ladder. updateProduct fully replaces tiers from this field;
     // omitting it would silently revert the product to flat pricing.
+    // Drop incomplete rows (a freshly-added, unfilled row defaults to 0/0): a
+    // row only submits when BOTH its qty and its peso price are filled in (> 0).
+    // Seeded tiers are always complete, so this never drops them.
     formData.set(
       "priceTiers",
-      serializeTiers(tiers.filter((t) => t.minQty > 0))
+      serializeTiers(tiers.filter((t) => t.minQty > 0 && t.pricePesos > 0))
     );
 
     startTransition(async () => {
@@ -244,6 +252,7 @@ export function CustomProductRow({
                       {
                         minQty: tiers.length === 0 ? 1 : 0,
                         pricePesos: 0,
+                        uid: crypto.randomUUID(),
                       },
                     ])
                   }
@@ -258,7 +267,7 @@ export function CustomProductRow({
               </p>
               <div className="space-y-2">
                 {tiers.map((tier, i) => (
-                  <div key={i} className="flex items-center gap-2">
+                  <div key={tier.uid} className="flex items-center gap-2">
                     <input
                       type="number"
                       min="1"
