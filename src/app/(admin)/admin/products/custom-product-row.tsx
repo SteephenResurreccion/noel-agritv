@@ -4,6 +4,7 @@ import { useState, useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2, Pencil, X, Plus, Star } from "lucide-react";
 import type { AdminProduct } from "@/lib/admin-store";
+import type { PriceTier } from "@/lib/pricing";
 import type { Category } from "@/data/categories";
 import { getCategoryBySlug } from "@/data/categories";
 import { compressImage } from "@/lib/compress-image";
@@ -13,6 +14,35 @@ import {
   updateProduct,
   toggleFeaturedProduct,
 } from "../actions";
+
+/** A volume-tier row as held in the form: price in pesos for the number input. */
+export interface TierRow {
+  minQty: number;
+  pricePesos: number;
+}
+
+/** Existing centavos tiers -> editable peso rows for the form. */
+export function tiersToPesos(tiers: PriceTier[] | undefined): TierRow[] {
+  return (tiers ?? []).map((t) => ({
+    minQty: t.minQty,
+    pricePesos: t.priceCentavos / 100,
+  }));
+}
+
+/**
+ * Serialize the peso tier rows back to the centavos JSON the server action
+ * parses. Same rounding as the Price field (`Math.round(pesos * 100)`).
+ * ALWAYS produce a value (possibly "[]") so handleSave can submit it on every
+ * save — never omit the field, or updateProduct would silently clear tiers.
+ */
+export function serializeTiers(rows: TierRow[]): string {
+  return JSON.stringify(
+    rows.map((r) => ({
+      minQty: Math.trunc(r.minQty),
+      priceCentavos: Math.round(r.pricePesos * 100),
+    }))
+  );
+}
 
 export function CustomProductRow({
   product,
@@ -32,6 +62,9 @@ export function CustomProductRow({
   const [specs, setSpecs] = useState(product.specs ?? []);
   const [crops, setCrops] = useState(product.compatibleCrops ?? []);
   const [cropInput, setCropInput] = useState("");
+  // Volume tiers, held in pesos for the inputs. Initialized from the product's
+  // existing centavos tiers so a routine edit re-submits (preserves) them.
+  const [tiers, setTiers] = useState(() => tiersToPesos(product.priceTiers));
   const router = useRouter();
 
   function handleToggle() {
@@ -81,6 +114,14 @@ export function CustomProductRow({
       formData.set("compatibleCrops", JSON.stringify(crops));
     }
 
+    // ALWAYS submit tiers — even when untouched — so a routine edit preserves
+    // the existing ladder. updateProduct fully replaces tiers from this field;
+    // omitting it would silently revert the product to flat pricing.
+    formData.set(
+      "priceTiers",
+      serializeTiers(tiers.filter((t) => t.minQty > 0))
+    );
+
     startTransition(async () => {
       await updateProduct(product.id, formData);
       router.refresh();
@@ -92,6 +133,7 @@ export function CustomProductRow({
     setSpecs(product.specs ?? []);
     setCrops(product.compatibleCrops ?? []);
     setCropInput("");
+    setTiers(tiersToPesos(product.priceTiers));
     setEditing(true);
   }
 
@@ -185,6 +227,86 @@ export function CustomProductRow({
                   accept="image/*"
                   className="w-full text-sm text-text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-brand-accent/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-accent hover:file:bg-brand-accent/20"
                 />
+              </div>
+            </div>
+
+            {/* Wholesale tiers (volume pricing) */}
+            <div className="border-t border-border pt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-xs font-semibold text-text-secondary">
+                  Wholesale tiers (volume pricing)
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTiers([
+                      ...tiers,
+                      {
+                        minQty: tiers.length === 0 ? 1 : 0,
+                        pricePesos: 0,
+                      },
+                    ])
+                  }
+                  className="inline-flex min-h-12 items-center gap-1 text-xs font-semibold text-brand-accent hover:underline"
+                >
+                  <Plus className="h-3 w-3" /> Add tier
+                </button>
+              </div>
+              <p className="mb-2 text-xs text-text-secondary/60">
+                First tier must start at qty 1. Quantities ascend; price per item
+                must not increase as quantity rises.
+              </p>
+              <div className="space-y-2">
+                {tiers.map((tier, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="Min qty"
+                      aria-label={`Tier ${i + 1} minimum quantity`}
+                      value={Number.isNaN(tier.minQty) ? "" : tier.minQty}
+                      onChange={(e) =>
+                        setTiers(
+                          tiers.map((t, j) =>
+                            j === i
+                              ? { ...t, minQty: e.target.valueAsNumber }
+                              : t
+                          )
+                        )
+                      }
+                      className="h-12 w-1/3 rounded-md border border-border bg-bg px-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+                    />
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="Price each (₱)"
+                      aria-label={`Tier ${i + 1} price each in pesos`}
+                      value={Number.isNaN(tier.pricePesos) ? "" : tier.pricePesos}
+                      onChange={(e) =>
+                        setTiers(
+                          tiers.map((t, j) =>
+                            j === i
+                              ? { ...t, pricePesos: e.target.valueAsNumber }
+                              : t
+                          )
+                        )
+                      }
+                      className="h-12 flex-1 rounded-md border border-border bg-bg px-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      aria-label={`Remove tier ${i + 1}`}
+                      onClick={() =>
+                        setTiers(tiers.filter((_, j) => j !== i))
+                      }
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-red-50 hover:text-red-600"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
