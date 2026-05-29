@@ -37,8 +37,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session }) {
       if (session.user?.email) {
-        const role = await resolveRole(session.user.email);
-        session.user.role = role ?? undefined;
+        // Fail CLOSED on a strict Blob-read outage: resolveRole throws if the
+        // admin config can't be read. Swallow it and leave role undefined so
+        // the (admin) layout guard cleanly redirects to login instead of the
+        // whole admin surface 500-ing. No access is ever granted on error.
+        try {
+          const role = await resolveRole(session.user.email);
+          session.user.role = role ?? undefined;
+        } catch (e) {
+          console.error("session: resolveRole failed, denying role:", e);
+          session.user.role = undefined;
+        }
       }
       return session;
     },

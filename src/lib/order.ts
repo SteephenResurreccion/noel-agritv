@@ -65,11 +65,22 @@ export const checkoutSchema = z.object({
 });
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 
+/** Number of base-36 chars in the order-number random suffix (new orders). */
+const ORDER_SUFFIX_LEN = 6;
+
 /**
- * Generate an order number `NAG-YYYYMMDD-XXXX` (XXXX = 4 base-36 uppercase
+ * Generate an order number `NAG-YYYYMMDD-XXXXXX` (XXXXXX = 6 base-36 uppercase
  * chars) where the date is in Asia/Manila timezone. The date is computed via
  * `Intl.DateTimeFormat` so UTC instants near midnight Manila roll forward
  * correctly (e.g. `2026-05-21T16:30:00Z` → Manila `2026-05-22`).
+ *
+ * The suffix is drawn from `crypto.getRandomValues` (Web Crypto, available in
+ * the Node/Edge runtime) — NOT `Math.random()` — and widened from 4 to 6 chars.
+ * Per-day keyspace goes from 36^4 (~1.7M) to 36^6 (~2.2B), making the
+ * birthday-collision probability negligible at this store's order volume.
+ *
+ * Legacy 4-char suffixes already issued remain valid for lookup; the guard in
+ * `@/lib/lookup` (`ORDER_NUMBER_RE`) accepts a 4–6 char suffix for that reason.
  */
 export function generateOrderNumber(now: Date = new Date()): string {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -80,11 +91,11 @@ export function generateOrderNumber(now: Date = new Date()): string {
   }).formatToParts(now);
   const get = (t: string) => parts.find((p) => p.type === t)!.value;
   const datePart = `${get("year")}${get("month")}${get("day")}`;
+  const bytes = new Uint8Array(ORDER_SUFFIX_LEN);
+  crypto.getRandomValues(bytes);
   let suffix = "";
-  for (let i = 0; i < 4; i++) {
-    suffix += Math.floor(Math.random() * 36)
-      .toString(36)
-      .toUpperCase();
+  for (let i = 0; i < ORDER_SUFFIX_LEN; i++) {
+    suffix += (bytes[i] % 36).toString(36).toUpperCase();
   }
   return `NAG-${datePart}-${suffix}`;
 }

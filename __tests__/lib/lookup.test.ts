@@ -93,6 +93,34 @@ describe("lookupSchema", () => {
     const r = lookupSchema.safeParse({
       orderNumber: "NAG-20260521-A7K",
       phoneLast4: "4567",
+      turnstileToken: "test-token",
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("accepts a legacy 4-char suffix (backward compat with pre-R2 orders)", () => {
+    const r = lookupSchema.safeParse({
+      orderNumber: "NAG-20260521-A7K1",
+      phoneLast4: "4567",
+      turnstileToken: "test-token",
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it("accepts a new 6-char suffix (post-R2 orders)", () => {
+    const r = lookupSchema.safeParse({
+      orderNumber: "NAG-20260521-A7K1Z9",
+      phoneLast4: "4567",
+      turnstileToken: "test-token",
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects a 7-char suffix (above the 4–6 range)", () => {
+    const r = lookupSchema.safeParse({
+      orderNumber: "NAG-20260521-A7K1Z9X",
+      phoneLast4: "4567",
+      turnstileToken: "test-token",
     });
     expect(r.success).toBe(false);
   });
@@ -125,6 +153,16 @@ describe("lookupSchema", () => {
 describe("isOrderNumber (parse-boundary guard)", () => {
   it("accepts a canonical order number", () => {
     expect(isOrderNumber("NAG-20260529-KX6S")).toBe(true);
+  });
+
+  it("accepts both legacy 4-char and new 6-char suffixes", () => {
+    // Legacy orders in the live Sheet are 4-char; new ones are 6-char (R2).
+    expect(isOrderNumber("NAG-20260529-KX6S")).toBe(true); // 4
+    expect(isOrderNumber("NAG-20260529-KX6S9Q")).toBe(true); // 6
+  });
+
+  it("rejects a 7-char suffix (above the 4–6 range)", () => {
+    expect(isOrderNumber("NAG-20260529-KX6S9QZ")).toBe(false);
   });
 
   it("rejects a human-friendly header label", () => {

@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 /**
- * Canonical order-number shape: `NAG-YYYYMMDD-XXXX` where XXXX is 4 base-36
- * uppercase chars (`[A-Z0-9]`), per `generateOrderNumber` in `@/lib/order`.
- * This is the single source of truth for "is this cell a real order #?" — used
- * both to validate buyer input and to guard the sheet-parse boundary.
+ * Canonical order-number shape: `NAG-YYYYMMDD-XXXXXX` where the suffix is 4–6
+ * base-36 uppercase chars (`[A-Z0-9]`). New orders are 6 chars (CSPRNG, see
+ * `generateOrderNumber` in `@/lib/order`); legacy orders already issued in the
+ * Sheet are 4 chars and MUST stay lookup-able, hence the `{4,6}` range. This is
+ * the single source of truth for "is this cell a real order #?" — used both to
+ * validate buyer input and to guard the sheet-parse boundary.
  */
-export const ORDER_NUMBER_RE = /^NAG-\d{8}-[A-Z0-9]{4}$/;
+export const ORDER_NUMBER_RE = /^NAG-\d{8}-[A-Z0-9]{4,6}$/;
 
 /**
  * True when `value` is a syntactically valid order number. Any sheet row whose

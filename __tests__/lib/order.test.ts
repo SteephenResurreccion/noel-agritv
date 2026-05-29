@@ -31,9 +31,10 @@ describe("normalizePhPhone", () => {
 });
 
 describe("generateOrderNumber", () => {
-  it("matches NAG-YYYYMMDD-XXXX with base-36 uppercase suffix", () => {
+  it("matches NAG-YYYYMMDD-XXXXXX with a 6-char base-36 uppercase suffix", () => {
+    // R2 fix: suffix widened from 4 to 6 chars, drawn from a CSPRNG.
     expect(generateOrderNumber(new Date("2026-05-21T03:00:00Z"))).toMatch(
-      /^NAG-\d{8}-[0-9A-Z]{4}$/
+      /^NAG-\d{8}-[0-9A-Z]{6}$/
     );
   });
   it("uses Asia/Manila date (UTC 16:30 on May 21 is already May 22 in Manila)", () => {
@@ -41,6 +42,15 @@ describe("generateOrderNumber", () => {
     expect(generateOrderNumber(new Date("2026-05-21T16:30:00Z"))).toMatch(
       /^NAG-20260522-/
     );
+  });
+  it("produces distinct suffixes across many calls (CSPRNG, no collisions)", () => {
+    const now = new Date("2026-05-21T03:00:00Z");
+    const seen = new Set<string>();
+    for (let i = 0; i < 1000; i++) {
+      seen.add(generateOrderNumber(now).split("-")[2]);
+    }
+    // 36^6 keyspace ⇒ 1000 draws should be unique with overwhelming probability.
+    expect(seen.size).toBe(1000);
   });
 });
 

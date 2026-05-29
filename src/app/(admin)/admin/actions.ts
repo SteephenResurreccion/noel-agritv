@@ -15,13 +15,36 @@ import { priceTierSchema } from "@/lib/price-tiers";
 // ── Validation Schemas ──
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-  "image/gif",
-];
+/**
+ * MIME type → fixed file extension. This is the SINGLE source of truth for
+ * allowed image types AND their on-disk extension. The blob key extension is
+ * derived from the validated `file.type` via this map — NEVER from the
+ * attacker-controlled `file.name`, which can contain path-traversal sequences
+ * (e.g. `x.jpg/../../admin/config.json`) that escape the `products/` prefix.
+ */
+const IMAGE_TYPE_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/avif": "avif",
+  "image/gif": "gif",
+};
+const ALLOWED_IMAGE_TYPES = Object.keys(IMAGE_TYPE_EXT);
+
+/**
+ * Return the safe, whitelisted extension for an already-validated image file.
+ * `validateImageFile` must run first; this throws if the type is somehow not in
+ * the map (defense-in-depth — should be unreachable after validation).
+ */
+function safeImageExt(file: File): string {
+  const ext = IMAGE_TYPE_EXT[file.type];
+  if (!ext) {
+    throw new Error(
+      "Only JPEG, PNG, WebP, AVIF, and GIF images are allowed."
+    );
+  }
+  return ext;
+}
 
 const productSpecSchema = z.object({
   label: z.string().trim().min(1).max(100),
@@ -218,11 +241,10 @@ export async function addProduct(formData: FormData) {
     let imageUrl = "/images/NewLogo.png"; // fallback
     if (imageFile && imageFile.size > 0) {
       validateImageFile(imageFile);
-      const ext = imageFile.name.split(".").pop() || "jpg";
+      const ext = safeImageExt(imageFile);
       const blob = await put(`products/${slug}-${Date.now()}.${ext}`, imageFile, {
         access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
+        addRandomSuffix: true,
         contentType: imageFile.type,
       });
       imageUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
@@ -319,11 +341,10 @@ export async function updateProduct(id: string, formData: FormData) {
     let imageUrl = existing.image;
     if (imageFile && imageFile.size > 0) {
       validateImageFile(imageFile);
-      const ext = imageFile.name.split(".").pop() || "jpg";
+      const ext = safeImageExt(imageFile);
       const blob = await put(`products/${slug}-${Date.now()}.${ext}`, imageFile, {
         access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
+        addRandomSuffix: true,
         contentType: imageFile.type,
       });
       imageUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
@@ -476,11 +497,10 @@ export async function addVideo(formData: FormData) {
     if (thumbnailFile && thumbnailFile.size > 0) {
       validateImageFile(thumbnailFile);
       const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-      const ext = thumbnailFile.name.split(".").pop() || "webp";
+      const ext = safeImageExt(thumbnailFile);
       const blob = await put(`videos/${slug}.${ext}`, thumbnailFile, {
         access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
+        addRandomSuffix: true,
         contentType: thumbnailFile.type,
       });
       thumbnailUrl = `/api/blob-image?url=${encodeURIComponent(blob.url)}`;
@@ -635,13 +655,23 @@ export async function removeManager(email: string) {
 
 // ── Shipping ──
 
+// Per-region shipping fee ceiling: ₱10,000 (1,000,000 centavos). Real J&T
+// nationwide fees sit far below this; the cap is defense-in-depth against a
+// fat-fingered or tampered owner submission setting an absurd customer-facing
+// fee. Generous headroom so legitimate provincial rates never hit it.
+const MAX_SHIPPING_FEE_CENTAVOS = 1_000_000;
+const shippingFeeCentavos = z
+  .number()
+  .int()
+  .nonnegative()
+  .max(MAX_SHIPPING_FEE_CENTAVOS);
 const shippingSchema = z.object({
   enabled: z.boolean(),
   feesCentavos: z.object({
-    ncr: z.number().int().nonnegative(),
-    luzon: z.number().int().nonnegative(),
-    visayas: z.number().int().nonnegative(),
-    mindanao: z.number().int().nonnegative(),
+    ncr: shippingFeeCentavos,
+    luzon: shippingFeeCentavos,
+    visayas: shippingFeeCentavos,
+    mindanao: shippingFeeCentavos,
   }),
 });
 
