@@ -29,7 +29,7 @@ const base: OrderRowInput = {
     { name: "Bio Enzyme", qty: 1, priceCentavos: 15000 },
   ],
   subtotalCentavos: 65000,
-  shipping: { showFee: true, shippingCentavos: 12000 },
+  shipping: { showFee: true, shippingCentavos: 12000, free: false },
   notes: "Leave at gate",
 };
 
@@ -47,8 +47,12 @@ describe("buildSheetRow", () => {
     expect(row[16]).toBe(""); // staff notes blank
   });
   it("writes 'Confirmed on call' when shipping is not shown", () => {
-    const row = buildSheetRow({ ...base, shipping: { showFee: false, shippingCentavos: 0 } });
+    const row = buildSheetRow({ ...base, shipping: { showFee: false, shippingCentavos: 0, free: false } });
     expect(row[12]).toBe("Confirmed on call");
+  });
+  it("writes FREE in the shipping column when shipping.free is true", () => {
+    const row = buildSheetRow({ ...base, shipping: { showFee: false, shippingCentavos: 0, free: true } });
+    expect(row[12]).toBe("FREE");
   });
 });
 

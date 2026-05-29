@@ -83,7 +83,8 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
 
   // 4. Order number + shipping + region label + timestamp
   const orderNumber = generateOrderNumber();
-  const shipping = resolveShipping(config.shipping, data.region);
+  const totalUnits = data.items.reduce((sum, i) => sum + i.qty, 0);
+  const shipping = resolveShipping(config.shipping, data.region, totalUnits);
   const regionLabel =
     PH_REGIONS.find((r) => r.value === data.region)?.label ?? data.region;
   const timestampManila = new Intl.DateTimeFormat("en-CA", {

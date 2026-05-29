@@ -25,9 +25,11 @@ export function buildSheetRow(o: OrderRowInput): string[] {
   const itemsStr = o.items
     .map((i) => `${i.name} ×${i.qty} @${formatCentavos(i.priceCentavos)}`)
     .join("; ");
-  const shippingStr = o.shipping.showFee
-    ? formatCentavos(o.shipping.shippingCentavos)
-    : "Confirmed on call";
+  const shippingStr = o.shipping.free
+    ? "FREE"
+    : o.shipping.showFee
+      ? formatCentavos(o.shipping.shippingCentavos)
+      : "Confirmed on call";
   return [
     o.orderNumber, // Order#
     o.timestampManila, // Timestamp (Asia/Manila)
