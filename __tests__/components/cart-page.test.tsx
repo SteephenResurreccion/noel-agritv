@@ -17,6 +17,12 @@ describe("cart volume feedback", () => {
     expect(screen.getByText(/add 1 more/i)).toBeInTheDocument();
     expect(screen.getByText(/₱520/)).toBeInTheDocument();
   });
+  it("shows the next-tier nudge at the inclusive boundary (2 units away)", () => {
+    useCart.setState({ items: [line(10)] }); // next break at 12 → unitsToNext = 2
+    render(<CartPage />);
+    expect(screen.getByText(/add 2 more/i)).toBeInTheDocument();
+    expect(screen.getByText(/₱520/)).toBeInTheDocument();
+  });
   it("hides the nudge when far from the next break (3+ away)", () => {
     useCart.setState({ items: [line(5)] }); // next break at 12 → 7 away
     render(<CartPage />);

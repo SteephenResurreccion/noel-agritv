@@ -39,14 +39,14 @@ function CartLineNudge({ item }: { item: CartItem }) {
 function FreeShippingLine({ totalUnits }: { totalUnits: number }) {
   if (totalUnits >= FREE_SHIPPING_MIN_UNITS) {
     return (
-      <p className="mt-2 text-sm font-bold text-brand-mid">
-        ✓ FREE shipping unlocked
+      <p aria-live="polite" className="mt-2 text-sm font-bold text-brand-mid">
+        <span aria-hidden="true">✓</span> FREE shipping unlocked
       </p>
     );
   }
   const remaining = FREE_SHIPPING_MIN_UNITS - totalUnits;
   return (
-    <p className="mt-2 text-sm font-medium text-text-primary">
+    <p aria-live="polite" className="mt-2 text-sm font-medium text-text-primary">
       Add {remaining} more item{remaining === 1 ? "" : "s"} for FREE shipping
     </p>
   );
@@ -107,7 +107,7 @@ export default function CartPage() {
                 <button
                   onClick={() => removeItem(i.slug)}
                   aria-label={`Remove ${i.name}`}
-                  className="flex h-11 w-11 items-center justify-center rounded-md text-text-secondary hover:text-red-600"
+                  className="flex h-12 w-12 items-center justify-center rounded-md text-text-secondary hover:text-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -117,7 +117,7 @@ export default function CartPage() {
                   <button
                     onClick={() => setQty(i.slug, i.qty - 1)}
                     aria-label="Decrease quantity"
-                    className="flex h-11 w-11 items-center justify-center rounded-md border border-border text-text-primary"
+                    className="flex h-12 w-12 items-center justify-center rounded-md border border-border text-text-primary"
                   >
                     −
                   </button>
@@ -127,7 +127,7 @@ export default function CartPage() {
                   <button
                     onClick={() => setQty(i.slug, i.qty + 1)}
                     aria-label="Increase quantity"
-                    className="flex h-11 w-11 items-center justify-center rounded-md border border-border text-text-primary"
+                    className="flex h-12 w-12 items-center justify-center rounded-md border border-border text-text-primary"
                   >
                     +
                   </button>
@@ -152,7 +152,7 @@ export default function CartPage() {
         href="/checkout"
         className="mt-4 block rounded-md bg-brand-darkest px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-dark"
       >
-        Proceed to Checkout
+        Checkout · {formatCentavos(subtotal)}
       </Link>
     </div>
   );
