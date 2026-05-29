@@ -38,13 +38,13 @@ export function TierTable({ tiers, activeQty }: TierTableProps) {
         <tr className="bg-brand-dark">
           <th
             scope="col"
-            className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.06em] text-white/90"
+            className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.06em] text-white/92"
           >
             Quantity
           </th>
           <th
             scope="col"
-            className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.06em] text-white/90"
+            className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.06em] text-white/92"
           >
             Price each
           </th>
@@ -63,15 +63,15 @@ export function TierTable({ tiers, activeQty }: TierTableProps) {
               key={tier.minQty}
               data-testid={`tier-row-${tier.minQty}`}
               data-active={isActive ? "true" : "false"}
+              aria-current={isActive ? "true" : undefined}
               className={cn(
-                "min-h-[52px]",
                 !isLast && "border-b border-border",
                 isActive && "bg-bg-wheat"
               )}
             >
               <td
                 className={cn(
-                  "border-l-4 px-4 py-3.5 text-left text-base text-text-primary",
+                  "border-l-4 px-4 py-4 text-left text-base text-text-primary",
                   isActive
                     ? "border-brand-accent font-bold"
                     : "border-transparent font-medium"
@@ -81,7 +81,7 @@ export function TierTable({ tiers, activeQty }: TierTableProps) {
               </td>
               <td
                 className={cn(
-                  "px-4 py-3.5 text-right text-[17px] font-bold",
+                  "px-4 py-4 text-right text-[17px] font-bold",
                   isActive ? "text-brand-accent" : "text-text-primary"
                 )}
               >
