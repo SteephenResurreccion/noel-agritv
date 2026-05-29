@@ -7,6 +7,16 @@ vi.mock("@/app/(storefront)/lookup/actions", () => ({
   lookupOrder: vi.fn(),
 }));
 
+// Turnstile is a no-op widget in tests (no NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+// surface a token immediately so the gated "Find my order" button is enabled.
+// Mirrors the checkout-form test mock.
+vi.mock("@/components/turnstile-widget", () => ({
+  TurnstileWidget: ({ onToken }: { onToken: (t: string) => void }) => {
+    onToken("test-token");
+    return null;
+  },
+}));
+
 import { lookupOrder } from "@/app/(storefront)/lookup/actions";
 
 const mockLookup = vi.mocked(lookupOrder);
@@ -192,6 +202,28 @@ describe("LookupForm", () => {
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(/too many lookups/i);
     });
+  });
+
+  it("passes the Turnstile token to the action and renders the turnstile error", async () => {
+    mockLookup.mockResolvedValueOnce({
+      ok: false,
+      error: "turnstile",
+      message: "Anti-spam check failed. Please retry.",
+    });
+
+    render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
+    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.click(
+      screen.getByRole("button", { name: /find my order/i })
+    );
+
+    // The mocked widget supplies "test-token"; the action must receive it.
+    await waitFor(() => {
+      expect(mockLookup).toHaveBeenCalledWith(
+        expect.objectContaining({ turnstileToken: "test-token" })
+      );
+    });
+    expect(screen.getByRole("alert")).toHaveTextContent(/anti-spam check failed/i);
   });
 
   it("enforces maxLength on the phone-last-4 input", () => {

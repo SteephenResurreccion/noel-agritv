@@ -6,10 +6,15 @@
  *   - At most `maxPerWindow` requests per `windowMs` (default 30 per 60_000 ms).
  *
  * Caveats:
- *   - Module-scoped state. Does NOT survive Vercel cold starts and does NOT
- *     coordinate across serverless instances. Good enough for v1 against
- *     casual abuse from a single client; for production-grade defense add a
- *     Cloudflare WAF rule or an Upstash Redis bucket.
+ *   - BEST-EFFORT ONLY — treat as a speed bump, not a security control.
+ *     Module-scoped state: it does NOT survive Vercel cold starts and does NOT
+ *     coordinate across serverless instances, so a botnet (or even one client
+ *     hitting freshly-spun lambdas) routes around it. Good enough for v1
+ *     against casual single-client abuse. The REAL cross-instance defenses are:
+ *     (a) an invisible Cloudflare Turnstile gate on the action — already wired
+ *     into `/checkout` (`submitOrder`) and `/lookup` (`lookupOrder`) — and
+ *     (b) a Cloudflare WAF rate-rule on the POST path (see AGENTS.md hardening
+ *     section) or an Upstash Redis bucket. Do not rely on this limiter alone.
  *   - Eviction is inline (no setInterval — those don't run reliably on
  *     serverless): once the map exceeds `maxEntries` we drop entries older
  *     than `staleAfterMs`.

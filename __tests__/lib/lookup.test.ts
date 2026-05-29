@@ -3,6 +3,7 @@ import {
   lookupSchema,
   findOrderInRows,
   summarizeRow,
+  isOrderNumber,
 } from "@/lib/lookup";
 
 /**
@@ -41,12 +42,27 @@ function buildRow(overrides: Partial<Record<number, string>> = {}): string[] {
 }
 
 describe("lookupSchema", () => {
-  it("accepts a canonical order number and 4-digit phone tail", () => {
+  it("accepts a canonical order number, 4-digit phone tail, and a token", () => {
     const r = lookupSchema.safeParse({
       orderNumber: "NAG-20260521-A7K1",
       phoneLast4: "4567",
+      turnstileToken: "test-token",
     });
     expect(r.success).toBe(true);
+  });
+
+  it("rejects a missing or empty Turnstile token", () => {
+    const missing = lookupSchema.safeParse({
+      orderNumber: "NAG-20260521-A7K1",
+      phoneLast4: "4567",
+    });
+    expect(missing.success).toBe(false);
+    const empty = lookupSchema.safeParse({
+      orderNumber: "NAG-20260521-A7K1",
+      phoneLast4: "4567",
+      turnstileToken: "",
+    });
+    expect(empty.success).toBe(false);
   });
 
   it("rejects an order number missing the NAG- prefix", () => {
@@ -106,6 +122,29 @@ describe("lookupSchema", () => {
   });
 });
 
+describe("isOrderNumber (parse-boundary guard)", () => {
+  it("accepts a canonical order number", () => {
+    expect(isOrderNumber("NAG-20260529-KX6S")).toBe(true);
+  });
+
+  it("rejects a human-friendly header label", () => {
+    expect(isOrderNumber("Order Number")).toBe(false);
+    expect(isOrderNumber("Order#")).toBe(false);
+  });
+
+  it("rejects blank, whitespace, and undefined cells", () => {
+    expect(isOrderNumber("")).toBe(false);
+    expect(isOrderNumber("   ")).toBe(false);
+    expect(isOrderNumber(undefined)).toBe(false);
+  });
+
+  it("rejects near-misses (lowercase suffix, wrong date length, no prefix)", () => {
+    expect(isOrderNumber("NAG-20260529-kx6s")).toBe(false);
+    expect(isOrderNumber("NAG-2026529-KX6S")).toBe(false);
+    expect(isOrderNumber("20260529-KX6S")).toBe(false);
+  });
+});
+
 describe("findOrderInRows", () => {
   it("returns the matching row when order# and phone tail match", () => {
     const rows = [buildRow(), buildRow({ 0: "NAG-20260521-Z9Z9" })];
@@ -130,12 +169,46 @@ describe("findOrderInRows", () => {
     expect(findOrderInRows([], "NAG-20260521-A7K1", "4567")).toBeNull();
   });
 
-  it("ignores a header row that contains 'Order#'", () => {
-    const header = ["Order#", "Timestamp", "Name", "Phone"];
+  it("ignores a human-friendly header row (column A is not an order #)", () => {
+    // The header the client pastes into row 1 of the live Sheet.
+    const header = [
+      "Order Number",
+      "Order Date",
+      "Customer Name",
+      "Phone Number",
+      "Region",
+      "Province",
+      "City / Municipality",
+      "Barangay",
+      "Street / House No.",
+      "Landmark",
+      "Items",
+      "Subtotal",
+      "Shipping",
+      "Customer Notes",
+      "Status",
+      "J&T Tracking Number",
+      "Staff Notes",
+    ];
     const rows = [header, buildRow()];
     const hit = findOrderInRows(rows, "NAG-20260521-A7K1", "4567");
     expect(hit).not.toBeNull();
     expect(hit![0]).toBe("NAG-20260521-A7K1");
+  });
+
+  it("ignores a fully blank row and still returns a valid order below it", () => {
+    const blank = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
+    const rows = [blank, buildRow()];
+    const hit = findOrderInRows(rows, "NAG-20260521-A7K1", "4567");
+    expect(hit).not.toBeNull();
+    expect(hit![0]).toBe("NAG-20260521-A7K1");
+  });
+
+  it("never matches a non-order row even when its column A equals the query", () => {
+    // Junk row whose column A is not a valid order #: must never be parsed as
+    // an order, even if a (malformed) lookup happened to pass the same string.
+    const junk = buildRow({ 0: "not-an-order" });
+    expect(findOrderInRows([junk], "not-an-order", "4567")).toBeNull();
   });
 
   it("strips non-digits from the sheet's phone column before comparing", () => {

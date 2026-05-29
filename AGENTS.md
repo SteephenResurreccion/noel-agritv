@@ -14,3 +14,16 @@ The live COD checkout has diverged from the original 2026-05-21 spec in three pl
 
 **Sticky bottom checkout bar on storefront pages.** When the cart has items, a sticky bar (cream `bg-surface` + gold `bg-brand-accent` CTA) is mounted from `src/app/(storefront)/layout.tsx` and shows on storefront pages only. It hides itself on `/cart`, `/checkout/*`, and any `/admin/*` route to avoid covering the page-level CTAs there.
 
+## Security hardening
+
+**Bot/abuse defense is layered; the in-process rate limiter is NOT a real control.** `src/lib/rate-limit.ts` is module-scoped — it does not survive Vercel cold starts and does not coordinate across serverless instances, so it cannot stop a botnet or a client that keeps hitting freshly-spun lambdas. Treat it as a single-warm-instance speed bump only.
+
+The two real defenses for abuse-prone POST endpoints are:
+
+1. **Invisible Cloudflare Turnstile on the server action** — verified server-side via `verifyTurnstile` (`src/lib/turnstile.ts`, reads `TURNSTILE_SECRET_KEY`) before any data access. Already wired into:
+   - `/checkout` → `submitOrder` (before the Sheets append).
+   - `/lookup` → `lookupOrder` (before the Sheets read) — added to raise the bot cost of order-status enumeration (order # + last-4-phone). The widget (`src/components/turnstile-widget.tsx`) is invisible and adds zero buyer friction; IAB-safe (no popup, same-tab).
+   - Any new POST that reads or mutates buyer data should mount the same `TurnstileWidget` and call `verifyTurnstile` first.
+
+2. **Cloudflare WAF rate-rule on the POST path (RECOMMENDED — not yet configured).** Add a WAF rate-limiting rule in the Cloudflare dashboard that throttles POSTs to the order-lookup endpoint per source IP (suggested starting point: ~10 requests/min/IP, challenge or block on exceed). This is the cross-instance ceiling the in-process limiter cannot provide. Apply the same to `/checkout` submission and the `/api/geocode` proxy. Configure in Cloudflare, not in app code — keep the distributed limiter out of v1 (no Redis). Server-Action POSTs hit the route the page is served from, so scope the rule by method=POST + path prefix rather than expecting a dedicated URL.
+

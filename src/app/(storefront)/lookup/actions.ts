@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { createRateLimiter } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 import {
   lookupSchema,
   findOrderInRows,
@@ -16,16 +17,22 @@ import { fetchAllOrderRows } from "@/lib/sheets-read";
  * Pipeline:
  *   1. Re-validate input via `lookupSchema` (client already validates, but
  *      server actions must never trust client-side checks).
- *   2. Rate-limit per IP — module-scoped limiter, dev-bypassed (matches the
+ *   2. Verify the Cloudflare Turnstile token server-side via `verifyTurnstile`
+ *      — the SAME helper `submitOrder` uses — BEFORE any sheet read. This is
+ *      the real cross-instance barrier against order enumeration; the in-process
+ *      rate limiter below is only best-effort (does not survive serverless cold
+ *      starts / multiple instances — see `@/lib/rate-limit`).
+ *   3. Rate-limit per IP — module-scoped limiter, dev-bypassed (matches the
  *      pattern in `/api/geocode`, commit ee458d5). The "unknown" bucket would
  *      otherwise trip the 1-req/sec rule on every dev request.
- *   3. Read all rows from the Orders sheet (30s in-memory cache absorbs F5
+ *   4. Read all rows from the Orders sheet (30s in-memory cache absorbs F5
  *      mashing) and scan for the order # + phone-tail match.
- *   4. On hit → return only the buyer-visible columns (status / items /
+ *   5. On hit → return only the buyer-visible columns (status / items /
  *      shipping / tracking #). Never leak name, phone, address, or notes.
  *
  * Error mapping → form UI:
  *   - `validation`     → schema mismatch (defensive; client guards this).
+ *   - `turnstile`      → anti-spam check failed → "please retry" (re-solves).
  *   - `rate_limited`   → too many lookups, please wait.
  *   - `not_found`      → no row matches → "double-check or message us".
  *   - `sheets`         → upstream/auth blew up → "we can't reach the log".
@@ -54,7 +61,19 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     };
   }
 
-  // 2. Rate-limit (production only — dev shares the "unknown" bucket).
+  // 2. Turnstile (server-side) — same helper + ordering as `submitOrder`.
+  //    This runs BEFORE the sheet read so a bot can't enumerate orders without
+  //    first solving a challenge. It is the real cross-instance barrier; the
+  //    rate limiter below is only best-effort on a single warm instance.
+  if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
+    return {
+      ok: false,
+      error: "turnstile",
+      message: "Anti-spam check failed. Please retry.",
+    };
+  }
+
+  // 3. Rate-limit (production only — dev shares the "unknown" bucket).
   if (process.env.NODE_ENV === "production") {
     const rl = limiter.check(await clientIp());
     if (!rl.allowed) {
@@ -66,7 +85,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     }
   }
 
-  // 3. Read the sheet (cache absorbs burst traffic).
+  // 4. Read the sheet (cache absorbs burst traffic).
   let rows: string[][];
   try {
     rows = await fetchAllOrderRows();
@@ -80,7 +99,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     };
   }
 
-  // 4. Match → summarize (privacy-sanitized).
+  // 5. Match → summarize (privacy-sanitized).
   const hit = findOrderInRows(rows, parsed.data.orderNumber, parsed.data.phoneLast4);
   if (!hit) {
     return {

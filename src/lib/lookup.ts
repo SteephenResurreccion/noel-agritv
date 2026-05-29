@@ -1,6 +1,23 @@
 import { z } from "zod";
 
 /**
+ * Canonical order-number shape: `NAG-YYYYMMDD-XXXX` where XXXX is 4 base-36
+ * uppercase chars (`[A-Z0-9]`), per `generateOrderNumber` in `@/lib/order`.
+ * This is the single source of truth for "is this cell a real order #?" — used
+ * both to validate buyer input and to guard the sheet-parse boundary.
+ */
+export const ORDER_NUMBER_RE = /^NAG-\d{8}-[A-Z0-9]{4}$/;
+
+/**
+ * True when `value` is a syntactically valid order number. Any sheet row whose
+ * column A fails this is not an order (header row, blank row, junk) and must be
+ * skipped by every reader — see `findOrderInRows`.
+ */
+export function isOrderNumber(value: string | undefined): boolean {
+  return typeof value === "string" && ORDER_NUMBER_RE.test(value);
+}
+
+/**
  * Buyer self-service order lookup.
  *
  * The buyer types their order # (NAG-YYYYMMDD-XXXX) and the last 4 digits of
@@ -19,11 +36,20 @@ export const lookupSchema = z.object({
   orderNumber: z
     .string()
     .trim()
-    .regex(/^NAG-\d{8}-[A-Z0-9]{4}$/, "Order number format is NAG-YYYYMMDD-XXXX"),
+    .regex(ORDER_NUMBER_RE, "Order number format is NAG-YYYYMMDD-XXXX"),
   phoneLast4: z
     .string()
     .trim()
     .regex(/^\d{4}$/, "Enter the last 4 digits of your phone"),
+  /**
+   * Cloudflare Turnstile token, mirroring `checkoutSchema` in `@/lib/order`.
+   * `lookupOrder` verifies it server-side via `verifyTurnstile` BEFORE any
+   * sheet read, raising the bot cost of order enumeration. Invisible widget,
+   * so a real buyer never sees it. Required and non-empty — an empty/absent
+   * token fails verification anyway, but rejecting it at the schema avoids a
+   * pointless siteverify round-trip.
+   */
+  turnstileToken: z.string().min(1, "Anti-spam check failed. Please retry."),
 });
 
 export type LookupInput = z.infer<typeof lookupSchema>;
@@ -47,7 +73,7 @@ export type LookupResult =
   | { ok: true; summary: LookupSummary }
   | {
       ok: false;
-      error: "validation" | "not_found" | "sheets" | "rate_limited";
+      error: "validation" | "turnstile" | "not_found" | "sheets" | "rate_limited";
       message: string;
     };
 
@@ -70,9 +96,11 @@ const COL = {
  * sheet payload as input, returns the matching row (or null). The READ helper
  * supplies the rows; the server action orchestrates.
  *
- * Header-row tolerance: if row 0 is a header (`row[0] === "Order#"`) we just
- * skip it — the regex would never match `"Order#"` against `"NAG-..."` anyway,
- * but explicit handling protects against future header changes.
+ * Parse-boundary guard: any row whose column A is not a valid order number
+ * (`isOrderNumber`) is skipped — this covers a human-friendly header row, blank
+ * rows, and junk uniformly, so no non-order row is ever parsed as an order.
+ * This is THE place the guard lives; every reader through this function (the
+ * `/lookup` page today, any future "list all orders" view) inherits it.
  *
  * Phone match: digits-only on the sheet side, then `endsWith` the buyer's
  * last-4. Tolerates accidental spaces/dashes if staff manually edits the row.
@@ -82,11 +110,10 @@ export function findOrderInRows(
   orderNumber: string,
   phoneLast4: string
 ): string[] | null {
-  if (rows.length === 0) return null;
-  const start = rows[0]?.[COL.orderNumber] === "Order#" ? 1 : 0;
-  for (let i = start; i < rows.length; i++) {
+  for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     if (!row || row.length <= COL.phone) continue;
+    if (!isOrderNumber(row[COL.orderNumber])) continue;
     if (row[COL.orderNumber] !== orderNumber) continue;
     const digits = (row[COL.phone] ?? "").replace(/\D/g, "");
     if (digits.endsWith(phoneLast4)) return row;

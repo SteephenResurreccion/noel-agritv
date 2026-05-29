@@ -3,13 +3,19 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { MESSENGER_URL } from "@/lib/constants";
 import { lookupSchema, type LookupResult } from "@/lib/lookup";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import { lookupOrder } from "./actions";
 
 /**
  * Buyer self-service lookup form.
  *
  * The buyer enters their order # and the last 4 digits of the phone they used
- * at checkout. On submit:
+ * at checkout. An invisible Cloudflare Turnstile widget (same component + props
+ * as `/checkout`) solves in the background and supplies a token; the server
+ * action verifies it before reading the sheet, raising the bot cost of order
+ * enumeration. Zero friction for a real buyer — they never see a challenge.
+ *
+ * On submit:
  *   - Local schema check (zod) — fast feedback, no server hop on bad input.
  *   - Server action does the work + privacy-sanitizes the response.
  *   - Three result branches:
@@ -43,6 +49,7 @@ const ERROR_CLASS = "mt-1 text-sm text-destructive";
 export function LookupForm({ initialOrderNumber }: LookupFormProps) {
   const [orderNumber, setOrderNumber] = useState(initialOrderNumber);
   const [phoneLast4, setPhoneLast4] = useState("");
+  const [token, setToken] = useState<string>("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [result, setResult] = useState<LookupResult | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -53,10 +60,14 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
     const payload = {
       orderNumber: orderNumber.trim().toUpperCase(),
       phoneLast4: phoneLast4.trim(),
+      turnstileToken: token,
     };
     const parsed = lookupSchema.safeParse(payload);
     if (!parsed.success) {
-      // Pull out the first error per field for the inline message.
+      // Pull out the first error per field for the inline message. The
+      // turnstileToken field isn't surfaced inline (the submit button is
+      // gated on `!token`, so a real submit always carries one); it stays in
+      // the schema so the server re-validates the same shape.
       const next: FieldErrors = {};
       for (const issue of parsed.error.issues) {
         const key = issue.path[0] as keyof FieldErrors;
@@ -68,6 +79,9 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
     setErrors({});
     startTransition(async () => {
       const res = await lookupOrder(parsed.data);
+      // Reset the token on a failed Turnstile verify so the widget re-solves
+      // before the next attempt (mirrors `submitOrder` handling in checkout).
+      if (!res.ok && res.error === "turnstile") setToken("");
       setResult(res);
     });
   }
@@ -145,10 +159,14 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
             </p>
           )}
         </div>
+        {/* Invisible Turnstile — same widget/props as checkout. Renders nothing
+            visible; supplies the token consumed above. IAB-safe (no popup). */}
+        <TurnstileWidget onToken={setToken} />
+
         <button
           type="submit"
-          disabled={isPending}
-          className="min-h-11 w-full rounded-md bg-brand-darkest px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 sm:w-auto"
+          disabled={isPending || !token}
+          className="min-h-11 w-full rounded-md bg-brand-darkest px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed sm:w-auto"
         >
           {isPending ? "Looking up…" : "Find my order"}
         </button>
