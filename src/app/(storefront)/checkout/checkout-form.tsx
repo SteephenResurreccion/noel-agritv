@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ZodObject, ZodTypeAny } from "zod";
-import { useCart } from "@/lib/cart-store";
+import { useCart, lineUnitPriceCentavos } from "@/lib/cart-store";
 import { formatCentavos } from "@/lib/utils";
 import { resolveShipping } from "@/lib/shipping";
 import type { ShippingConfig } from "@/lib/admin-store";
@@ -376,11 +376,11 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               <div className="flex-1 text-sm">
                 <p className="font-semibold text-text-primary">{i.name}</p>
                 <p className="text-text-secondary">
-                  {formatCentavos(i.priceCentavos)} × {i.qty}
+                  {formatCentavos(lineUnitPriceCentavos(i))} × {i.qty}
                 </p>
               </div>
               <p className="text-sm font-semibold text-text-primary">
-                {formatCentavos(i.priceCentavos * i.qty)}
+                {formatCentavos(lineUnitPriceCentavos(i) * i.qty)}
               </p>
             </li>
           ))}

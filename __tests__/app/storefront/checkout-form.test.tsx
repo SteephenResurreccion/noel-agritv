@@ -171,6 +171,51 @@ describe("CheckoutForm — free-shipping summary mirrors the server", () => {
   });
 });
 
+describe("CheckoutForm — tier-aware per-line prices in the order summary", () => {
+  // Bio Enzyme: base ₱548 (54800), volume tier at minQty 12 = ₱520 (52000).
+  // At qty 12 the order-summary LINE must show the tier unit price (₱520),
+  // not the flat base (₱548), so the lines reconcile with the tier-aware
+  // subtotal. Display-only — the server recompute in submitOrder is authoritative.
+  beforeEach(() => {
+    useCart.getState().clear();
+  });
+  afterEach(() => {
+    useCart.getState().clear();
+  });
+
+  it("renders the tier unit price (₱520) not the flat base (₱548) at the tier quantity", async () => {
+    useCart.setState({
+      items: [
+        {
+          slug: "bio-enzyme",
+          name: "Bio Enzyme",
+          priceCentavos: 54800,
+          priceTiers: [{ minQty: 12, priceCentavos: 52000 }],
+          qty: 12,
+          image: "/img.jpg",
+        },
+      ],
+    });
+    render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/bio enzyme/i)).toBeInTheDocument();
+    });
+
+    // Per-line unit price reflects the tier, not the flat base.
+    expect(screen.getByText(/₱520 × 12/)).toBeInTheDocument();
+    expect(screen.queryByText(/₱548 × 12/)).not.toBeInTheDocument();
+
+    // Line total = tier unit × qty = ₱520 × 12 = ₱6,240 (NOT 548 × 12 = ₱6,576).
+    // The flat-base line total must NOT appear anywhere.
+    expect(screen.queryByText("₱6,576")).not.toBeInTheDocument();
+
+    // The line total reconciles with the tier-aware subtotal: both ₱6,240
+    // (single line). Two matches expected — the line total and the subtotal.
+    expect(screen.getAllByText("₱6,240").length).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe("CheckoutForm — hooks order across cart hydration", () => {
   // The other suites seed the cart BEFORE the first render, so the component
   // always mounts on the full-form path and the hook count never changes —
