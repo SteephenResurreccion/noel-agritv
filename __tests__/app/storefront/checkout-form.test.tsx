@@ -134,6 +134,43 @@ describe("CheckoutForm — live field validation", () => {
   });
 });
 
+describe("CheckoutForm — free-shipping summary mirrors the server", () => {
+  // The summary's shipping line must reflect resolveShipping(..., totalUnits):
+  // at FREE_SHIPPING_MIN_UNITS+ total units it returns { free:true } and the
+  // summary should read "FREE" — not a fee or "confirmed on the call".
+  beforeEach(() => {
+    useCart.getState().clear();
+  });
+  afterEach(() => {
+    useCart.getState().clear();
+  });
+
+  it("shows FREE shipping when the cart has 4+ total units", async () => {
+    useCart.setState({
+      items: [
+        {
+          slug: "bio-plant-booster",
+          name: "Bio Plant Booster",
+          priceCentavos: 50000,
+          qty: 4,
+          image: "/img.jpg",
+        },
+      ],
+    });
+    render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
+    await waitFor(() => {
+      expect(screen.getByText(/^FREE$/)).toBeInTheDocument();
+    });
+    // The "confirmed on the call" fallback must NOT show — free overrides it.
+    expect(
+      screen.queryByText(/shipping confirmed on the call/i)
+    ).not.toBeInTheDocument();
+    // Estimated total equals the subtotal (no shipping added). 4 × ₱500 = ₱2,000
+    // appears both as the line total and the estimated total — both correct.
+    expect(screen.getAllByText("₱2,000").length).toBeGreaterThanOrEqual(1);
+  });
+});
+
 describe("CheckoutForm — hooks order across cart hydration", () => {
   // The other suites seed the cart BEFORE the first render, so the component
   // always mounts on the full-form path and the hook count never changes —

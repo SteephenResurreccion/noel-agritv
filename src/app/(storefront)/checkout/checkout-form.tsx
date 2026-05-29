@@ -77,6 +77,7 @@ const ERROR_CLASS = "mt-1 text-sm text-destructive";
 export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
   const items = useCart((s) => s.items);
   const subtotal = useCart((s) => s.subtotalCentavos());
+  const totalUnits = useCart((s) => s.totalItems());
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -86,9 +87,13 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
   const [submitError, setSubmitError] = useState<string>("");
   const [sheetsFallback, setSheetsFallback] = useState<string>("");
 
+  // Pass the cart's total units so the summary mirrors the server: at
+  // FREE_SHIPPING_MIN_UNITS+ units resolveShipping returns { free:true } and
+  // we render "FREE", instead of a region fee / "confirmed on call". The
+  // server (submitOrder) recomputes this independently and stays authoritative.
   const estimate = useMemo(
-    () => resolveShipping(shipping, fields.region),
-    [shipping, fields.region]
+    () => resolveShipping(shipping, fields.region, totalUnits),
+    [shipping, fields.region, totalUnits]
   );
 
   /**
@@ -386,7 +391,22 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
             <span>Subtotal</span>
             <span className="font-semibold">{formatCentavos(subtotal)}</span>
           </div>
-          {estimate.showFee ? (
+          {estimate.free ? (
+            <>
+              <div className="mt-2 flex items-center justify-between text-text-primary">
+                <span>Shipping</span>
+                <span className="font-bold text-brand-mid">FREE</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-base">
+                <span className="font-semibold text-brand-darkest">
+                  Estimated total
+                </span>
+                <span className="font-bold text-brand-darkest">
+                  {formatCentavos(subtotal)}
+                </span>
+              </div>
+            </>
+          ) : estimate.showFee ? (
             <>
               <div className="mt-2 flex items-center justify-between text-text-primary">
                 <span>Estimated shipping</span>
