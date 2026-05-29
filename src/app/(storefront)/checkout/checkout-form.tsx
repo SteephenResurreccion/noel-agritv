@@ -91,22 +91,6 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
     [shipping, fields.region]
   );
 
-  if (items.length === 0) {
-    return (
-      <div className="py-[var(--spacing-section)] text-center">
-        <h2 className="text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-          Your cart is empty
-        </h2>
-        <Link
-          href="/products"
-          className="mt-4 inline-block rounded-md bg-brand-darkest px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
-        >
-          Browse products
-        </Link>
-      </div>
-    );
-  }
-
   /**
    * Re-validate a single top-level field against `checkoutSchema.shape[name]`
    * and update the `errors` state. Used by `onChange` handlers so a field's
@@ -115,6 +99,12 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
    *
    * Gated on "field already has an error" — we don't surface validation
    * messages before the user has tried to submit at least once.
+   *
+   * MUST stay above the empty-cart early return below: the cart store hydrates
+   * from localStorage after first paint, so this component renders once empty
+   * (early return) and again populated. A hook placed below the return would
+   * change the hook count between those renders → "Rendered more/fewer hooks
+   * than expected". All hooks stay unconditional; only the JSX is conditional.
    */
   const validateField = useCallback(
     (name: keyof FieldErrors, value: unknown) => {
@@ -138,6 +128,22 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
     },
     []
   );
+
+  if (items.length === 0) {
+    return (
+      <div className="py-[var(--spacing-section)] text-center">
+        <h2 className="text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
+          Your cart is empty
+        </h2>
+        <Link
+          href="/products"
+          className="mt-4 inline-block rounded-md bg-brand-darkest px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
+        >
+          Browse products
+        </Link>
+      </div>
+    );
+  }
 
   function updateField<K extends keyof FormFields>(
     key: K,

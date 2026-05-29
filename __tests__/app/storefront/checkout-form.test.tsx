@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CheckoutForm } from "@/app/(storefront)/checkout/checkout-form";
 import { useCart } from "@/lib/cart-store";
@@ -131,5 +131,54 @@ describe("CheckoutForm — live field validation", () => {
         screen.queryByText(/select a valid region/i)
       ).not.toBeInTheDocument();
     });
+  });
+});
+
+describe("CheckoutForm — hooks order across cart hydration", () => {
+  // The other suites seed the cart BEFORE the first render, so the component
+  // always mounts on the full-form path and the hook count never changes —
+  // which is exactly why those 164 tests pass with the hooks bug present.
+  //
+  // In a real browser the cart store (Zustand `persist`, no skipHydration)
+  // first paints with `items: []` (empty-cart early return) and then
+  // rehydrates from localStorage with real items, flipping the early-return
+  // branch on a SECOND render. If any hook lives below that early `return`,
+  // the two renders call a different number of hooks and React throws
+  // "Rendered more/fewer hooks than expected". This reproduces that exact
+  // transition: mount empty → populate the store → assert no hooks error.
+  beforeEach(() => {
+    useCart.getState().clear();
+  });
+  afterEach(() => {
+    useCart.getState().clear();
+  });
+
+  it("does not throw a hooks-order error when the cart hydrates after mount", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      // First render: empty cart → "Your cart is empty" early-return path.
+      render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
+      expect(screen.getByText(/your cart is empty/i)).toBeInTheDocument();
+
+      // Hydration: the store gains items, flipping the early-return branch.
+      // With the bug (useCallback below the early return) this re-render
+      // changes the hook count and React throws the invariant.
+      act(() => {
+        seedCart();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
+      });
+
+      // No React hooks-order invariant should have been logged.
+      const hooksError = errorSpy.mock.calls
+        .flat()
+        .map((a) => (a instanceof Error ? a.message : String(a)))
+        .find((m) => /rendered (more|fewer) hooks than expected/i.test(m));
+      expect(hooksError).toBeUndefined();
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });
