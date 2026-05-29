@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 
 /**
  * Official J&T Express Philippines tracking URL.
@@ -77,6 +78,15 @@ export default function TrackPage() {
           Track on J&amp;T
         </button>
       </form>
+      <p className="mt-4 max-w-md text-sm text-text-secondary">
+        Don&apos;t have a tracking number yet?{" "}
+        <Link
+          href="/lookup"
+          className="font-semibold text-brand-darkest underline underline-offset-4 hover:text-brand-dark"
+        >
+          Look up your order
+        </Link>
+      </p>
     </div>
   );
 }
