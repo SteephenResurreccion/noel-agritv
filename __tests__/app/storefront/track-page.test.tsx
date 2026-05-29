@@ -70,7 +70,7 @@ describe("TrackPage", () => {
     expect(assignMock).toHaveBeenCalledTimes(1);
     const target = assignMock.mock.calls[0][0] as string;
     expect(target).toBe(
-      "https://www.jtexpress.ph/index/query/gzquery.html?bills=JT1234567890"
+      "https://www.jtexpress.ph/trajectoryQuery?waybillNo=JT1234567890&flag=1"
     );
   });
 
@@ -84,7 +84,7 @@ describe("TrackPage", () => {
 
     expect(assignMock).toHaveBeenCalledTimes(1);
     const target = assignMock.mock.calls[0][0] as string;
-    expect(target).toContain("bills=AB%2012%2B34");
+    expect(target).toContain("waybillNo=AB%2012%2B34");
   });
 
   it("clears the inline hint once the user starts typing again", async () => {

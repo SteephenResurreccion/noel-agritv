@@ -4,16 +4,17 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 
 /**
- * Official J&T Express Philippines tracking URL.
+ * Official J&T Express Philippines tracking URL — links DIRECT to the tracking result.
  *
- * Verified 2026-05-28 against public search-result evidence for the live tracker
- * (e.g. `https://www.jtexpress.ph/index/query/gzquery.html?bills=1635015099` —
- * a real tracking number in the URL). The page renders client-side, so we cannot
- * inspect its HTML over WebFetch; this is the format J&T PH currently exposes
- * publicly. Update if J&T changes its public URL/param.
+ * Updated 2026-05-29 (client request: send buyers straight to the tracking result,
+ * not the J&T landing/search page). The live tracker deep-links via
+ * `https://www.jtexpress.ph/trajectoryQuery?waybillNo=<wb>&flag=1` (public
+ * search-result evidence, e.g. `waybillNo=941351660566&flag=1`). The tracker renders
+ * client-side, so its HTML can't be inspected over WebFetch — verify the live URL
+ * with a real waybill if J&T changes its public URL/param.
  */
-const JT_TRACK_URL = "https://www.jtexpress.ph/index/query/gzquery.html";
-const JT_TRACK_PARAM = "bills";
+const JT_TRACK_URL = "https://www.jtexpress.ph/trajectoryQuery";
+const JT_TRACK_PARAM = "waybillNo";
 
 export default function TrackPage() {
   const [value, setValue] = useState("");
@@ -27,7 +28,7 @@ export default function TrackPage() {
       return;
     }
     setShowHint(false);
-    const url = `${JT_TRACK_URL}?${JT_TRACK_PARAM}=${encodeURIComponent(code)}`;
+    const url = `${JT_TRACK_URL}?${JT_TRACK_PARAM}=${encodeURIComponent(code)}&flag=1`;
     // Same-tab redirect — Facebook in-app browser cannot handle window.open / target=_blank.
     window.location.assign(url);
   }

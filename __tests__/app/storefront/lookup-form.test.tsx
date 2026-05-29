@@ -107,7 +107,7 @@ describe("LookupForm", () => {
     const trackLink = screen.getByRole("link", { name: /track shipment on j&t/i });
     expect(trackLink).toHaveAttribute(
       "href",
-      "https://www.jtexpress.ph/index/query/gzquery.html?bills=JT9988776655"
+      "https://www.jtexpress.ph/trajectoryQuery?waybillNo=JT9988776655&flag=1"
     );
     // IAB-safe — never opens a new tab.
     expect(trackLink).not.toHaveAttribute("target", "_blank");

@@ -31,8 +31,8 @@ import { lookupOrder } from "./actions";
 
 // Same constant as `/track/page.tsx` — public J&T PH tracker. Update here if
 // J&T changes the URL/param (see /track/page.tsx for verification notes).
-const JT_TRACK_URL = "https://www.jtexpress.ph/index/query/gzquery.html";
-const JT_TRACK_PARAM = "bills";
+const JT_TRACK_URL = "https://www.jtexpress.ph/trajectoryQuery";
+const JT_TRACK_PARAM = "waybillNo";
 
 export interface LookupFormProps {
   /** Pre-fill from `?order=` query param on the confirmation cross-link. */
@@ -197,7 +197,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
 
   const s = result.summary;
   const trackHref = s.trackingNumber
-    ? `${JT_TRACK_URL}?${JT_TRACK_PARAM}=${encodeURIComponent(s.trackingNumber)}`
+    ? `${JT_TRACK_URL}?${JT_TRACK_PARAM}=${encodeURIComponent(s.trackingNumber)}&flag=1`
     : "";
 
   return (
