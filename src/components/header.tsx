@@ -153,6 +153,12 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 >
                   Contact
                 </Link>
+                <Link
+                  href="/lookup"
+                  className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+                >
+                  Find my order
+                </Link>
               </nav>
 
               {/* Cart badge */}
@@ -399,6 +405,15 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                     className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
                     Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/lookup"
+                    onClick={handleNavClick}
+                    className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
+                  >
+                    Find my order
                   </Link>
                 </li>
               </ul>
