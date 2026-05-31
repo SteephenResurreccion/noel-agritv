@@ -111,28 +111,11 @@ export default function AboutPage() {
             className="font-bold text-text-primary"
             style={{ fontSize: "var(--font-size-h2)" }}
           >
-            What We Believe
+            {copy.about.believeHeading}
           </h2>
           <div className="mt-2 h-1 w-12 bg-brand-accent" />
           <ul className="mt-6 space-y-4">
-            {[
-              {
-                title: "Test everything ourselves",
-                desc: "Every product is field-tested on Noel\u2019s farm before it reaches yours.",
-              },
-              {
-                title: "Natural first",
-                desc: "Bio-organic solutions that improve yields without harsh chemicals.",
-              },
-              {
-                title: "Affordable for every farmer",
-                desc: "Quality products priced for the everyday Filipino grower, not just large operations.",
-              },
-              {
-                title: "Teach, don\u2019t just sell",
-                desc: "Free farming tips and tutorials on Facebook and YouTube — because knowledge grows harvests.",
-              },
-            ].map((item) => (
+            {copy.about.believeItems.map((item) => (
               <li key={item.title} className="flex gap-3">
                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-accent" />
                 <div>
