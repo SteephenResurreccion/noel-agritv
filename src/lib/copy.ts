@@ -383,4 +383,40 @@ export const copy = {
     messageCta: "Message Us for Wholesale →",
     callPhone: (phone: string) => `Call ${phone}`,
   },
+  errors: {
+    // Checkout schema (src/lib/order.ts) — Zod validation messages.
+    phone: "Enter a valid PH mobile number",
+    nameRequired: "Name is required",
+    regionInvalid: "Select a valid region",
+    provinceRequired: "Province is required",
+    cityRequired: "City/Municipality is required",
+    barangayRequired: "Barangay is required",
+    streetRequired: "Street / house no. is required",
+    privacyRequired: "You must agree to the privacy notice",
+    cartEmpty: "Your cart is empty",
+    cartTooMany: "Too many items in cart",
+    // ⚠ EM-DASH variant, lowercase "please", NO trailing period — distinct from
+    // common.antiSpam ("Anti-spam check failed. Please retry."). Used ONLY by the
+    // checkout schema's Turnstile token validator. Do NOT merge the two spellings.
+    antiSpam: "Anti-spam check failed — please retry",
+    // Lookup schema (src/lib/lookup.ts) — Zod validation messages.
+    orderFormat: "Order number format is NAG-YYYYMMDD-XXXX",
+    last4: "Enter the last 4 digits of your phone",
+    // Server action results (checkout/actions.ts, lookup/actions.ts).
+    formCheck: "Please check the form and try again.",
+    lookupFormCheck: "Please double-check the form and try again.",
+    itemUnavailable: "An item in your cart is no longer available.",
+    submitFailed:
+      "We couldn't submit your order right now — please message us to complete it.",
+    tooManyLookups: "Too many lookups. Please try again in a minute.",
+    logUnreachable:
+      "We can't reach the order log right now — please message us.",
+    orderNotFound:
+      "Order not found. Double-check your order number and phone number, or message us.",
+    // Track page empty-submit hint. Same byte-for-byte text as copy.track.hint
+    // (a separate key, kept for the track-page error path).
+    trackEnterNumber: "Enter your tracking number to continue.",
+    // sheets.ts shipping display string surfaced in the lookup result.
+    shippingOnCall: "Confirmed on call",
+  },
 } as const;

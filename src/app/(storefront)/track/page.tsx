@@ -67,7 +67,7 @@ export default function TrackPage() {
             role="alert"
             className="text-sm text-text-secondary"
           >
-            {copy.track.hint}
+            {copy.errors.trackEnterNumber}
           </p>
         )}
         <button

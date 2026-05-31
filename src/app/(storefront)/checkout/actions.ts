@@ -14,6 +14,7 @@ import { adminToProduct } from "@/lib/admin-to-product";
 import { products } from "@/data/products";
 import { priceForQuantity } from "@/lib/pricing";
 import { appendOrderRow, buildSheetRow } from "@/lib/sheets";
+import { copy } from "@/lib/copy";
 
 export async function submitOrder(payload: unknown): Promise<SubmitResult> {
   // 1. Validate
@@ -22,7 +23,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     return {
       ok: false,
       error: "validation",
-      message: "Please check the form and try again.",
+      message: copy.errors.formCheck,
     };
   }
   const data = parsed.data;
@@ -32,7 +33,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     return {
       ok: false,
       error: "turnstile",
-      message: "Anti-spam check failed. Please retry.",
+      message: copy.common.antiSpam,
     };
   }
 
@@ -67,7 +68,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
       return {
         ok: false,
         error: "validation",
-        message: "An item in your cart is no longer available.",
+        message: copy.errors.itemUnavailable,
       };
     }
     // Server-authoritative unit price: re-derive the tier from the catalog,
@@ -106,7 +107,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     return {
       ok: false,
       error: "validation",
-      message: "Please check the form and try again.",
+      message: copy.errors.formCheck,
     };
   }
   try {
@@ -132,8 +133,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     return {
       ok: false,
       error: "sheets",
-      message:
-        "We couldn't submit your order right now — please message us to complete it.",
+      message: copy.errors.submitFailed,
     };
   }
 

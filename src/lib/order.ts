@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { cartItemSchema, type CartItem } from "@/lib/cart-store";
 import { PH_REGIONS } from "@/lib/ph-regions";
+import { copy } from "@/lib/copy";
 
 /**
  * Normalize a PH mobile number to canonical "+639XXXXXXXXX", or null if invalid.
@@ -26,7 +27,7 @@ export const phoneSchema = z
   .string()
   .trim()
   .refine((v) => normalizePhPhone(v) !== null, {
-    message: "Enter a valid PH mobile number",
+    message: copy.errors.phone,
   });
 
 /**
@@ -38,30 +39,30 @@ export const phoneSchema = z
  * Turnstile token is required client-side; the server re-verifies it.
  */
 export const checkoutSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120),
+  name: z.string().trim().min(1, copy.errors.nameRequired).max(120),
   phone: phoneSchema,
   region: z
     .string()
     .trim()
     .refine((v) => PH_REGIONS.some((r) => r.value === v), {
-      message: "Select a valid region",
+      message: copy.errors.regionInvalid,
     }),
-  province: z.string().trim().min(1, "Province is required").max(120),
-  city: z.string().trim().min(1, "City/Municipality is required").max(120),
-  barangay: z.string().trim().min(1, "Barangay is required").max(120),
-  street: z.string().trim().min(1, "Street / house no. is required").max(200),
+  province: z.string().trim().min(1, copy.errors.provinceRequired).max(120),
+  city: z.string().trim().min(1, copy.errors.cityRequired).max(120),
+  barangay: z.string().trim().min(1, copy.errors.barangayRequired).max(120),
+  street: z.string().trim().min(1, copy.errors.streetRequired).max(200),
   landmark: z.string().trim().max(200).optional().default(""),
   notes: z.string().trim().max(1000).optional().default(""),
   consent: z.literal(true, {
-    message: "You must agree to the privacy notice",
+    message: copy.errors.privacyRequired,
   }),
   items: z
     .array(cartItemSchema)
-    .min(1, "Your cart is empty")
-    .max(50, "Too many items in cart"),
+    .min(1, copy.errors.cartEmpty)
+    .max(50, copy.errors.cartTooMany),
   turnstileToken: z
     .string()
-    .min(1, "Anti-spam check failed — please retry"),
+    .min(1, copy.errors.antiSpam),
 });
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 
