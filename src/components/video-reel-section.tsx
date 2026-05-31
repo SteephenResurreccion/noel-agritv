@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { FACEBOOK_URL } from "@/lib/constants";
+import { copy } from "@/lib/copy";
 
 interface VideoItem {
   title: string;
@@ -76,7 +77,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
       {/* Heading */}
       <div className="relative z-10 px-[var(--spacing-container-gutter)]">
         <h2 className="text-center text-[26px] font-bold italic text-brand-darkest min-[741px]:text-[36px]">
-          See It From the Farm — Come Take a Peek!
+          {copy.videoReel.title}
         </h2>
       </div>
 
@@ -86,7 +87,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
         <button
           onClick={() => scroll("left")}
           className="absolute left-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-50 md:flex"
-          aria-label="Scroll left"
+          aria-label={copy.videoReel.scrollLeftAriaLabel}
         >
           <ChevronLeft className="h-5 w-5 text-text-primary" />
         </button>
@@ -95,7 +96,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
         <button
           onClick={() => scroll("right")}
           className="absolute right-2 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-md transition-colors hover:bg-gray-50 md:flex"
-          aria-label="Scroll right"
+          aria-label={copy.videoReel.scrollRightAriaLabel}
         >
           <ChevronRight className="h-5 w-5 text-text-primary" />
         </button>
@@ -157,7 +158,7 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-sm font-semibold text-brand-accent hover:underline"
         >
-          See all videos on Facebook →
+          {copy.videoReel.seeAllOnFacebook}
         </a>
       </div>
     </section>

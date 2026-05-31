@@ -1,3 +1,5 @@
+import { copy } from "@/lib/copy";
+
 interface SocialProofStripProps {
   variant?: "light" | "dark";
 }
@@ -11,7 +13,7 @@ export function SocialProofStrip({ variant = "light" }: SocialProofStripProps) {
           : "text-white/60"
       }`}
     >
-      250k+ Followers · Since 2021 · Nationwide via J&amp;T
+      {copy.socialProof.strip}
     </p>
   );
 }

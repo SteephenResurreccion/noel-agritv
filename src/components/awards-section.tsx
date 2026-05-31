@@ -3,18 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { copy } from "@/lib/copy";
 
 interface AwardsSectionProps {
   variant?: "compact" | "full";
 }
 
 const awards = [
-  { src: "/images/awards/certificates.webp", label: "Certificates of Recognition & Appreciation" },
-  { src: "/images/awards/magazine-noelagritv.webp", label: "Noel AgriTV — The Art of Helping Others" },
-  { src: "/images/awards/magazine-stela.webp", label: "STELA Magazine — Sustainable Farming & Humanitarian Advocate" },
-  { src: "/images/awards/plaque-2024.webp", label: "2024 Excellent Filipino Awards — Outstanding Leadership in Agri Business" },
-  { src: "/images/awards/plaque-recognition.webp", label: "2024 Philippines Choice Award — Humanitarian Service in Agri Business" },
-  { src: "/images/awards/stela-trophy.webp", label: "STELA 2024 — Most Outstanding Agri Business Leader of the Year" },
+  { src: "/images/awards/certificates.webp", label: copy.awards.items[0] },
+  { src: "/images/awards/magazine-noelagritv.webp", label: copy.awards.items[1] },
+  { src: "/images/awards/magazine-stela.webp", label: copy.awards.items[2] },
+  { src: "/images/awards/plaque-2024.webp", label: copy.awards.items[3] },
+  { src: "/images/awards/plaque-recognition.webp", label: copy.awards.items[4] },
+  { src: "/images/awards/stela-trophy.webp", label: copy.awards.items[5] },
 ];
 
 export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
@@ -119,14 +120,14 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
       {/* Heading */}
       <div className="px-[var(--spacing-container-gutter)] text-center">
         <p className="text-[length:var(--font-size-meta)] font-semibold uppercase tracking-widest text-brand-accent">
-          Awards &amp; Recognition
+          {copy.awards.eyebrow}
         </p>
         <h2
           className={`font-heading mt-4 text-[28px] font-bold min-[741px]:text-[36px] ${
             isCompact ? "text-white" : "text-text-primary"
           }`}
         >
-          Recognized for Excellence in Filipino Agriculture
+          {copy.awards.title}
         </h2>
       </div>
 
@@ -144,7 +145,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
               ? "bg-white/10 text-white/40 hover:bg-white/25 hover:text-white/90"
               : "bg-black/5 text-text-secondary/30 hover:bg-black/10 hover:text-text-primary"
           }`}
-          aria-label="Previous award"
+          aria-label={copy.awards.prevAriaLabel}
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
@@ -155,7 +156,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
               ? "bg-white/10 text-white/40 hover:bg-white/25 hover:text-white/90"
               : "bg-black/5 text-text-secondary/30 hover:bg-black/10 hover:text-text-primary"
           }`}
-          aria-label="Next award"
+          aria-label={copy.awards.nextAriaLabel}
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -230,7 +231,7 @@ export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
                   ? "w-6 bg-brand-accent"
                   : `w-2 ${isCompact ? "bg-white/20" : "bg-text-secondary/20"}`
               }`}
-              aria-label={`Go to award ${i + 1}`}
+              aria-label={copy.awards.nav(i + 1)}
             />
           ))}
         </div>

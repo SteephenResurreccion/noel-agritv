@@ -13,6 +13,7 @@ import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { defaultVideos } from "@/data/videos";
+import { copy } from "@/lib/copy";
 
 export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
@@ -95,7 +96,7 @@ export default async function HomePage() {
               <div className="overflow-hidden rounded-2xl">
                 <Image
                   src="/images/mission.jpg"
-                  alt="Noel Tolentino standing in a rice paddy"
+                  alt={copy.home.heroImageAlt}
                   width={720}
                   height={960}
                   priority
@@ -108,19 +109,19 @@ export default async function HomePage() {
             {/* Right — Text content, z-[3] so it stays above landscape */}
             <div className="relative z-[3] pb-8 text-center min-[741px]:pb-12 min-[741px]:text-left">
               <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[28px]">
-                Bio-organic products
+                {copy.home.heroTaglineLine1}
               </p>
               <p className="text-[22px] italic leading-snug text-brand-dark min-[741px]:text-[28px]">
-                trusted by Filipino farmers
+                {copy.home.heroTaglineLine2}
               </p>
               <h1 className="mt-3 text-[50px] font-bold leading-[0.95] text-brand-darkest min-[741px]:text-[76px]">
-                Natural Solutions
+                {copy.home.heroHeadlineLine1}
               </h1>
               <h1 className="text-[50px] font-bold leading-[0.95] text-brand-accent min-[741px]:text-[76px]">
-                For Better Harvests
+                {copy.home.heroHeadlineLine2}
               </h1>
               <p className="mt-5 text-[18px] font-semibold text-brand-dark min-[741px]:text-xl">
-                Since 2021 · 250k+ Followers
+                {copy.home.heroSocial}
               </p>
 
               <div className="mt-8 flex flex-col items-center gap-3 min-[741px]:flex-row min-[741px]:items-start">
@@ -128,7 +129,7 @@ export default async function HomePage() {
                   href="/products"
                   className="inline-flex h-14 items-center justify-center rounded-[var(--radius-button)] bg-brand-darkest px-12 text-[15px] font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-brand-dark"
                 >
-                  Browse Products
+                  {copy.common.browseProducts}
                 </Link>
               </div>
 
@@ -229,7 +230,7 @@ export default async function HomePage() {
       <section className="bg-surface px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
         <div className="container-site mx-auto">
           <h2 className="font-heading text-[38px] font-bold text-brand-darkest min-[741px]:text-[54px]">
-            Top Picks For You
+            {copy.home.topPicks}
           </h2>
 
           {/* Category filter pills */}
@@ -241,7 +242,7 @@ export default async function HomePage() {
               href="/products"
               className="text-sm font-semibold text-brand-accent hover:underline"
             >
-              View all Products →
+              {copy.home.viewAll}
             </Link>
           </div>
         </div>
@@ -257,23 +258,21 @@ export default async function HomePage() {
             {/* Left — Text content */}
             <div>
               <p className="text-[length:var(--font-size-meta)] font-semibold uppercase tracking-widest text-brand-accent">
-                Our Mission
+                {copy.home.missionEyebrow}
               </p>
               <blockquote className="mt-6">
                 <p className="text-[28px] font-bold leading-[1.25] text-text-primary min-[741px]:text-[36px]">
-                  &ldquo;I started Noel AgriTV to help Filipino farmers grow
-                  more with less — using natural, affordable solutions that
-                  actually work in our soil and climate.&rdquo;
+                  {copy.home.missionQuote}
                 </p>
               </blockquote>
               <p className="mt-6 text-sm font-semibold uppercase tracking-widest text-text-secondary">
-                Noel Tolentino — Founder
+                {copy.home.missionAttribution}
               </p>
               <Link
                 href="/about"
                 className="mt-6 inline-flex h-10 items-center justify-center rounded-full bg-brand-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
               >
-                Our Story →
+                {copy.home.ourStory}
               </Link>
             </div>
 
@@ -282,7 +281,7 @@ export default async function HomePage() {
               <div className="overflow-hidden rounded-2xl min-[741px]:h-full">
                 <Image
                   src="/images/New-Found-Hero.png"
-                  alt="Noel Tolentino holding fresh harvested vegetables"
+                  alt={copy.home.missionImageAlt}
                   width={640}
                   height={960}
                   className="h-full w-full object-cover max-[740px]:aspect-[3/4] max-[740px]:max-h-[480px] min-[741px]:min-h-[480px]"
