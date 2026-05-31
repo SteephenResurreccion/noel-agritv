@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart-store";
 import { priceForQuantity, type PriceTier } from "@/lib/pricing";
 import { formatCentavos } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 import { TierTable } from "@/components/tier-table";
 
 export interface AddToCartProps {
@@ -46,7 +47,7 @@ export function AddToCart({
         onClick={handleAdd}
         className="w-full rounded-md bg-brand-darkest px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
       >
-        {added ? "Added ✓" : "Add to cart"}
+        {added ? copy.addToCart.added : copy.addToCart.add}
       </button>
     );
   }
@@ -66,17 +67,17 @@ export function AddToCart({
           {formatCentavos(unitPrice)}
         </p>
         <p className="text-sm text-text-secondary tabular-nums">
-          each · at {qty} pcs
+          {copy.addToCart.eachAtQty(qty)}
         </p>
       </div>
 
       {/* Quantity row */}
       <div className="flex items-center justify-between gap-4">
-        <span className="text-[15px] font-semibold text-text-primary">Quantity</span>
+        <span className="text-[15px] font-semibold text-text-primary">{copy.addToCart.quantity}</span>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            aria-label="Decrease quantity"
+            aria-label={copy.addToCart.decreaseQuantityAriaLabel}
             onClick={() => setQty((q) => Math.max(1, q - 1))}
             className="flex h-12 w-12 items-center justify-center rounded-md border-[1.5px] border-brand-mid text-lg text-text-primary"
           >
@@ -87,7 +88,7 @@ export function AddToCart({
           </span>
           <button
             type="button"
-            aria-label="Increase quantity"
+            aria-label={copy.addToCart.increaseQuantityAriaLabel}
             onClick={() => setQty((q) => Math.min(99, q + 1))}
             className="flex h-12 w-12 items-center justify-center rounded-md border-[1.5px] border-brand-mid text-lg text-text-primary"
           >
@@ -102,21 +103,21 @@ export function AddToCart({
         onClick={handleAdd}
         className="flex min-h-[52px] w-full items-center justify-center whitespace-nowrap rounded-lg bg-brand-accent px-4 text-base font-bold tracking-[0.01em] text-white transition-colors hover:brightness-95"
       >
-        {added ? "Added ✓" : `Add to cart · ${formatCentavos(lineTotal)}`}
+        {added ? copy.addToCart.added : copy.addToCart.addWithTotal(formatCentavos(lineTotal))}
       </button>
 
       {/* Wholesale tier table — only when the product has tiers */}
       {hasTiers && (
         <div className="mt-4">
           <h2 className="font-heading text-[19px] font-semibold leading-snug text-text-primary">
-            Wholesale price — buy more, save more
+            {copy.addToCart.wholesaleHint}
           </h2>
-          <p className="mt-0.5 text-sm italic text-brand-accent">Tipid sa dami.</p>
+          <p className="mt-0.5 text-sm italic text-brand-accent">{copy.addToCart.tipid}</p>
           <div className="mt-3">
             <TierTable tiers={priceTiers!} activeQty={qty} />
           </div>
           <p className="mt-3 text-[13px] leading-snug text-text-secondary">
-            Discount applies automatically — no code needed.
+            {copy.addToCart.discountAuto}
           </p>
         </div>
       )}

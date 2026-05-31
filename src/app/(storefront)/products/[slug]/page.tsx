@@ -5,6 +5,7 @@ import { products, getProductBySlug, type Product } from "@/data/products";
 import { getCategoryBySlug } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
+import { copy } from "@/lib/copy";
 import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "@/components/messenger-cta";
 import { CallCTA } from "@/components/call-cta";
@@ -239,14 +240,14 @@ export default async function ProductDetailPage({
               <MessengerCTA
                 productName={product.name}
                 packSize=""
-                label="Ask on Messenger"
+                label={copy.productDetail.askOnMessenger}
                 variant="default"
                 size="lg"
                 context="product-detail"
                 className="w-full justify-center"
               />
               <CallCTA
-                label="Call to Order"
+                label={copy.common.callToOrder}
                 variant="outline"
                 size="lg"
                 context="product-detail"
@@ -266,7 +267,7 @@ export default async function ProductDetailPage({
         {/* What It Does */}
         <div className="mt-10">
           <h2 className="mb-3 text-[length:var(--font-size-h2)] font-bold text-brand-darkest">
-            What It Does
+            {copy.productDetail.whatItDoes}
           </h2>
           <p className="text-[length:var(--font-size-body)] leading-relaxed text-text-primary">
             {product.description}
@@ -279,7 +280,7 @@ export default async function ProductDetailPage({
             <Accordion>
               {hasHowToApply && (
                 <AccordionItem value="how-to-apply">
-                  <AccordionTrigger>How to Apply</AccordionTrigger>
+                  <AccordionTrigger>{copy.productDetail.howToApply}</AccordionTrigger>
                   <AccordionContent>
                     <p className="text-text-primary">{product.howToApply}</p>
                   </AccordionContent>
@@ -288,7 +289,7 @@ export default async function ProductDetailPage({
 
               {hasCompatibleCrops && (
                 <AccordionItem value="compatible-crops">
-                  <AccordionTrigger>Compatible Crops</AccordionTrigger>
+                  <AccordionTrigger>{copy.productDetail.compatibleCrops}</AccordionTrigger>
                   <AccordionContent>
                     <ul className="flex flex-wrap gap-2">
                       {product.compatibleCrops.map((crop) => (
@@ -303,7 +304,7 @@ export default async function ProductDetailPage({
 
               {hasSafetyNotes && (
                 <AccordionItem value="safety">
-                  <AccordionTrigger>Safety &amp; Handling</AccordionTrigger>
+                  <AccordionTrigger>{copy.productDetail.safety}</AccordionTrigger>
                   <AccordionContent>
                     <p className="text-text-primary">{product.safetyNotes}</p>
                   </AccordionContent>
@@ -317,11 +318,11 @@ export default async function ProductDetailPage({
         {product.youtubeId && (
           <div className="mt-10">
             <h2 className="mb-4 text-[length:var(--font-size-h2)] font-bold text-brand-darkest">
-              Watch
+              {copy.productDetail.watch}
             </h2>
             <YouTubeFacade
               videoId={product.youtubeId}
-              title={`${product.name} — Demo Video`}
+              title={copy.productDetail.demoVideoSuffix(product.name)}
             />
           </div>
         )}
@@ -330,7 +331,7 @@ export default async function ProductDetailPage({
         {relatedProducts.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-4 text-[length:var(--font-size-h2)] font-bold text-brand-darkest">
-              You May Also Like
+              {copy.productDetail.related}
             </h2>
             <div className="flex gap-[var(--spacing-grid-gap)] overflow-x-auto pb-4">
               {relatedProducts.map((rp) => (
