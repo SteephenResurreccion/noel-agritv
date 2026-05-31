@@ -92,7 +92,7 @@ export const copy = {
   },
   mobileBottomBar: {
     quickActionsAriaLabel: "Mga mabilisang aksyon",
-    products: "Mga Produkto",
+    products: "Produkto",
     messenger: "Messenger",
     sms: "SMS",
     call: "Tawag",
