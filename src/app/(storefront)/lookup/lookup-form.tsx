@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { MESSENGER_URL } from "@/lib/constants";
+import { copy } from "@/lib/copy";
 import { lookupSchema, type LookupResult } from "@/lib/lookup";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { lookupOrder } from "./actions";
@@ -91,7 +92,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
       <form onSubmit={handleSubmit} className="max-w-md space-y-4" noValidate>
         <div>
           <label htmlFor="lookup-order" className={LABEL_CLASS}>
-            Order number
+            {copy.lookup.orderNumber}
           </label>
           <input
             id="lookup-order"
@@ -99,7 +100,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
             type="text"
             required
             autoComplete="off"
-            placeholder="NAG-YYYYMMDD-XXXX"
+            placeholder={copy.lookup.orderNumberPlaceholder}
             value={orderNumber}
             onChange={(e) => {
               setOrderNumber(e.target.value);
@@ -125,7 +126,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
         </div>
         <div>
           <label htmlFor="lookup-phone" className={LABEL_CLASS}>
-            Last 4 digits of your phone
+            {copy.lookup.last4}
           </label>
           <input
             id="lookup-phone"
@@ -135,7 +136,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
             inputMode="numeric"
             autoComplete="off"
             maxLength={4}
-            placeholder="1234"
+            placeholder={copy.lookup.last4Placeholder}
             value={phoneLast4}
             onChange={(e) => {
               setPhoneLast4(e.target.value.replace(/\D/g, ""));
@@ -168,7 +169,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
           disabled={isPending || !token}
           className="min-h-11 w-full rounded-md bg-brand-darkest px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed sm:w-auto"
         >
-          {isPending ? "Looking up…" : "Find my order"}
+          {isPending ? copy.lookup.looking : copy.common.findMyOrder}
         </button>
       </form>
 
@@ -189,7 +190,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
           href={MESSENGER_URL}
           className="mt-3 inline-block min-h-11 rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
         >
-          Message us on Messenger
+          {copy.lookup.messageUsOnMessenger}
         </a>
       </div>
     );
@@ -212,15 +213,21 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
       </div>
       <dl className="space-y-3 text-sm">
         <div>
-          <dt className="font-semibold text-text-primary">Items</dt>
+          <dt className="font-semibold text-text-primary">
+            {copy.lookup.items}
+          </dt>
           <dd className="text-text-secondary">{s.itemsLine}</dd>
         </div>
         <div className="flex justify-between">
-          <dt className="font-semibold text-text-primary">Subtotal</dt>
+          <dt className="font-semibold text-text-primary">
+            {copy.lookup.subtotal}
+          </dt>
           <dd className="text-text-primary">{s.subtotal}</dd>
         </div>
         <div className="flex justify-between">
-          <dt className="font-semibold text-text-primary">Shipping</dt>
+          <dt className="font-semibold text-text-primary">
+            {copy.lookup.shipping}
+          </dt>
           <dd className="text-text-primary">{s.shipping}</dd>
         </div>
       </dl>
@@ -230,19 +237,18 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
           href={trackHref}
           className="mt-5 block min-h-11 rounded-md bg-brand-accent px-5 py-3 text-center text-sm font-semibold text-white hover:opacity-90"
         >
-          Track shipment on J&amp;T →
+          {copy.lookup.trackJt}
         </a>
       ) : (
         <div className="mt-5 space-y-3">
           <p className="text-sm text-text-secondary">
-            Your order is confirmed. We&apos;ll text you the tracking number
-            once it&apos;s booked with J&amp;T.
+            {copy.lookup.confirmedNotice}
           </p>
           <a
             href={MESSENGER_URL}
             className="block min-h-11 rounded-md border border-border bg-surface px-5 py-3 text-center text-sm font-semibold text-brand-darkest hover:bg-bg-wheat"
           >
-            Message us
+            {copy.lookup.messageUs}
           </a>
         </div>
       )}
