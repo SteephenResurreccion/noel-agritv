@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { YouTubeFacade } from "@/components/youtube-facade";
+import { copy } from "@/lib/copy";
 
 vi.mock("@vercel/analytics", () => ({ track: vi.fn() }));
 
@@ -13,7 +14,9 @@ describe("YouTubeFacade", () => {
 
   it("renders iframe after clicking play", () => {
     render(<YouTubeFacade videoId="abc123" title="Test Video" />);
-    const playButton = screen.getByRole("button", { name: /play/i });
+    const playButton = screen.getByRole("button", {
+      name: copy.videoFacade.play("Test Video"),
+    });
     fireEvent.click(playButton);
     const iframe = screen.getByTitle("Test Video");
     expect(iframe).toBeInTheDocument();

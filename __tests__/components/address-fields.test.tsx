@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { AddressFields } from "@/components/address-fields";
 import { PH_REGIONS } from "@/lib/ph-regions";
 import { clearPsgcCache } from "@/lib/psgc";
+import { copy } from "@/lib/copy";
 
 const NCR_FIXTURE = {
   region: "NCR",
@@ -62,7 +63,9 @@ describe("AddressFields", () => {
   it("renders the region select populated from PH_REGIONS", () => {
     const { Wrapper } = harness();
     render(<Wrapper />);
-    const regionSelect = screen.getByLabelText(/region/i) as HTMLSelectElement;
+    const regionSelect = screen.getByLabelText(
+      copy.addressFields.region
+    ) as HTMLSelectElement;
     expect(regionSelect).toBeInTheDocument();
     expect(regionSelect.tagName).toBe("SELECT");
     // 17 regions + 1 placeholder
@@ -72,15 +75,15 @@ describe("AddressFields", () => {
   it("keeps Province / City / Barangay disabled when Region is empty", () => {
     const { Wrapper } = harness();
     render(<Wrapper />);
-    expect(screen.getByLabelText(/^province/i)).toBeDisabled();
-    expect(screen.getByLabelText(/city/i)).toBeDisabled();
-    expect(screen.getByLabelText(/barangay/i)).toBeDisabled();
+    expect(screen.getByLabelText(copy.addressFields.province)).toBeDisabled();
+    expect(screen.getByLabelText(copy.addressFields.city)).toBeDisabled();
+    expect(screen.getByLabelText(copy.addressFields.barangay)).toBeDisabled();
   });
 
   it("fires onChange when the user picks a region", async () => {
     const { onChange, Wrapper } = harness();
     render(<Wrapper />);
-    const regionSelect = screen.getByLabelText(/region/i);
+    const regionSelect = screen.getByLabelText(copy.addressFields.region);
     await userEvent.selectOptions(regionSelect, "NCR");
     expect(onChange).toHaveBeenCalledWith("region", "NCR");
   });
@@ -91,7 +94,7 @@ describe("AddressFields", () => {
     render(<Wrapper />);
     await waitFor(() => {
       const provinceSelect = screen.getByLabelText(
-        /^province/i
+        copy.addressFields.province
       ) as HTMLSelectElement;
       expect(provinceSelect).not.toBeDisabled();
       expect(
@@ -108,7 +111,9 @@ describe("AddressFields", () => {
     });
     render(<Wrapper />);
     await waitFor(() => {
-      const citySelect = screen.getByLabelText(/city/i) as HTMLSelectElement;
+      const citySelect = screen.getByLabelText(
+        copy.addressFields.city
+      ) as HTMLSelectElement;
       expect(citySelect).not.toBeDisabled();
       const vals = Array.from(citySelect.options).map((o) => o.value);
       expect(vals).toContain("City of Manila");
@@ -125,7 +130,9 @@ describe("AddressFields", () => {
     });
     render(<Wrapper />);
     await waitFor(() => {
-      const brgy = screen.getByLabelText(/barangay/i) as HTMLSelectElement;
+      const brgy = screen.getByLabelText(
+        copy.addressFields.barangay
+      ) as HTMLSelectElement;
       expect(brgy).not.toBeDisabled();
       const vals = Array.from(brgy.options).map((o) => o.value);
       expect(vals).toContain("Barangay 1");
@@ -137,10 +144,12 @@ describe("AddressFields", () => {
     const { Wrapper } = harness();
     render(<Wrapper />);
     expect(
-      (screen.getByLabelText(/street/i) as HTMLInputElement).tagName
+      (screen.getByLabelText(copy.addressFields.street) as HTMLInputElement)
+        .tagName
     ).toBe("INPUT");
     expect(
-      (screen.getByLabelText(/landmark/i) as HTMLInputElement).tagName
+      (screen.getByLabelText(copy.addressFields.landmark) as HTMLInputElement)
+        .tagName
     ).toBe("INPUT");
   });
 });

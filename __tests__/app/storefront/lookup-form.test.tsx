@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LookupForm } from "@/app/(storefront)/lookup/lookup-form";
+import { copy } from "@/lib/copy";
 
 vi.mock("@/app/(storefront)/lookup/actions", () => ({
   lookupOrder: vi.fn(),
@@ -31,8 +32,8 @@ describe("LookupForm", () => {
     expect(
       screen.getByRole("textbox", { name: /order number/i })
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/last 4 digits/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /find my order/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(copy.lookup.last4)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: copy.common.findMyOrder })).toBeInTheDocument();
   });
 
   it("pre-fills the order number from the initial prop", () => {
@@ -49,13 +50,13 @@ describe("LookupForm", () => {
       screen.getByRole("textbox", { name: /order number/i }),
       "not-an-order"
     );
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
     await waitFor(() => {
       expect(
-        screen.getByText(/order number format is/i)
+        screen.getByText(copy.errors.orderFormat)
       ).toBeInTheDocument();
     });
     expect(mockLookup).not.toHaveBeenCalled();
@@ -67,13 +68,13 @@ describe("LookupForm", () => {
       screen.getByRole("textbox", { name: /order number/i }),
       "NAG-20260521-A7K1"
     );
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "12");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "12");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
     await waitFor(() => {
       expect(
-        screen.getByText(/enter the last 4 digits/i)
+        screen.getByText(copy.errors.last4)
       ).toBeInTheDocument();
     });
     expect(mockLookup).not.toHaveBeenCalled();
@@ -93,9 +94,9 @@ describe("LookupForm", () => {
     });
 
     render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
 
     await waitFor(() => {
@@ -104,7 +105,7 @@ describe("LookupForm", () => {
     expect(
       screen.getByText("Bio Plant Booster ×1 @₱575")
     ).toBeInTheDocument();
-    const trackLink = screen.getByRole("link", { name: /track shipment on j&t/i });
+    const trackLink = screen.getByRole("link", { name: copy.lookup.trackJt });
     expect(trackLink).toHaveAttribute(
       "href",
       "https://www.jtexpress.ph/trajectoryQuery?waybillNo=JT9988776655&flag=1"
@@ -127,21 +128,23 @@ describe("LookupForm", () => {
     });
 
     render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
 
     await waitFor(() => {
       expect(screen.getByText("Confirmed")).toBeInTheDocument();
     });
     expect(
-      screen.getByText(/text you the tracking number/i)
+      screen.getByText(copy.lookup.confirmedNotice)
     ).toBeInTheDocument();
-    const messengerLink = screen.getByRole("link", { name: /message us/i });
+    const messengerLink = screen.getByRole("link", {
+      name: copy.lookup.messageUs,
+    });
     expect(messengerLink).toHaveAttribute("href", "https://m.me/noeltolentino2728");
     expect(
-      screen.queryByRole("link", { name: /track shipment on j&t/i })
+      screen.queryByRole("link", { name: copy.lookup.trackJt })
     ).not.toBeInTheDocument();
   });
 
@@ -154,15 +157,17 @@ describe("LookupForm", () => {
     });
 
     render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(/order not found/i);
     });
-    const messengerLink = screen.getByRole("link", { name: /message us/i });
+    const messengerLink = screen.getByRole("link", {
+      name: copy.lookup.messageUsOnMessenger,
+    });
     expect(messengerLink).toHaveAttribute("href", "https://m.me/noeltolentino2728");
   });
 
@@ -174,9 +179,9 @@ describe("LookupForm", () => {
     });
 
     render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
 
     await waitFor(() => {
@@ -194,9 +199,9 @@ describe("LookupForm", () => {
     });
 
     render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
 
     await waitFor(() => {
@@ -212,9 +217,9 @@ describe("LookupForm", () => {
     });
 
     render(<LookupForm initialOrderNumber="NAG-20260521-A7K1" />);
-    await userEvent.type(screen.getByLabelText(/last 4 digits/i), "4567");
+    await userEvent.type(screen.getByLabelText(copy.lookup.last4), "4567");
     await userEvent.click(
-      screen.getByRole("button", { name: /find my order/i })
+      screen.getByRole("button", { name: copy.common.findMyOrder })
     );
 
     // The mocked widget supplies "test-token"; the action must receive it.
@@ -229,7 +234,7 @@ describe("LookupForm", () => {
   it("enforces maxLength on the phone-last-4 input", () => {
     render(<LookupForm initialOrderNumber="" />);
     const phoneInput = screen.getByLabelText(
-      /last 4 digits/i
+      copy.lookup.last4
     ) as HTMLInputElement;
     expect(phoneInput).toHaveAttribute("maxLength", "4");
     expect(phoneInput).toHaveAttribute("inputMode", "numeric");

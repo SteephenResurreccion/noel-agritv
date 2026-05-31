@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useCart } from "@/lib/cart-store";
+import { copy } from "@/lib/copy";
 
 // Default mock — overridden inside individual describes via vi.doMock.
 vi.mock("next/navigation", () => ({
@@ -34,7 +35,7 @@ describe("CheckoutBar — visibility based on cart state", () => {
     useCart.getState().addItem(sampleItem, 2);
     const { CheckoutBar } = await import("@/components/checkout-bar");
     render(<CheckoutBar />);
-    expect(screen.getByText(/2 items/i)).toBeInTheDocument();
+    expect(screen.getByText(copy.checkoutBar.count(2))).toBeInTheDocument();
     expect(screen.getByText("₱500")).toBeInTheDocument();
     const link = screen.getByRole("link", { name: /checkout/i });
     expect(link).toHaveAttribute("href", "/checkout");
@@ -44,7 +45,7 @@ describe("CheckoutBar — visibility based on cart state", () => {
     useCart.getState().addItem(sampleItem, 1);
     const { CheckoutBar } = await import("@/components/checkout-bar");
     render(<CheckoutBar />);
-    expect(screen.getByText(/1 item\b/i)).toBeInTheDocument();
+    expect(screen.getByText(copy.checkoutBar.count(1))).toBeInTheDocument();
     expect(screen.queryByText(/1 items/i)).not.toBeInTheDocument();
   });
 
@@ -52,7 +53,7 @@ describe("CheckoutBar — visibility based on cart state", () => {
     useCart.getState().addItem(sampleItem, 3);
     const { CheckoutBar } = await import("@/components/checkout-bar");
     render(<CheckoutBar />);
-    expect(screen.getByText(/3 items/i)).toBeInTheDocument();
+    expect(screen.getByText(copy.checkoutBar.count(3))).toBeInTheDocument();
   });
 });
 

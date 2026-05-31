@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { CategoryFilter } from "@/components/category-filter";
+import { copy } from "@/lib/copy";
 
 vi.mock("@vercel/analytics", () => ({ track: vi.fn() }));
 
@@ -12,7 +13,7 @@ vi.mock("next/navigation", () => ({
 describe("CategoryFilter", () => {
   it("renders All pill plus one pill per category", () => {
     render(<CategoryFilter />);
-    expect(screen.getByText("All")).toBeInTheDocument();
+    expect(screen.getByText(copy.common.filterAll)).toBeInTheDocument();
     expect(screen.getByText("Crop Care")).toBeInTheDocument();
     expect(screen.getByText("Seeds")).toBeInTheDocument();
   });

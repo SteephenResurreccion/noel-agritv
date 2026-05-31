@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GeolocateButton } from "@/components/geolocate-button";
 import { clearPsgcCache } from "@/lib/psgc";
+import { copy } from "@/lib/copy";
 
 const NCR_FIXTURE = {
   region: "NCR",
@@ -85,7 +86,7 @@ describe("GeolocateButton", () => {
     const onPrefill = vi.fn();
     render(<GeolocateButton onPrefill={onPrefill} />);
     expect(
-      screen.getByRole("button", { name: /use my location/i })
+      screen.getByRole("button", { name: copy.geolocate.use })
     ).toBeInTheDocument();
   });
 
@@ -106,7 +107,7 @@ describe("GeolocateButton", () => {
     const onPrefill = vi.fn();
     render(<GeolocateButton onPrefill={onPrefill} />);
     await userEvent.click(
-      screen.getByRole("button", { name: /use my location/i })
+      screen.getByRole("button", { name: copy.geolocate.use })
     );
     await waitFor(() => {
       expect(onPrefill).toHaveBeenCalledTimes(1);
@@ -124,11 +125,11 @@ describe("GeolocateButton", () => {
     const onPrefill = vi.fn();
     render(<GeolocateButton onPrefill={onPrefill} />);
     await userEvent.click(
-      screen.getByRole("button", { name: /use my location/i })
+      screen.getByRole("button", { name: copy.geolocate.use })
     );
     await waitFor(() => {
       expect(
-        screen.getByText(/location permission denied/i)
+        screen.getByText(copy.geolocate.denied)
       ).toBeInTheDocument();
     });
     expect(onPrefill).not.toHaveBeenCalled();
@@ -146,10 +147,10 @@ describe("GeolocateButton", () => {
     const onPrefill = vi.fn();
     render(<GeolocateButton onPrefill={onPrefill} />);
     await userEvent.click(
-      screen.getByRole("button", { name: /use my location/i })
+      screen.getByRole("button", { name: copy.geolocate.use })
     );
     await waitFor(() => {
-      expect(screen.getByText(/couldn't find/i)).toBeInTheDocument();
+      expect(screen.getByText(copy.geolocate.unavailable)).toBeInTheDocument();
     });
     expect(onPrefill).not.toHaveBeenCalled();
   });
