@@ -7,9 +7,8 @@ import { copy } from "@/lib/copy";
 import { AwardsSection } from "@/components/awards-section";
 
 export const metadata: Metadata = {
-  title: "About Noel | Noel AgriTV",
-  description:
-    "Learn about Noel Tolentino and Noel AgriTV — helping Filipino farmers grow more with natural, bio-organic solutions since 2021.",
+  title: copy.meta.aboutTitle,
+  description: copy.meta.aboutDescription,
 };
 
 const stats = [

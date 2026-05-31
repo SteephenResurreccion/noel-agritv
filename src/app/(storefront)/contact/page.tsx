@@ -5,9 +5,8 @@ import { copy } from "@/lib/copy";
 import { ContactPageClient } from "./contact-client";
 
 export const metadata: Metadata = {
-  title: "Contact | Noel AgriTV",
-  description:
-    "Get in touch with Noel AgriTV. Message us on Facebook Messenger, call, or email — we'd love to hear from you.",
+  title: copy.meta.contactTitle,
+  description: copy.meta.contactDescription,
 };
 
 const faqJsonLd = {

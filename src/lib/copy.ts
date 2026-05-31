@@ -383,6 +383,28 @@ export const copy = {
     messageCta: "Message Us for Wholesale →",
     callPhone: (phone: string) => `Call ${phone}`,
   },
+  meta: {
+    // SEO metadata + JSON-LD text. VERBATIM current rendered strings — em-dashes,
+    // apostrophes (straight), and the title template "%s" are load-bearing.
+    rootTitleDefault: "Noel AgriTV — Natural Solutions for Better Harvests",
+    rootTitleTemplate: "%s | Noel AgriTV",
+    rootDescription:
+      "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021. Browse our products and message us to order.",
+    // Org/WebSite JSON-LD description (no trailing "Browse…" sentence).
+    orgDescription:
+      "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021.",
+    productsTitle: "All Products",
+    productsDescription:
+      "Browse Noel AgriTV's bio-organic crop care products and quality rice seeds. Message us to order.",
+    aboutTitle: "About Noel | Noel AgriTV",
+    aboutDescription:
+      "Learn about Noel Tolentino and Noel AgriTV — helping Filipino farmers grow more with natural, bio-organic solutions since 2021.",
+    contactTitle: "Contact | Noel AgriTV",
+    contactDescription:
+      "Get in touch with Noel AgriTV. Message us on Facebook Messenger, call, or email — we'd love to hear from you.",
+    breadcrumbHome: "Home",
+    breadcrumbProducts: "Products",
+  },
   errors: {
     // Checkout schema (src/lib/order.ts) — Zod validation messages.
     phone: "Enter a valid PH mobile number",

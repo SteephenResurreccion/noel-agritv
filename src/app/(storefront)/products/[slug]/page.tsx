@@ -142,11 +142,11 @@ export default async function ProductDetailPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      { "@type": "ListItem", position: 1, name: copy.meta.breadcrumbHome, item: siteUrl },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Products",
+        name: copy.meta.breadcrumbProducts,
         item: `${siteUrl}/products`,
       },
       ...(category

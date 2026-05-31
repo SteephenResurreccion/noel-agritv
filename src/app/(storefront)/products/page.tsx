@@ -10,9 +10,8 @@ import { copy } from "@/lib/copy";
 export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
 export const metadata: Metadata = {
-  title: "All Products",
-  description:
-    "Browse Noel AgriTV's bio-organic crop care products and quality rice seeds. Message us to order.",
+  title: copy.meta.productsTitle,
+  description: copy.meta.productsDescription,
 };
 
 export default async function ProductsPage({

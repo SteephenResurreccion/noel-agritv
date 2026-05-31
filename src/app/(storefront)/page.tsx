@@ -18,9 +18,8 @@ import { copy } from "@/lib/copy";
 export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
 export const metadata: Metadata = {
-  title: "Noel AgriTV — Natural Solutions for Better Harvests",
-  description:
-    "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021. Browse our products and message us to order.",
+  title: copy.meta.rootTitleDefault,
+  description: copy.meta.rootDescription,
 };
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
@@ -28,13 +27,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Noel AgriTV",
+  name: copy.common.brand,
   url: siteUrl,
-  description:
-    "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021.",
+  description: copy.meta.orgDescription,
   publisher: {
     "@type": "Organization",
-    name: "Noel AgriTV",
+    name: copy.common.brand,
     url: siteUrl,
     sameAs: [FACEBOOK_URL, YOUTUBE_URL],
   },
