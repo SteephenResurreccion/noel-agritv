@@ -134,6 +134,13 @@ export const copy = {
     scrollRightAriaLabel: "Scroll right",
     seeAllOnFacebook: "See all videos on Facebook →",
   },
+
+  // ─── Home: Video facade (lazy-load YouTube embed) ───────────────
+  // ${title} is video DATA passed in by the component — fixed UI text only here.
+  videoFacade: {
+    thumbnail: (title: string) => `Thumbnail for ${title}`,
+    play: (title: string) => `Play ${title}`,
+  },
   productList: {
     title: "All Products",
     empty: "No products found in this category.",
@@ -253,7 +260,6 @@ export const copy = {
     title: "Track My Order",
     help: "Enter the tracking number we texted you to follow your order on J&T's official tracker.",
     waybill: "J&T tracking number",
-    hint: "Enter your tracking number to continue.",
     trackOnJt: "Track on J&T",
     noTrackingYet: "Don't have a tracking number yet?",
     lookup: "Look up your order",
@@ -435,8 +441,7 @@ export const copy = {
       "We can't reach the order log right now — please message us.",
     orderNotFound:
       "Order not found. Double-check your order number and phone number, or message us.",
-    // Track page empty-submit hint. Same byte-for-byte text as copy.track.hint
-    // (a separate key, kept for the track-page error path).
+    // Track page empty-submit hint — surfaced on the track-page error path.
     trackEnterNumber: "Enter your tracking number to continue.",
     // sheets.ts shipping display string surfaced in the lookup result.
     shippingOnCall: "Confirmed on call",

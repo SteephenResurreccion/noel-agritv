@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Play } from "lucide-react";
 import { trackVideoPlay } from "@/lib/analytics";
+import { copy } from "@/lib/copy";
 
 interface YouTubeFacadeProps {
   videoId: string;
@@ -45,13 +46,13 @@ export function YouTubeFacade({ videoId, title, className }: YouTubeFacadeProps)
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={thumbnailUrl}
-        alt={`Thumbnail for ${title}`}
+        alt={copy.videoFacade.thumbnail(title)}
         loading="lazy"
         className="h-full w-full object-cover"
       />
       <button
         onClick={handlePlay}
-        aria-label={`Play ${title}`}
+        aria-label={copy.videoFacade.play(title)}
         className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40"
       >
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-accent text-white shadow-lg">
