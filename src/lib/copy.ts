@@ -167,4 +167,31 @@ export const copy = {
     qty: "Quantity",
     priceEach: "Price each",
   },
+  cart: {
+    empty: "Your cart is empty",
+    // ⚠ Verbatim cart text is "Browse products" (lowercase p). copy.common.browseProducts
+    // is "Browse Products" (capital P) — different rendered casing, so this is a SEPARATE key.
+    browse: "Browse products",
+    title: "Your cart",
+    itemCount: (n: number) => `${n} items`,
+    eachPrice: (price: string) => `${price} each`,
+    removeAria: (name: string) => `Remove ${name}`,
+    nudge: (units: number) => `Add ${units} more`,
+    nudgeEach: (price: string) => `${price} each`,
+    freeUnlocked: "FREE shipping unlocked",
+    freeShippingPrompt: (remaining: number) =>
+      `Add ${remaining} more item${remaining === 1 ? "" : "s"} for FREE shipping`,
+    subtotal: "Subtotal",
+    checkoutWithSubtotal: (subtotal: string) => `Checkout · ${subtotal}`,
+  },
+  checkoutBar: {
+    summaryAria: "Cart summary",
+    count: (n: number) => (n === 1 ? "1 item" : `${n} items`),
+    checkout: "Checkout →",
+  },
+  cartBadge: {
+    label: "Cart",
+    aria: (n: number) => `Cart, ${n} items`,
+    overflow: "99+",
+  },
 } as const;

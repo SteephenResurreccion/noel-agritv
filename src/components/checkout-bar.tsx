@@ -7,6 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHasMounted } from "@/lib/use-has-mounted";
 import { formatCentavos } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 /**
  * Lazada/Shopee-style sticky checkout bar.
@@ -55,7 +56,7 @@ export function CheckoutBar(): React.ReactElement | null {
   return (
     <div
       role="region"
-      aria-label="Cart summary"
+      aria-label={copy.checkoutBar.summaryAria}
       className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] md:bottom-0"
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
@@ -63,7 +64,7 @@ export function CheckoutBar(): React.ReactElement | null {
         <div className="flex items-center gap-2 text-text-primary">
           <ShoppingCart className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span className="text-sm font-semibold sm:text-base">
-            {count === 1 ? "1 item" : `${count} items`}
+            {copy.checkoutBar.count(count)}
           </span>
           <span aria-hidden="true" className="text-text-secondary">
             ·
@@ -76,7 +77,7 @@ export function CheckoutBar(): React.ReactElement | null {
           href="/checkout"
           className="rounded-md bg-brand-accent px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent sm:text-base"
         >
-          Checkout →
+          {copy.checkoutBar.checkout}
         </Link>
       </div>
     </div>

@@ -9,6 +9,7 @@ import {
 } from "@/lib/cart-store";
 import { nextTierInfo, FREE_SHIPPING_MIN_UNITS } from "@/lib/pricing";
 import { formatCentavos } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 /**
  * Per-line "buy a little more, save more" nudge. Renders ONLY when the line is
@@ -21,10 +22,10 @@ function CartLineNudge({ item }: { item: CartItem }) {
   if (!next || next.unitsToNext > 2) return null;
   return (
     <p className="mt-3 border-t border-border pt-3 text-sm font-medium text-text-primary">
-      Add {next.unitsToNext} more{" "}
+      {copy.cart.nudge(next.unitsToNext)}{" "}
       <span className="text-text-disabled">→</span>{" "}
       <span className="font-bold text-brand-accent">
-        {formatCentavos(next.nextPriceCentavos)} each
+        {copy.cart.nudgeEach(formatCentavos(next.nextPriceCentavos))}
       </span>
     </p>
   );
@@ -40,14 +41,14 @@ function FreeShippingLine({ totalUnits }: { totalUnits: number }) {
   if (totalUnits >= FREE_SHIPPING_MIN_UNITS) {
     return (
       <p aria-live="polite" className="mt-2 text-sm font-bold text-brand-mid">
-        <span aria-hidden="true">✓</span> FREE shipping unlocked
+        <span aria-hidden="true">✓</span> {copy.cart.freeUnlocked}
       </p>
     );
   }
   const remaining = FREE_SHIPPING_MIN_UNITS - totalUnits;
   return (
     <p aria-live="polite" className="mt-2 text-sm font-medium text-text-primary">
-      Add {remaining} more item{remaining === 1 ? "" : "s"} for FREE shipping
+      {copy.cart.freeShippingPrompt(remaining)}
     </p>
   );
 }
@@ -63,13 +64,13 @@ export default function CartPage() {
     return (
       <div className="container-site py-[var(--spacing-section)] text-center">
         <h1 className="text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-          Your cart is empty
+          {copy.cart.empty}
         </h1>
         <Link
           href="/products"
           className="mt-4 inline-block rounded-md bg-brand-darkest px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
         >
-          Browse products
+          {copy.cart.browse}
         </Link>
       </div>
     );
@@ -78,9 +79,11 @@ export default function CartPage() {
   return (
     <div className="container-site py-[var(--spacing-section)]">
       <h1 className="text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-        Your cart
+        {copy.cart.title}
       </h1>
-      <p className="mb-6 mt-1 text-sm text-text-secondary">{totalUnits} items</p>
+      <p className="mb-6 mt-1 text-sm text-text-secondary">
+        {copy.cart.itemCount(totalUnits)}
+      </p>
       <ul className="space-y-4">
         {items.map((i) => {
           const unit = lineUnitPriceCentavos(i);
@@ -101,12 +104,12 @@ export default function CartPage() {
                     {i.name}
                   </p>
                   <p className="text-sm tabular-nums text-text-secondary">
-                    {formatCentavos(unit)} each
+                    {copy.cart.eachPrice(formatCentavos(unit))}
                   </p>
                 </div>
                 <button
                   onClick={() => removeItem(i.slug)}
-                  aria-label={`Remove ${i.name}`}
+                  aria-label={copy.cart.removeAria(i.name)}
                   className="flex h-12 w-12 items-center justify-center rounded-md text-text-secondary hover:text-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -116,7 +119,7 @@ export default function CartPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setQty(i.slug, i.qty - 1)}
-                    aria-label="Decrease quantity"
+                    aria-label={copy.addToCart.decreaseQuantityAriaLabel}
                     className="flex h-12 w-12 items-center justify-center rounded-md border border-border text-text-primary"
                   >
                     −
@@ -126,7 +129,7 @@ export default function CartPage() {
                   </span>
                   <button
                     onClick={() => setQty(i.slug, i.qty + 1)}
-                    aria-label="Increase quantity"
+                    aria-label={copy.addToCart.increaseQuantityAriaLabel}
                     className="flex h-12 w-12 items-center justify-center rounded-md border border-border text-text-primary"
                   >
                     +
@@ -142,7 +145,9 @@ export default function CartPage() {
         })}
       </ul>
       <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
-        <span className="text-base font-semibold text-text-primary">Subtotal</span>
+        <span className="text-base font-semibold text-text-primary">
+          {copy.cart.subtotal}
+        </span>
         <span className="text-lg font-bold tabular-nums text-brand-darkest">
           {formatCentavos(subtotal)}
         </span>
@@ -152,7 +157,7 @@ export default function CartPage() {
         href="/checkout"
         className="mt-4 block rounded-md bg-brand-darkest px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-dark"
       >
-        Checkout · {formatCentavos(subtotal)}
+        {copy.cart.checkoutWithSubtotal(formatCentavos(subtotal))}
       </Link>
     </div>
   );
