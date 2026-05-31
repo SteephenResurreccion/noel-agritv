@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FACEBOOK_URL } from "@/lib/constants";
+import { copy } from "@/lib/copy";
 
 export type AnnouncementItem = {
   text: string;
@@ -8,9 +9,9 @@ export type AnnouncementItem = {
 };
 
 const defaultAnnouncements: AnnouncementItem[] = [
-  { text: "Bio-organic products trusted by 250k+ Filipino farmers", href: "/products" },
-  { text: "Message us on Facebook to order — nationwide delivery via J&T", href: FACEBOOK_URL, external: true },
-  { text: "Natural crop care solutions since 2021", href: "/about" },
+  { text: copy.announcementBar.items[0], href: "/products" },
+  { text: copy.announcementBar.items[1], href: FACEBOOK_URL, external: true },
+  { text: copy.announcementBar.items[2], href: "/about" },
 ];
 
 export function AnnouncementBar({
