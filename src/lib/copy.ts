@@ -342,4 +342,45 @@ export const copy = {
     home: "Go Home",
     // browse CTA reuses copy.common.browseProducts ("Browse Products")
   },
+  addressFields: {
+    region: "Region",
+    province: "Province",
+    city: "City / Municipality",
+    barangay: "Barangay",
+    street: "Street / House no.",
+    landmark: "Landmark (optional)",
+    selectRegion: "Select a region…",
+    selectProvince: "Select a province…",
+    pickRegionFirst: "Pick a region first",
+    selectCity: "Select a city / municipality…",
+    pickProvinceFirst: "Pick a province first",
+    selectBarangay: "Select a barangay…",
+    pickCityFirst: "Pick a city first",
+    loadingProvinces: "Loading provinces…",
+    loadError:
+      "Couldn't load the province list. Please try again or pick a different region.",
+  },
+  geolocate: {
+    use: "Use my location",
+    locating: "Locating…",
+    geocoding: "Finding your address…",
+    matching: "Matching to provinces…",
+    success: "Address pre-filled — please verify each field.",
+    denied: "Location permission denied — pick manually below.",
+    unavailable: "We couldn't find your location. Please pick manually below.",
+    noMatch:
+      "We located you, but couldn't auto-fill — please pick manually below.",
+  },
+  wholesaleBanner: {
+    eyebrow: "Wholesale",
+    title: "Buying in Bulk? We've Got You Covered",
+    benefits: [
+      "Volume discounts available",
+      "Nationwide delivery via J&T",
+      "All products available in bulk",
+      "Message us on Facebook or call to inquire",
+    ],
+    messageCta: "Message Us for Wholesale →",
+    callPhone: (phone: string) => `Call ${phone}`,
+  },
 } as const;

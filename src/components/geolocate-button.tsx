@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PH_REGIONS } from "@/lib/ph-regions";
 import { loadRegion, type PsgcRegion } from "@/lib/psgc";
 import { reverseGeocode, type NominatimAddress } from "@/lib/nominatim";
+import { copy } from "@/lib/copy";
 
 /**
  * "Use my location" button for the checkout address section.
@@ -42,14 +43,13 @@ type Status =
 
 const STATUS_TEXT: Record<Status["kind"], string> = {
   idle: "",
-  locating: "Locating…",
-  geocoding: "Finding your address…",
-  matching: "Matching to provinces…",
-  success: "Address pre-filled — please verify each field.",
-  denied: "Location permission denied — pick manually below.",
-  unavailable: "We couldn't find your location. Please pick manually below.",
-  "no-match":
-    "We located you, but couldn't auto-fill — please pick manually below.",
+  locating: copy.geolocate.locating,
+  geocoding: copy.geolocate.geocoding,
+  matching: copy.geolocate.matching,
+  success: copy.geolocate.success,
+  denied: copy.geolocate.denied,
+  unavailable: copy.geolocate.unavailable,
+  "no-match": copy.geolocate.noMatch,
 };
 
 /**
@@ -288,7 +288,7 @@ export function GeolocateButton({ onPrefill }: GeolocateButtonProps) {
   if (status.kind === "denied") {
     errorText = STATUS_TEXT.denied;
   } else if (status.kind === "unavailable") {
-    errorText = "We couldn't find your location. Please pick manually below.";
+    errorText = STATUS_TEXT.unavailable;
   } else if (status.kind === "no-match") {
     errorText = STATUS_TEXT["no-match"];
   }
@@ -301,7 +301,7 @@ export function GeolocateButton({ onPrefill }: GeolocateButtonProps) {
         disabled={busy}
         className="inline-flex items-center gap-2 rounded-md border border-brand-mid bg-surface px-4 py-3 text-sm font-medium text-brand-darkest hover:bg-bg-wheat disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {busy ? STATUS_TEXT[status.kind] : "Use my location"}
+        {busy ? STATUS_TEXT[status.kind] : copy.geolocate.use}
       </button>
       {status.kind === "success" && (
         <p className="text-sm text-text-secondary">{STATUS_TEXT.success}</p>
