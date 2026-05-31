@@ -67,7 +67,7 @@ export const copy = {
     shop: "Mamili",
     shopLinksAriaLabel: "Mga shop link sa footer",
     allProducts: "Lahat ng Produkto",
-    cropCare: "Crop Care",
+    cropCare: "Pangalaga sa Pananim",
     seeds: "Mga Binhi",
     company: "Kompanya",
     companyLinksAriaLabel: "Mga company link sa footer",

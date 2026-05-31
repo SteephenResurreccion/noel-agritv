@@ -66,6 +66,8 @@ describe("categories data", () => {
   it("getCategoryBySlug returns correct category", () => {
     const category = getCategoryBySlug("seeds");
     expect(category).toBeDefined();
-    expect(category!.name).toBe("Seeds");
+    // name is Taglish seed data (draft for client review); assert it resolves to
+    // the same record in the categories array rather than a hardcoded English string.
+    expect(category!.name).toBe(categories.find((c) => c.slug === "seeds")!.name);
   });
 });
