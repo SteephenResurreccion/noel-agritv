@@ -8,6 +8,7 @@ import {
   type PsgcProvince,
   type PsgcCity,
 } from "@/lib/psgc";
+import { copy } from "@/lib/copy";
 
 /**
  * Cascading address picker for the checkout form.
@@ -102,9 +103,7 @@ export function AddressFields({
         if (cancelled) return;
         setData(null);
         setLoading(false);
-        setLoadError(
-          "Couldn't load the province list. Please try again or pick a different region."
-        );
+        setLoadError(copy.addressFields.loadError);
         // Surface for debugging but don't crash.
         console.error("AddressFields loadRegion failed:", e);
       }
@@ -131,7 +130,7 @@ export function AddressFields({
     <div className="space-y-4">
       <div>
         <label htmlFor="region" className={LABEL_CLASS}>
-          Region
+          {copy.addressFields.region}
         </label>
         <select
           id="region"
@@ -149,7 +148,7 @@ export function AddressFields({
           aria-describedby={errors?.region ? "region-error" : undefined}
           className={INPUT_CLASS}
         >
-          <option value="">Select a region…</option>
+          <option value="">{copy.addressFields.selectRegion}</option>
           {regions.map((r) => (
             <option key={r.value} value={r.value}>
               {r.label}
@@ -167,7 +166,7 @@ export function AddressFields({
         )}
         {loading && (
           <p className="mt-1 text-sm text-text-secondary">
-            Loading provinces…
+            {copy.addressFields.loadingProvinces}
           </p>
         )}
         {loadError && (
@@ -179,7 +178,7 @@ export function AddressFields({
 
       <div>
         <label htmlFor="province" className={LABEL_CLASS}>
-          Province
+          {copy.addressFields.province}
         </label>
         <select
           id="province"
@@ -197,7 +196,9 @@ export function AddressFields({
           className={INPUT_CLASS}
         >
           <option value="">
-            {region ? "Select a province…" : "Pick a region first"}
+            {region
+              ? copy.addressFields.selectProvince
+              : copy.addressFields.pickRegionFirst}
           </option>
           {provinces.map((p) => (
             <option key={p.name} value={p.name}>
@@ -218,7 +219,7 @@ export function AddressFields({
 
       <div>
         <label htmlFor="city" className={LABEL_CLASS}>
-          City / Municipality
+          {copy.addressFields.city}
         </label>
         <select
           id="city"
@@ -235,7 +236,9 @@ export function AddressFields({
           className={INPUT_CLASS}
         >
           <option value="">
-            {province ? "Select a city / municipality…" : "Pick a province first"}
+            {province
+              ? copy.addressFields.selectCity
+              : copy.addressFields.pickProvinceFirst}
           </option>
           {cities.map((c) => (
             <option key={c.name} value={c.name}>
@@ -256,7 +259,7 @@ export function AddressFields({
 
       <div>
         <label htmlFor="barangay" className={LABEL_CLASS}>
-          Barangay
+          {copy.addressFields.barangay}
         </label>
         <select
           id="barangay"
@@ -270,7 +273,9 @@ export function AddressFields({
           className={INPUT_CLASS}
         >
           <option value="">
-            {city ? "Select a barangay…" : "Pick a city first"}
+            {city
+              ? copy.addressFields.selectBarangay
+              : copy.addressFields.pickCityFirst}
           </option>
           {barangays.map((b) => (
             <option key={b} value={b}>
@@ -291,7 +296,7 @@ export function AddressFields({
 
       <div>
         <label htmlFor="street" className={LABEL_CLASS}>
-          Street / House no.
+          {copy.addressFields.street}
         </label>
         <input
           id="street"
@@ -317,7 +322,7 @@ export function AddressFields({
 
       <div>
         <label htmlFor="landmark" className={LABEL_CLASS}>
-          Landmark (optional)
+          {copy.addressFields.landmark}
         </label>
         <input
           id="landmark"

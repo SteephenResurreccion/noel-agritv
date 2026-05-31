@@ -5,6 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { PHONE_TEL } from "@/lib/constants";
 import { trackCallClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 interface CallCTAProps {
   label?: string;
@@ -15,7 +16,7 @@ interface CallCTAProps {
 }
 
 export function CallCTA({
-  label = "Call to Order",
+  label = copy.common.callToOrder,
   variant = "outline",
   size = "default",
   className,

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
 import { categories } from "@/data/categories";
 import { CartBadge } from "@/components/cart-badge";
+import { copy } from "@/lib/copy";
 
 interface SearchProduct {
   slug: string;
@@ -14,13 +15,7 @@ interface SearchProduct {
   image: string;
 }
 
-const TRENDING_SEARCHES = [
-  "Bio Plant Booster",
-  "Bio Enzyme",
-  "Rice Seeds",
-  "Jasmine",
-  "Mayumi",
-];
+const TRENDING_SEARCHES = copy.header.trendingTerms;
 
 export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct[] }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -100,9 +95,9 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               <button
                 onClick={() => setSearchOpen(true)}
                 className="hidden h-10 w-[280px] items-center justify-between rounded-md border border-text-primary/30 px-4 text-sm text-text-secondary/50 transition-colors hover:border-text-primary/50 md:flex"
-                aria-label="Search products"
+                aria-label={copy.header.searchProductsAriaLabel}
               >
-                <span>Search products...</span>
+                <span>{copy.header.searchProductsPlaceholder}</span>
                 <Search className="h-4 w-4" />
               </button>
 
@@ -110,7 +105,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               <button
                 onClick={() => setMobileMenuOpen(true)}
                 className="flex h-10 w-10 items-center justify-center md:hidden"
-                aria-label="Open menu"
+                aria-label={copy.header.openMenuAriaLabel}
               >
                 <Menu className="h-5 w-5 text-text-primary" />
               </button>
@@ -120,7 +115,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
             <Link href="/" className="flex items-center justify-center">
               <Image
                 src="/images/whitebglogo.png"
-                alt="Noel AgriTV"
+                alt={copy.header.logoAlt}
                 width={120}
                 height={120}
                 className="h-10 w-10 md:h-14 md:w-14"
@@ -133,31 +128,31 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               {/* Desktop nav */}
               <nav
                 className="hidden items-center gap-8 md:flex"
-                aria-label="Main navigation"
+                aria-label={copy.header.mainNavAriaLabel}
               >
                 <Link
                   href="/products"
                   className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
-                  Products
+                  {copy.common.productsNav}
                 </Link>
                 <Link
                   href="/about"
                   className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
-                  About
+                  {copy.header.navAbout}
                 </Link>
                 <Link
                   href="/contact"
                   className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
-                  Contact
+                  {copy.header.navContact}
                 </Link>
                 <Link
                   href="/lookup"
                   className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
-                  Find my order
+                  {copy.common.findMyOrder}
                 </Link>
               </nav>
 
@@ -168,7 +163,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               <button
                 onClick={() => setSearchOpen(true)}
                 className="flex h-10 w-10 items-center justify-center md:hidden"
-                aria-label="Search"
+                aria-label={copy.header.searchAriaLabel}
               >
                 <Search className="h-5 w-5 text-text-primary" />
               </button>
@@ -194,7 +189,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search products..."
+                  placeholder={copy.header.searchProductsPlaceholder}
                   className="h-12 w-full rounded-md border border-border bg-bg pl-9 pr-4 text-base text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none md:h-10 md:text-sm"
                 />
               </div>
@@ -203,7 +198,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 className="flex h-12 items-center px-3 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
               >
                 <X className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Close</span>
+                <span className="hidden md:inline">{copy.header.close}</span>
               </button>
             </div>
 
@@ -213,7 +208,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 {results.length > 0 ? (
                   <>
                     <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                      Products
+                      {copy.header.productsHeading}
                     </p>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                       {results.map((product) => (
@@ -252,7 +247,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   </>
                 ) : (
                   <p className="py-8 text-center text-sm text-text-secondary">
-                    No products found for &ldquo;{query}&rdquo;
+                    {copy.header.noResults(query)}
                   </p>
                 )}
               </div>
@@ -262,7 +257,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 {/* Trending Searches */}
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                    Trending Searches
+                    {copy.header.trendingSearches}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {TRENDING_SEARCHES.map((term) => (
@@ -280,7 +275,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 {/* Shop By Category */}
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                    Shop By Category
+                    {copy.header.shopByCategory}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {categories.map((cat) => (
@@ -299,7 +294,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 {/* Top Products */}
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                    Top Products
+                    {copy.header.topProducts}
                   </p>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                     {searchProducts.slice(0, 5).map((product) => (
@@ -354,7 +349,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
               <Image
                 src="/images/whitebglogo.png"
-                alt="Noel AgriTV"
+                alt={copy.header.logoAlt}
                 width={80}
                 height={80}
                 className="h-9 w-9"
@@ -362,14 +357,14 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex h-10 w-10 items-center justify-center"
-                aria-label="Close menu"
+                aria-label={copy.header.closeMenuAriaLabel}
               >
                 <X className="h-5 w-5 text-text-primary" />
               </button>
             </div>
 
             {/* Mobile nav links */}
-            <nav className="p-4" aria-label="Mobile navigation">
+            <nav className="p-4" aria-label={copy.header.mobileNavAriaLabel}>
               <ul className="space-y-1">
                 <li>
                   <Link
@@ -377,7 +372,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                     onClick={handleNavClick}
                     className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
-                    Home
+                    {copy.header.navHome}
                   </Link>
                 </li>
                 <li>
@@ -386,7 +381,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                     onClick={handleNavClick}
                     className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
-                    Products
+                    {copy.common.productsNav}
                   </Link>
                 </li>
                 <li>
@@ -395,7 +390,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                     onClick={handleNavClick}
                     className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
-                    About
+                    {copy.header.navAbout}
                   </Link>
                 </li>
                 <li>
@@ -404,7 +399,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                     onClick={handleNavClick}
                     className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
-                    Contact
+                    {copy.header.navContact}
                   </Link>
                 </li>
                 <li>
@@ -413,7 +408,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                     onClick={handleNavClick}
                     className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
-                    Find my order
+                    {copy.common.findMyOrder}
                   </Link>
                 </li>
               </ul>

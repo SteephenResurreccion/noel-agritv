@@ -10,6 +10,7 @@ import {
   type LookupResult,
 } from "@/lib/lookup";
 import { fetchAllOrderRows } from "@/lib/sheets-read";
+import { copy } from "@/lib/copy";
 
 /**
  * Buyer self-service order lookup.
@@ -57,7 +58,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     return {
       ok: false,
       error: "validation",
-      message: "Please double-check the form and try again.",
+      message: copy.errors.lookupFormCheck,
     };
   }
 
@@ -69,7 +70,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     return {
       ok: false,
       error: "turnstile",
-      message: "Anti-spam check failed. Please retry.",
+      message: copy.common.antiSpam,
     };
   }
 
@@ -80,7 +81,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
       return {
         ok: false,
         error: "rate_limited",
-        message: "Too many lookups. Please try again in a minute.",
+        message: copy.errors.tooManyLookups,
       };
     }
   }
@@ -94,8 +95,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     return {
       ok: false,
       error: "sheets",
-      message:
-        "We can't reach the order log right now — please message us.",
+      message: copy.errors.logUnreachable,
     };
   }
 
@@ -105,8 +105,7 @@ export async function lookupOrder(payload: unknown): Promise<LookupResult> {
     return {
       ok: false,
       error: "not_found",
-      message:
-        "Order not found. Double-check your order number and phone number, or message us.",
+      message: copy.errors.orderNotFound,
     };
   }
   return { ok: true, summary: summarizeRow(hit) };

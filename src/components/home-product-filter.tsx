@@ -5,6 +5,7 @@ import type { Category } from "@/data/categories";
 import type { Product } from "@/data/products";
 import { ProductCard } from "./product-card";
 import { cn } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 interface HomeProductFilterProps {
   categories: Category[];
@@ -22,7 +23,7 @@ export function HomeProductFilter({
       ? products
       : products.filter((p) => p.categorySlug === active);
 
-  const pills = [{ slug: "all", name: "All" }, ...categories];
+  const pills = [{ slug: "all", name: copy.common.filterAll }, ...categories];
 
   return (
     <>

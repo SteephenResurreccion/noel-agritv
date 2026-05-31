@@ -1,6 +1,7 @@
 import { JWT } from "google-auth-library";
 import type { ShippingEstimate } from "@/lib/shipping";
 import { formatCentavos } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 export interface OrderRowInput {
   orderNumber: string;
@@ -29,7 +30,7 @@ export function buildSheetRow(o: OrderRowInput): string[] {
     ? "FREE"
     : o.shipping.showFee
       ? formatCentavos(o.shipping.shippingCentavos)
-      : "Confirmed on call";
+      : copy.errors.shippingOnCall;
   return [
     o.orderNumber, // Order#
     o.timestampManila, // Timestamp (Asia/Manila)

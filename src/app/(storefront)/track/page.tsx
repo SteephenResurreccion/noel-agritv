@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { copy } from "@/lib/copy";
 
 /**
  * Official J&T Express Philippines tracking URL — links DIRECT to the tracking result.
@@ -36,19 +37,16 @@ export default function TrackPage() {
   return (
     <div className="container-site py-[var(--spacing-section)]">
       <h1 className="mb-3 text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-        Track My Order
+        {copy.track.title}
       </h1>
-      <p className="mb-6 max-w-md text-text-secondary">
-        Enter the tracking number we texted you to follow your order on
-        J&amp;T&apos;s official tracker.
-      </p>
+      <p className="mb-6 max-w-md text-text-secondary">{copy.track.help}</p>
       <form
         onSubmit={handleSubmit}
         className="flex max-w-md flex-col gap-3"
         noValidate
       >
         <label htmlFor="tracking-number" className="sr-only">
-          J&amp;T tracking number
+          {copy.track.waybill}
         </label>
         <input
           id="tracking-number"
@@ -59,7 +57,7 @@ export default function TrackPage() {
             setValue(e.target.value);
             if (showHint) setShowHint(false);
           }}
-          placeholder="J&T tracking number"
+          placeholder={copy.track.waybill}
           autoComplete="off"
           inputMode="text"
           className="h-11 w-full rounded-md border border-border bg-surface px-3 text-base text-text-primary focus:border-brand-accent focus:outline-none"
@@ -69,23 +67,23 @@ export default function TrackPage() {
             role="alert"
             className="text-sm text-text-secondary"
           >
-            Enter your tracking number to continue.
+            {copy.errors.trackEnterNumber}
           </p>
         )}
         <button
           type="submit"
           className="rounded-md bg-brand-darkest px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark"
         >
-          Track on J&amp;T
+          {copy.track.trackOnJt}
         </button>
       </form>
       <p className="mt-4 max-w-md text-sm text-text-secondary">
-        Don&apos;t have a tracking number yet?{" "}
+        {copy.track.noTrackingYet}{" "}
         <Link
           href="/lookup"
           className="font-semibold text-brand-darkest underline underline-offset-4 hover:text-brand-dark"
         >
-          Look up your order
+          {copy.track.lookup}
         </Link>
       </p>
     </div>

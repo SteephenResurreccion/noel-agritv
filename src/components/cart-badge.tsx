@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHasMounted } from "@/lib/use-has-mounted";
+import { copy } from "@/lib/copy";
 
 export function CartBadge() {
   const mounted = useHasMounted();
@@ -12,13 +13,13 @@ export function CartBadge() {
   return (
     <Link
       href="/cart"
-      aria-label={`Cart${mounted && count > 0 ? `, ${count} items` : ""}`}
+      aria-label={mounted && count > 0 ? copy.cartBadge.aria(count) : copy.cartBadge.label}
       className="relative flex h-10 w-10 items-center justify-center"
     >
       <ShoppingCart className="h-5 w-5 text-text-primary" />
       {mounted && count > 0 && (
         <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-accent px-1 text-[10px] font-bold text-white">
-          {count > 99 ? "99+" : count}
+          {count > 99 ? copy.cartBadge.overflow : count}
         </span>
       )}
     </Link>

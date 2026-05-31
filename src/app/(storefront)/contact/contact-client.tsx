@@ -17,29 +17,7 @@ import {
   PHONE_NUMBER,
   PHONE_TEL,
 } from "@/lib/constants";
-
-const faqs = [
-  {
-    question: "Is this the same Noel AgriTV from Facebook?",
-    answer:
-      "Yes, this is the official website of Noel AgriTV. You can verify by checking our Facebook page — the link is the same one Noel shares in his videos.",
-  },
-  {
-    question: "Do you deliver nationwide?",
-    answer:
-      "Yes, we deliver nationwide through J&T Express. Delivery times vary by province — typically 3-7 business days depending on your location.",
-  },
-  {
-    question: "How do I order?",
-    answer:
-      "Message us on Facebook or call — we'll confirm your order and arrange delivery via J&T.",
-  },
-  {
-    question: "How long does delivery take?",
-    answer:
-      "Delivery times vary by province. Metro Manila typically receives orders within 2-3 business days. Provincial deliveries usually take 3-7 business days through J&T Express.",
-  },
-];
+import { copy } from "@/lib/copy";
 
 export function ContactPageClient() {
   return (
@@ -51,10 +29,10 @@ export function ContactPageClient() {
             className="font-bold text-white"
             style={{ fontSize: "var(--font-size-h1)" }}
           >
-            Get In Touch
+            {copy.contact.heading}
           </h1>
           <p className="mt-3 text-white/70">
-            We&apos;d love to hear from you
+            {copy.contact.subheading}
           </p>
         </div>
       </section>
@@ -72,12 +50,12 @@ export function ContactPageClient() {
           >
             <MessageCircle className="mt-0.5 size-6 shrink-0 text-brand-accent" />
             <div>
-              <p className="font-semibold">Facebook Messenger</p>
+              <p className="font-semibold">{copy.contact.messengerTitle}</p>
               <p className="mt-0.5 text-sm text-white/70">
-                We typically reply within a few hours (Mon–Sat, 8am–6pm PHT)
+                {copy.contact.messengerHours}
               </p>
               <p className="mt-2 text-sm font-semibold text-brand-accent">
-                Message Us on Facebook →
+                {copy.contact.messengerCta}
               </p>
             </div>
           </Link>
@@ -89,9 +67,9 @@ export function ContactPageClient() {
           >
             <Phone className="mt-0.5 size-6 shrink-0 text-brand-accent" />
             <div>
-              <p className="font-semibold">Phone</p>
+              <p className="font-semibold">{copy.contact.phoneTitle}</p>
               <p className="mt-0.5 text-sm text-text-secondary">
-                {PHONE_NUMBER} — Tap to call
+                {copy.contact.phoneHelp(PHONE_NUMBER)}
               </p>
             </div>
           </Link>
@@ -116,9 +94,9 @@ export function ContactPageClient() {
               <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
             </svg>
             <div>
-              <p className="font-semibold">Facebook Page</p>
+              <p className="font-semibold">{copy.contact.facebookPageTitle}</p>
               <p className="mt-0.5 text-sm text-text-secondary">
-                facebook.com/noeltolentino2728
+                {copy.contact.facebookPageHandle}
               </p>
             </div>
           </Link>
@@ -130,7 +108,7 @@ export function ContactPageClient() {
           >
             <Mail className="mt-0.5 size-6 shrink-0 text-brand-accent" />
             <div>
-              <p className="font-semibold">Email</p>
+              <p className="font-semibold">{copy.contact.emailTitle}</p>
               <p className="mt-0.5 text-sm text-text-secondary">{EMAIL}</p>
             </div>
           </Link>
@@ -144,14 +122,12 @@ export function ContactPageClient() {
           >
             <Package className="mt-0.5 size-6 shrink-0 text-brand-accent" />
             <div>
-              <p className="font-semibold">Wholesale Inquiries</p>
+              <p className="font-semibold">{copy.contact.wholesaleTitle}</p>
               <p className="mt-0.5 text-sm text-white/70">
-                Buying in bulk? We offer volume discounts on all products with
-                nationwide J&T delivery. Message us or call for wholesale
-                pricing.
+                {copy.contact.wholesaleHelp}
               </p>
               <p className="mt-2 text-sm font-semibold text-brand-accent">
-                Inquire on Messenger →
+                {copy.contact.wholesaleCta}
               </p>
             </div>
           </Link>
@@ -165,14 +141,14 @@ export function ContactPageClient() {
             className="font-bold text-text-primary"
             style={{ fontSize: "var(--font-size-h2)" }}
           >
-            Frequently Asked Questions
+            {copy.contact.faqHeading}
           </h2>
           <div className="mt-6">
             <Accordion>
-              {faqs.map((faq, index) => (
+              {copy.faq.map((faq, index) => (
                 <AccordionItem key={index} value={String(index)}>
-                  <AccordionTrigger>{faq.question}</AccordionTrigger>
-                  <AccordionContent>{faq.answer}</AccordionContent>
+                  <AccordionTrigger>{faq.q}</AccordionTrigger>
+                  <AccordionContent>{faq.a}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>

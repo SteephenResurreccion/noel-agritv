@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { categories } from "@/data/categories";
 import { trackCategoryFilter } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 export function CategoryFilter() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function CategoryFilter() {
     }
   }
 
-  const pills = [{ slug: "all", name: "All" }, ...categories];
+  const pills = [{ slug: "all", name: copy.common.filterAll }, ...categories];
 
   return (
     <div className="flex gap-2 overflow-x-auto pb-2">

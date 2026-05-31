@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * formatPrice(1000) → "₱1,000"
  */
 export function formatPrice(amount: number): string {
-  return `₱${amount.toLocaleString("en-PH")}`;
+  return `₱${amount.toLocaleString("fil-PH")}`;
 }
 
 /**
@@ -24,7 +24,7 @@ export function formatPrice(amount: number): string {
 export function formatCentavos(centavos: number): string {
   const pesos = centavos / 100;
   const hasFraction = centavos % 100 !== 0;
-  return `₱${pesos.toLocaleString("en-PH", {
+  return `₱${pesos.toLocaleString("fil-PH", {
     minimumFractionDigits: hasFraction ? 2 : 0,
     maximumFractionDigits: 2,
   })}`;

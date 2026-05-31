@@ -1,5 +1,6 @@
 import { type PriceTier } from "@/lib/pricing";
 import { cn, formatCentavos } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 export interface TierTableProps {
   tiers: PriceTier[];
@@ -40,13 +41,13 @@ export function TierTable({ tiers, activeQty }: TierTableProps) {
             scope="col"
             className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.06em] text-white/92"
           >
-            Quantity
+            {copy.tierTable.qty}
           </th>
           <th
             scope="col"
             className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.06em] text-white/92"
           >
-            Price each
+            {copy.tierTable.priceEach}
           </th>
         </tr>
       </thead>

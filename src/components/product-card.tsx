@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/data/products";
 import { formatCentavos } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "./messenger-cta";
 
@@ -50,7 +51,7 @@ export function ProductCard({ product }: ProductCardProps) {
               </p>
               {product.priceTiers && product.priceTiers.length > 0 && (
                 <span className="rounded-full bg-bg-wheat px-2.5 py-1 text-xs font-semibold text-brand-accent">
-                  Wholesale available
+                  {copy.productCard.wholesaleAvailable}
                 </span>
               )}
             </div>
@@ -68,7 +69,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <MessengerCTA
               productName={product.name}
               packSize=""
-              label="Message Us"
+              label={copy.common.messenger}
               variant="default"
               size="default"
               context="catalog"

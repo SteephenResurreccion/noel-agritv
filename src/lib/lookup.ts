@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { copy } from "@/lib/copy";
 
 /**
  * Canonical order-number shape: `NAG-YYYYMMDD-XXXXXX` where the suffix is 4–6
@@ -38,11 +39,11 @@ export const lookupSchema = z.object({
   orderNumber: z
     .string()
     .trim()
-    .regex(ORDER_NUMBER_RE, "Order number format is NAG-YYYYMMDD-XXXX"),
+    .regex(ORDER_NUMBER_RE, copy.errors.orderFormat),
   phoneLast4: z
     .string()
     .trim()
-    .regex(/^\d{4}$/, "Enter the last 4 digits of your phone"),
+    .regex(/^\d{4}$/, copy.errors.last4),
   /**
    * Cloudflare Turnstile token, mirroring `checkoutSchema` in `@/lib/order`.
    * `lookupOrder` verifies it server-side via `verifyTurnstile` BEFORE any
@@ -51,7 +52,7 @@ export const lookupSchema = z.object({
    * token fails verification anyway, but rejecting it at the schema avoids a
    * pointless siteverify round-trip.
    */
-  turnstileToken: z.string().min(1, "Anti-spam check failed. Please retry."),
+  turnstileToken: z.string().min(1, copy.common.antiSpam),
 });
 
 export type LookupInput = z.infer<typeof lookupSchema>;

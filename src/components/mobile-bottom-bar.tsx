@@ -5,12 +5,13 @@ import { ShoppingBag, MessageCircle, Phone, Send } from "lucide-react";
 import { MESSENGER_URL, PHONE_NUMBER, PHONE_TEL } from "@/lib/constants";
 import { trackMessengerClick, trackCallClick } from "@/lib/analytics";
 import { openMessenger } from "@/lib/open-messenger";
+import { copy } from "@/lib/copy";
 
 export function MobileBottomBar() {
   return (
     <nav
       role="navigation"
-      aria-label="Quick actions"
+      aria-label={copy.mobileBottomBar.quickActionsAriaLabel}
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface md:hidden"
     >
       <div className="flex h-16 items-stretch">
@@ -19,7 +20,7 @@ export function MobileBottomBar() {
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
           <ShoppingBag className="h-5 w-5 shrink-0" />
-          <span className="text-[11px] font-semibold">Products</span>
+          <span className="text-[11px] font-semibold">{copy.mobileBottomBar.products}</span>
         </Link>
         <a
           href={MESSENGER_URL}
@@ -28,14 +29,14 @@ export function MobileBottomBar() {
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
           <MessageCircle className="h-5 w-5 shrink-0" />
-          <span className="text-[11px] font-semibold">Messenger</span>
+          <span className="text-[11px] font-semibold">{copy.mobileBottomBar.messenger}</span>
         </a>
         <a
           href={`sms:${PHONE_NUMBER.replace(/-/g, "")}`}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
           <Send className="h-5 w-5 shrink-0" />
-          <span className="text-[11px] font-semibold">SMS</span>
+          <span className="text-[11px] font-semibold">{copy.mobileBottomBar.sms}</span>
         </a>
         <a
           href={PHONE_TEL}
@@ -43,7 +44,7 @@ export function MobileBottomBar() {
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-text-primary active:bg-bg"
         >
           <Phone className="h-5 w-5 shrink-0" />
-          <span className="text-[11px] font-semibold">Call</span>
+          <span className="text-[11px] font-semibold">{copy.mobileBottomBar.call}</span>
         </a>
       </div>
     </nav>

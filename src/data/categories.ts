@@ -8,14 +8,14 @@ export interface Category {
 export const categories: Category[] = [
   {
     slug: "crop-care",
-    name: "Crop Care",
-    subtitle: "Boosters & Enzymes",
+    name: "Pangalaga sa Pananim",
+    subtitle: "Mga Booster at Enzyme",
     image: "/images/categories/crop-care.webp",
   },
   {
     slug: "seeds",
-    name: "Seeds",
-    subtitle: "Rice Varieties",
+    name: "Mga Binhi",
+    subtitle: "Mga Uri ng Palay",
     image: "/images/categories/seeds.webp",
   },
 ];

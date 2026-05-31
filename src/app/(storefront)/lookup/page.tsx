@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { copy } from "@/lib/copy";
 import { LookupForm } from "./lookup-form";
 
 /**
@@ -30,15 +31,12 @@ export default async function LookupPage({ searchParams }: LookupPageProps) {
   return (
     <div className="container-site py-[var(--spacing-section)]">
       <h1 className="mb-3 text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-        Find my order
+        {copy.common.findMyOrder}
       </h1>
-      <p className="mb-6 max-w-md text-text-secondary">
-        Enter your order number and the last 4 digits of the phone number you
-        used at checkout to see your order status.
-      </p>
+      <p className="mb-6 max-w-md text-text-secondary">{copy.lookup.help}</p>
       <Suspense
         fallback={
-          <p className="text-text-secondary">Loading lookup form…</p>
+          <p className="text-text-secondary">{copy.lookup.loadingForm}</p>
         }
       >
         <LookupForm initialOrderNumber={initialOrderNumber} />

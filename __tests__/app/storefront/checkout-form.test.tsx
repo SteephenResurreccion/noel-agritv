@@ -5,6 +5,7 @@ import { CheckoutForm } from "@/app/(storefront)/checkout/checkout-form";
 import { useCart } from "@/lib/cart-store";
 import type { ShippingConfig } from "@/lib/admin-store";
 import { PH_REGIONS } from "@/lib/ph-regions";
+import { copy } from "@/lib/copy";
 
 // Server action — mock so a failed submit only updates errors state.
 vi.mock("@/app/(storefront)/checkout/actions", () => ({
@@ -57,43 +58,47 @@ describe("CheckoutForm — live field validation", () => {
   it("clears the name error as soon as the user types a valid value", async () => {
     render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
     // Trigger validation by submitting an empty form.
-    await userEvent.click(screen.getByRole("button", { name: /place order/i }));
+    await userEvent.click(screen.getByRole("button", { name: copy.checkout.place }));
     // Name error should now be visible.
     await waitFor(() => {
-      expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(copy.errors.nameRequired)).toBeInTheDocument();
     });
     // Type a valid name — the error should disappear on input.
-    const nameInput = screen.getByLabelText(/^name$/i);
+    const nameInput = screen.getByLabelText(copy.checkout.name);
     await userEvent.type(nameInput, "Juan");
     await waitFor(() => {
-      expect(screen.queryByText(/name is required/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(copy.errors.nameRequired)
+      ).not.toBeInTheDocument();
     });
   });
 
   it("does not surface validation errors before the first submit", async () => {
     render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
-    const nameInput = screen.getByLabelText(/^name$/i);
+    const nameInput = screen.getByLabelText(copy.checkout.name);
     await userEvent.type(nameInput, "J");
     // No errors should be visible — we haven't submitted yet.
-    expect(screen.queryByText(/name is required/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/enter a valid ph mobile number/i)
+      screen.queryByText(copy.errors.nameRequired)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(copy.errors.phone)
     ).not.toBeInTheDocument();
   });
 
   it("clears the consent error the moment the checkbox is ticked", async () => {
     render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
-    await userEvent.click(screen.getByRole("button", { name: /place order/i }));
+    await userEvent.click(screen.getByRole("button", { name: copy.checkout.place }));
     await waitFor(() => {
       expect(
-        screen.getByText(/must agree to the privacy notice/i)
+        screen.getByText(copy.errors.privacyRequired)
       ).toBeInTheDocument();
     });
     const consent = screen.getByRole("checkbox");
     await userEvent.click(consent);
     await waitFor(() => {
       expect(
-        screen.queryByText(/must agree to the privacy notice/i)
+        screen.queryByText(copy.errors.privacyRequired)
       ).not.toBeInTheDocument();
     });
   });
@@ -102,10 +107,10 @@ describe("CheckoutForm — live field validation", () => {
     render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
     const phoneInput = screen.getByLabelText(/mobile number/i);
     await userEvent.type(phoneInput, "123");
-    await userEvent.click(screen.getByRole("button", { name: /place order/i }));
+    await userEvent.click(screen.getByRole("button", { name: copy.checkout.place }));
     await waitFor(() => {
       expect(
-        screen.getByText(/enter a valid ph mobile number/i)
+        screen.getByText(copy.errors.phone)
       ).toBeInTheDocument();
     });
     // Fix the value — error should disappear without a second submit.
@@ -113,22 +118,24 @@ describe("CheckoutForm — live field validation", () => {
     await userEvent.type(phoneInput, "09171234567");
     await waitFor(() => {
       expect(
-        screen.queryByText(/enter a valid ph mobile number/i)
+        screen.queryByText(copy.errors.phone)
       ).not.toBeInTheDocument();
     });
   });
 
   it("re-validates region as soon as a valid region is picked", async () => {
     render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
-    await userEvent.click(screen.getByRole("button", { name: /place order/i }));
+    await userEvent.click(screen.getByRole("button", { name: copy.checkout.place }));
     await waitFor(() => {
-      expect(screen.getByText(/select a valid region/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(copy.errors.regionInvalid)
+      ).toBeInTheDocument();
     });
-    const regionSelect = screen.getByLabelText(/region/i);
+    const regionSelect = screen.getByLabelText(copy.addressFields.region);
     await userEvent.selectOptions(regionSelect, "NCR");
     await waitFor(() => {
       expect(
-        screen.queryByText(/select a valid region/i)
+        screen.queryByText(copy.errors.regionInvalid)
       ).not.toBeInTheDocument();
     });
   });
@@ -159,11 +166,11 @@ describe("CheckoutForm — free-shipping summary mirrors the server", () => {
     });
     render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
     await waitFor(() => {
-      expect(screen.getByText(/^FREE$/)).toBeInTheDocument();
+      expect(screen.getByText(copy.checkout.free)).toBeInTheDocument();
     });
     // The "confirmed on the call" fallback must NOT show — free overrides it.
     expect(
-      screen.queryByText(/shipping confirmed on the call/i)
+      screen.queryByText(copy.checkout.shippingOnCall)
     ).not.toBeInTheDocument();
     // Estimated total equals the subtotal (no shipping added). 4 × ₱500 = ₱2,000
     // appears both as the line total and the estimated total — both correct.
@@ -240,7 +247,7 @@ describe("CheckoutForm — hooks order across cart hydration", () => {
     try {
       // First render: empty cart → "Your cart is empty" early-return path.
       render(<CheckoutForm shipping={shippingConfig} regions={PH_REGIONS} />);
-      expect(screen.getByText(/your cart is empty/i)).toBeInTheDocument();
+      expect(screen.getByText(copy.cart.empty)).toBeInTheDocument();
 
       // Hydration: the store gains items, flipping the early-return branch.
       // With the bug (useCallback below the early return) this re-render
@@ -250,7 +257,7 @@ describe("CheckoutForm — hooks order across cart hydration", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(copy.checkout.name)).toBeInTheDocument();
       });
 
       // No React hooks-order invariant should have been logged.

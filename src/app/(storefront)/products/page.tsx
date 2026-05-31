@@ -5,13 +5,13 @@ import { ProductCard } from "@/components/product-card";
 import { CategoryFilter } from "@/components/category-filter";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
+import { copy } from "@/lib/copy";
 
 export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
 export const metadata: Metadata = {
-  title: "All Products",
-  description:
-    "Browse Noel AgriTV's bio-organic crop care products and quality rice seeds. Message us to order.",
+  title: copy.meta.productsTitle,
+  description: copy.meta.productsDescription,
 };
 
 export default async function ProductsPage({
@@ -51,7 +51,7 @@ export default async function ProductsPage({
     <div className="bg-bg py-[var(--spacing-section)]">
       <div className="container-site">
         <h1 className="mb-6 text-center text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-          All Products
+          {copy.productList.title}
         </h1>
         <div className="mb-6">
           <Suspense>
@@ -60,7 +60,7 @@ export default async function ProductsPage({
         </div>
         {filtered.length === 0 ? (
           <p className="py-12 text-center text-sm text-text-secondary">
-            No products found in this category.
+            {copy.productList.empty}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-[var(--spacing-grid-gap)] min-[375px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1200px]:grid-cols-4">
