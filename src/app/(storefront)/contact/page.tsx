@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { copy } from "@/lib/copy";
+
 import { ContactPageClient } from "./contact-client";
 
 export const metadata: Metadata = {
@@ -11,40 +13,14 @@ export const metadata: Metadata = {
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Is this the same Noel AgriTV from Facebook?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes, this is the official website of Noel AgriTV. You can verify by checking our Facebook page — the link is the same one Noel shares in his videos.",
-      },
+  mainEntity: copy.faq.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.a,
     },
-    {
-      "@type": "Question",
-      name: "Do you deliver nationwide?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes, we deliver nationwide through J&T Express. Delivery times vary by province — typically 3-7 business days depending on your location.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How do I order?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Message us on Facebook or call — we'll confirm your order and arrange delivery via J&T.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How long does delivery take?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Delivery times vary by province. Metro Manila typically receives orders within 2-3 business days. Provincial deliveries usually take 3-7 business days through J&T Express.",
-      },
-    },
-  ],
+  })),
 };
 
 export default function ContactPage() {
