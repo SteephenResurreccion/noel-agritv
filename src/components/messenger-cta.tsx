@@ -6,6 +6,7 @@ import { MESSENGER_URL } from "@/lib/constants";
 import { trackMessengerClick } from "@/lib/analytics";
 import { openMessenger } from "@/lib/open-messenger";
 import { cn } from "@/lib/utils";
+import { copy } from "@/lib/copy";
 
 interface MessengerCTAProps {
   productName?: string;
@@ -26,7 +27,8 @@ export function MessengerCTA({
   context,
 }: MessengerCTAProps) {
   const displayLabel =
-    label ?? (productName ? "Message Us About This Product" : "Message Us");
+    label ??
+    (productName ? copy.common.messengerAboutProduct : copy.common.messenger);
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
