@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { copy } from "@/lib/copy";
 import { ConfirmationContent } from "./confirmation-content";
 
 export default function ConfirmationPage() {
@@ -8,7 +9,7 @@ export default function ConfirmationPage() {
     <Suspense
       fallback={
         <div className="container-site py-[var(--spacing-section)] text-center text-text-secondary">
-          Loading…
+          {copy.common.loading}
         </div>
       }
     >

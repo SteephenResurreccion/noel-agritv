@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-store";
+import { copy } from "@/lib/copy";
 
 export function ConfirmationContent() {
   const params = useSearchParams();
@@ -32,16 +33,16 @@ export function ConfirmationContent() {
     <div className="container-site py-[var(--spacing-section)]">
       <div className="mx-auto max-w-md text-center">
         <h1 className="text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-          Order received
+          {copy.confirmation.received}
         </h1>
         <p className="mt-3 text-text-secondary">
-          Our team will text/call you to confirm your order before shipping.
+          {copy.confirmation.teamWillContact}
         </p>
 
         {order && (
           <div className="mt-6 rounded-md border border-brand-mid bg-surface p-5 text-left">
             <p className="text-sm font-semibold text-text-secondary">
-              Save your order number
+              {copy.confirmation.save}
             </p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="font-mono text-lg font-semibold text-brand-darkest break-all">
@@ -50,17 +51,17 @@ export function ConfirmationContent() {
               <button
                 type="button"
                 onClick={handleCopy}
-                aria-label="Copy order number"
+                aria-label={copy.confirmation.copyAriaLabel}
                 className="min-h-11 shrink-0 rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-text-primary hover:bg-bg-wheat"
               >
-                {copied ? "Copied ✓" : "Copy"}
+                {copied ? copy.confirmation.copied : copy.confirmation.copy}
               </button>
             </div>
             <Link
               href={`/lookup?order=${encodeURIComponent(order)}`}
               className="mt-4 inline-block text-sm font-semibold text-brand-darkest underline underline-offset-4 hover:text-brand-dark"
             >
-              Check status any time
+              {copy.confirmation.checkStatus}
             </Link>
           </div>
         )}
@@ -69,7 +70,7 @@ export function ConfirmationContent() {
           href="/products"
           className="mt-6 inline-block min-h-11 rounded-md bg-brand-darkest px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
         >
-          Continue shopping
+          {copy.common.continueShopping}
         </Link>
       </div>
     </div>

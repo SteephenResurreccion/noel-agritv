@@ -194,4 +194,152 @@ export const copy = {
     aria: (n: number) => `Cart, ${n} items`,
     overflow: "99+",
   },
+  checkout: {
+    title: "Checkout",
+    contact: "Contact",
+    name: "Name",
+    mobile: "Mobile number",
+    phonePlaceholder: "09XXXXXXXXX",
+    deliveryAddress: "Delivery address",
+    orderNotes: "Order notes",
+    notesLabel: "Notes for the team (optional)",
+    payment: "Payment",
+    cod: "Cash on Delivery (COD)",
+    privacy: "Privacy",
+    privacyNotice:
+      "By placing this order you agree that Noel AgriTV will use your name, phone number, and address solely to process and deliver your order, per the Data Privacy Act of 2012 (RA 10173).",
+    orderSummary: "Order summary",
+    lineItem: (unit: string, qty: number) => `${unit} × ${qty}`,
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    free: "FREE",
+    estimatedTotal: "Estimated total",
+    estimatedShipping: "Estimated shipping",
+    shippingOnCall: "Shipping confirmed on the call.",
+    placing: "Placing order…",
+    place: "Place order",
+    messageToComplete: "Message us to complete your order",
+  },
+  confirmation: {
+    received: "Order received",
+    teamWillContact:
+      "Our team will text/call you to confirm your order before shipping.",
+    save: "Save your order number",
+    copyAriaLabel: "Copy order number",
+    copied: "Copied ✓",
+    copy: "Copy",
+    checkStatus: "Check status any time",
+  },
+  lookup: {
+    // title reuses copy.common.findMyOrder ("Find my order") — same byte-for-byte
+    help: "Enter your order number and the last 4 digits of the phone number you used at checkout to see your order status.",
+    loadingForm: "Loading lookup form…",
+    orderNumber: "Order number",
+    orderNumberPlaceholder: "NAG-YYYYMMDD-XXXX",
+    last4: "Last 4 digits of your phone",
+    last4Placeholder: "1234",
+    looking: "Looking up…",
+    // submit (resolved) reuses copy.common.findMyOrder ("Find my order")
+    messageUsOnMessenger: "Message us on Messenger",
+    items: "Items",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    trackJt: "Track shipment on J&T →",
+    confirmedNotice:
+      "Your order is confirmed. We'll text you the tracking number once it's booked with J&T.",
+    messageUs: "Message us",
+  },
+  track: {
+    title: "Track My Order",
+    help: "Enter the tracking number we texted you to follow your order on J&T's official tracker.",
+    waybill: "J&T tracking number",
+    hint: "Enter your tracking number to continue.",
+    trackOnJt: "Track on J&T",
+    noTrackingYet: "Don't have a tracking number yet?",
+    lookup: "Look up your order",
+  },
+  about: {
+    missionEyebrow: "Our Mission",
+    heroHeading: "Helping Filipino farmers grow more with natural solutions",
+    heroBody:
+      "Since 2021, Noel AgriTV has been sharing practical, affordable bio-organic farming techniques that work in Philippine soil and climate — and selling only the products we trust.",
+    storyHeading: "The Story",
+    storyP1:
+      "Noel Tolentino started Noel AgriTV in 2021 with a simple goal: share practical, affordable bio-organic farming techniques that actually work in Philippine soil and climate. What began as a Facebook page grew into a community of over 250,000 farmers, gardeners, and agriculture enthusiasts across the country.",
+    storyP2:
+      "Every product we carry has been tested on Noel's own farm. We only sell what we believe in — natural solutions that improve yields, reduce chemical dependence, and fit within the budget of the everyday Filipino farmer.",
+    storyP3: "From seed to harvest, we're here to help you grow.",
+    byTheNumbersHeading: "By the Numbers",
+    statFollowers: "Facebook Followers",
+    statFounded: "Founded",
+    portraitAlt: "Noel Tolentino with plants on his farm",
+    believeHeading: "What We Believe",
+    believeItems: [
+      {
+        title: "Test everything ourselves",
+        desc: "Every product is field-tested on Noel’s farm before it reaches yours.",
+      },
+      {
+        title: "Natural first",
+        desc: "Bio-organic solutions that improve yields without harsh chemicals.",
+      },
+      {
+        title: "Affordable for every farmer",
+        desc: "Quality products priced for the everyday Filipino grower, not just large operations.",
+      },
+      {
+        title: "Teach, don’t just sell",
+        desc: "Free farming tips and tutorials on Facebook and YouTube — because knowledge grows harvests.",
+      },
+    ],
+    joinEyebrow: "Join the Community",
+    followHeading: "Follow Noel's journey",
+    followBody:
+      "Daily farming tips, product demonstrations, and behind-the-scenes content from the farm.",
+    facebook: "Facebook",
+    youtube: "YouTube",
+    // "Message Us" CTA reuses copy.common.messenger
+  },
+  contact: {
+    heading: "Get In Touch",
+    subheading: "We'd love to hear from you",
+    messengerTitle: "Facebook Messenger",
+    messengerHours:
+      "We typically reply within a few hours (Mon–Sat, 8am–6pm PHT)",
+    messengerCta: "Message Us on Facebook →",
+    phoneTitle: "Phone",
+    phoneHelp: (phone: string) => `${phone} — Tap to call`,
+    facebookPageTitle: "Facebook Page",
+    facebookPageHandle: "facebook.com/noeltolentino2728",
+    emailTitle: "Email",
+    wholesaleTitle: "Wholesale Inquiries",
+    wholesaleHelp:
+      "Buying in bulk? We offer volume discounts on all products with nationwide J&T delivery. Message us or call for wholesale pricing.",
+    wholesaleCta: "Inquire on Messenger →",
+    faqHeading: "Frequently Asked Questions",
+  },
+  faq: [
+    {
+      q: "Is this the same Noel AgriTV from Facebook?",
+      a: "Yes, this is the official website of Noel AgriTV. You can verify by checking our Facebook page — the link is the same one Noel shares in his videos.",
+    },
+    {
+      q: "Do you deliver nationwide?",
+      a: "Yes, we deliver nationwide through J&T Express. Delivery times vary by province — typically 3-7 business days depending on your location.",
+    },
+    {
+      q: "How do I order?",
+      a: "Message us on Facebook or call — we'll confirm your order and arrange delivery via J&T.",
+    },
+    {
+      q: "How long does delivery take?",
+      a: "Delivery times vary by province. Metro Manila typically receives orders within 2-3 business days. Provincial deliveries usually take 3-7 business days through J&T Express.",
+    },
+  ],
+  notFound: {
+    code: "404",
+    message: "Page not found — this link may have been moved or removed.",
+    home: "Go Home",
+    // browse CTA reuses copy.common.browseProducts ("Browse Products")
+  },
 } as const;

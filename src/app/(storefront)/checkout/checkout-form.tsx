@@ -14,6 +14,7 @@ import { TurnstileWidget } from "@/components/turnstile-widget";
 import { AddressFields, type AddressField } from "@/components/address-fields";
 import { GeolocateButton } from "@/components/geolocate-button";
 import { MESSENGER_URL } from "@/lib/constants";
+import { copy } from "@/lib/copy";
 import { submitOrder } from "./actions";
 
 export interface CheckoutFormProps {
@@ -64,9 +65,6 @@ const INITIAL_FIELDS: FormFields = {
   notes: "",
   consent: false,
 };
-
-const RA_10173_NOTICE =
-  "By placing this order you agree that Noel AgriTV will use your name, phone number, and address solely to process and deliver your order, per the Data Privacy Act of 2012 (RA 10173).";
 
 const LABEL_CLASS =
   "block text-sm font-medium text-text-primary";
@@ -138,13 +136,13 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
     return (
       <div className="py-[var(--spacing-section)] text-center">
         <h2 className="text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-          Your cart is empty
+          {copy.cart.empty}
         </h2>
         <Link
           href="/products"
           className="mt-4 inline-block rounded-md bg-brand-darkest px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
         >
-          Browse products
+          {copy.cart.browse}
         </Link>
       </div>
     );
@@ -203,11 +201,11 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
       <div className="space-y-6">
         <section className="space-y-4">
           <h2 className="text-[length:var(--font-size-h2)] font-semibold text-brand-darkest">
-            Contact
+            {copy.checkout.contact}
           </h2>
           <div>
             <label htmlFor="name" className={LABEL_CLASS}>
-              Name
+              {copy.checkout.name}
             </label>
             <input
               id="name"
@@ -229,7 +227,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
           </div>
           <div>
             <label htmlFor="phone" className={LABEL_CLASS}>
-              Mobile number
+              {copy.checkout.mobile}
             </label>
             <input
               id="phone"
@@ -238,7 +236,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               required
               inputMode="tel"
               autoComplete="tel"
-              placeholder="09XXXXXXXXX"
+              placeholder={copy.checkout.phonePlaceholder}
               value={fields.phone}
               onChange={(e) => updateField("phone", e.target.value)}
               aria-invalid={errors.phone?.[0] ? "true" : "false"}
@@ -255,7 +253,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
 
         <section className="space-y-4">
           <h2 className="text-[length:var(--font-size-h2)] font-semibold text-brand-darkest">
-            Delivery address
+            {copy.checkout.deliveryAddress}
           </h2>
           <GeolocateButton
             onPrefill={(p) => {
@@ -294,11 +292,11 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
 
         <section className="space-y-4">
           <h2 className="text-[length:var(--font-size-h2)] font-semibold text-brand-darkest">
-            Order notes
+            {copy.checkout.orderNotes}
           </h2>
           <div>
             <label htmlFor="notes" className={LABEL_CLASS}>
-              Notes for the team (optional)
+              {copy.checkout.notesLabel}
             </label>
             <textarea
               id="notes"
@@ -320,16 +318,16 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
 
         <section className="space-y-4">
           <h2 className="text-[length:var(--font-size-h2)] font-semibold text-brand-darkest">
-            Payment
+            {copy.checkout.payment}
           </h2>
           <p className="rounded-md border border-border bg-surface px-3 py-2 text-base text-text-primary">
-            Cash on Delivery (COD)
+            {copy.checkout.cod}
           </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-[length:var(--font-size-h2)] font-semibold text-brand-darkest">
-            Privacy
+            {copy.checkout.privacy}
           </h2>
           <label className="flex items-start gap-3 text-sm text-text-secondary">
             <input
@@ -344,7 +342,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               }
               className="mt-1 h-4 w-4 rounded border-border text-brand-mid focus:ring-brand-mid"
             />
-            <span>{RA_10173_NOTICE}</span>
+            <span>{copy.checkout.privacyNotice}</span>
           </label>
           {errors.consent?.[0] && (
             <p id="consent-error" role="alert" className={ERROR_CLASS}>
@@ -363,7 +361,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
 
       <aside className="space-y-4 self-start rounded-md border border-border bg-surface p-4">
         <h2 className="text-[length:var(--font-size-h3)] font-semibold text-brand-darkest">
-          Order summary
+          {copy.checkout.orderSummary}
         </h2>
         <ul className="space-y-3">
           {items.map((i) => (
@@ -376,7 +374,10 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               <div className="flex-1 text-sm">
                 <p className="font-semibold text-text-primary">{i.name}</p>
                 <p className="text-text-secondary">
-                  {formatCentavos(lineUnitPriceCentavos(i))} × {i.qty}
+                  {copy.checkout.lineItem(
+                    formatCentavos(lineUnitPriceCentavos(i)),
+                    i.qty
+                  )}
                 </p>
               </div>
               <p className="text-sm font-semibold text-text-primary">
@@ -388,18 +389,20 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
 
         <div className="border-t border-border pt-3 text-sm">
           <div className="flex items-center justify-between text-text-primary">
-            <span>Subtotal</span>
+            <span>{copy.checkout.subtotal}</span>
             <span className="font-semibold">{formatCentavos(subtotal)}</span>
           </div>
           {estimate.free ? (
             <>
               <div className="mt-2 flex items-center justify-between text-text-primary">
-                <span>Shipping</span>
-                <span className="font-bold text-brand-mid">FREE</span>
+                <span>{copy.checkout.shipping}</span>
+                <span className="font-bold text-brand-mid">
+                  {copy.checkout.free}
+                </span>
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-base">
                 <span className="font-semibold text-brand-darkest">
-                  Estimated total
+                  {copy.checkout.estimatedTotal}
                 </span>
                 <span className="font-bold text-brand-darkest">
                   {formatCentavos(subtotal)}
@@ -409,14 +412,14 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
           ) : estimate.showFee ? (
             <>
               <div className="mt-2 flex items-center justify-between text-text-primary">
-                <span>Estimated shipping</span>
+                <span>{copy.checkout.estimatedShipping}</span>
                 <span className="font-semibold">
                   {formatCentavos(estimate.shippingCentavos)}
                 </span>
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-base">
                 <span className="font-semibold text-brand-darkest">
-                  Estimated total
+                  {copy.checkout.estimatedTotal}
                 </span>
                 <span className="font-bold text-brand-darkest">
                   {formatCentavos(subtotal + estimate.shippingCentavos)}
@@ -425,7 +428,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
             </>
           ) : (
             <p className="mt-2 text-text-secondary">
-              Shipping confirmed on the call.
+              {copy.checkout.shippingOnCall}
             </p>
           )}
         </div>
@@ -435,7 +438,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
           disabled={isPending || !token}
           className="mt-2 block w-full rounded-md bg-brand-darkest px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isPending ? "Placing order…" : "Place order"}
+          {isPending ? copy.checkout.placing : copy.checkout.place}
         </button>
 
         {submitError && (
@@ -454,7 +457,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
               href={MESSENGER_URL}
               className="mt-2 inline-block font-semibold underline"
             >
-              Message us to complete your order
+              {copy.checkout.messageToComplete}
             </a>
           </div>
         )}

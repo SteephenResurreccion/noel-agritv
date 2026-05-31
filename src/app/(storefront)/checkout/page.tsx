@@ -1,5 +1,6 @@
 import { getAdminConfig } from "@/lib/admin-store";
 import { PH_REGIONS } from "@/lib/ph-regions";
+import { copy } from "@/lib/copy";
 import { CheckoutForm } from "./checkout-form";
 
 export default async function CheckoutPage() {
@@ -7,7 +8,7 @@ export default async function CheckoutPage() {
   return (
     <div className="container-site py-[var(--spacing-section)]">
       <h1 className="mb-6 text-[length:var(--font-size-h1)] font-bold text-brand-darkest">
-        Checkout
+        {copy.checkout.title}
       </h1>
       <CheckoutForm shipping={config.shipping} regions={PH_REGIONS} />
     </div>
