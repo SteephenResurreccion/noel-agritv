@@ -21,7 +21,7 @@ const organizationJsonLd = {
     "@type": "ContactPoint",
     telephone: "+639272743281",
     contactType: "customer service",
-    availableLanguage: ["English", "Filipino"],
+    availableLanguage: ["Filipino", "English"],
   },
   email: EMAIL,
   sameAs: [FACEBOOK_URL, YOUTUBE_URL],
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_PH",
+    locale: "fil_PH",
     siteName: copy.common.brand,
     images: [{ url: "/images/og-default.webp", width: 1200, height: 630 }],
   },
@@ -76,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${sourceSans.variable} ${sourceSerif.variable} antialiased`}>
+    <html lang="fil" className={`${sourceSans.variable} ${sourceSerif.variable} antialiased`}>
       <head>
         <link rel="preconnect" href="https://i.ytimg.com" />
         <script
