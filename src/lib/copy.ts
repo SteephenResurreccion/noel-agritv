@@ -447,6 +447,6 @@ export const copy = {
     // Track page empty-submit hint — surfaced on the track-page error path.
     trackEnterNumber: "Ilagay ang tracking number mo para magpatuloy.",
     // sheets.ts shipping display string surfaced in the lookup result.
-    shippingOnCall: "Kumpirmado sa tawag",
+    shippingOnCall: "Confirmed on call",
   },
 } as const;
