@@ -1,13 +1,17 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { categories } from "@/data/categories";
+import { getLocalizedCategories } from "@/data/categories";
 import { trackCategoryFilter } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
-import { useCopy } from "@/lib/lang-context";
+import { useCopy, useLang } from "@/lib/lang-context";
 
 export function CategoryFilter() {
   const copy = useCopy();
+  const { lang } = useLang();
+  // Both category names ship to the client (~100 bytes) so the pills can
+  // re-localize instantly on language switch without a server round-trip.
+  const categories = getLocalizedCategories(lang);
   const router = useRouter();
   const searchParams = useSearchParams();
   const active = searchParams.get("category") ?? "all";

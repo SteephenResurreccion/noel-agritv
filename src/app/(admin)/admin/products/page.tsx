@@ -1,6 +1,6 @@
 import { AdminShell } from "@/components/admin-shell";
 import { getAdminConfig, type AdminConfig } from "@/lib/admin-store";
-import { categories } from "@/data/categories";
+import { getLocalizedCategories } from "@/data/categories";
 import { products as builtInProducts } from "@/data/products";
 import { AddProductForm } from "./add-product-form";
 import { CustomProductRow } from "./custom-product-row";
@@ -8,6 +8,8 @@ import { FeaturedProductList } from "./featured-product-row";
 import { SeedButton } from "./seed-button";
 
 export default async function AdminProductsPage() {
+  // Admin UI is English-only, so category names render in English here.
+  const categories = getLocalizedCategories("en");
   let customProducts: AdminConfig["customProducts"] = null;
   let featuredProductIds: string[] = [];
   let needsSeed = false;

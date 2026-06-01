@@ -120,7 +120,9 @@ function revalidateStorefront() {
 export async function seedBuiltInProducts() {
   await requireAuth();
   try {
-    const { products: builtInProducts } = await import("@/data/products");
+    const { products: builtInProducts, localizeProduct } = await import(
+      "@/data/products"
+    );
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
@@ -128,23 +130,30 @@ export async function seedBuiltInProducts() {
       (config.customProducts ?? []).map((p) => p.slug)
     );
 
+    // AdminProduct stores a SINGLE language (Blob). Seeding collapses the
+    // bilingual source to Filipino (the current live language).
+    // Task 6 will extend AdminProduct to carry both languages; until then
+    // seeding copies Filipino.
     const newProducts: AdminProduct[] = builtInProducts
       .filter((p) => !existingSlugs.has(p.slug))
-      .map((p) => ({
-        id: crypto.randomUUID(),
-        slug: p.slug,
-        name: p.name,
-        description: p.oneLiner,
-        image: p.image,
-        categorySlug: p.categorySlug,
-        visible: true,
-        priceCentavos: p.priceCentavos,
-        priceTiers: p.priceTiers,
-        specs: p.specs,
-        howToApply: p.howToApply,
-        compatibleCrops: p.compatibleCrops,
-        safetyNotes: p.safetyNotes,
-      }));
+      .map((source) => {
+        const p = localizeProduct(source, "fil");
+        return {
+          id: crypto.randomUUID(),
+          slug: p.slug,
+          name: p.name,
+          description: p.oneLiner,
+          image: p.image,
+          categorySlug: p.categorySlug,
+          visible: true,
+          priceCentavos: p.priceCentavos,
+          priceTiers: p.priceTiers,
+          specs: p.specs,
+          howToApply: p.howToApply,
+          compatibleCrops: p.compatibleCrops,
+          safetyNotes: p.safetyNotes,
+        };
+      });
 
     if (newProducts.length === 0) return;
 

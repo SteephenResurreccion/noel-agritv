@@ -8,8 +8,8 @@ import { HomeProductFilter } from "@/components/home-product-filter";
 import { VideoReelSection } from "@/components/video-reel-section";
 import { WholesaleBanner } from "@/components/wholesale-banner";
 import { AwardsSection } from "@/components/awards-section";
-import { products, type Product } from "@/data/products";
-import { categories } from "@/data/categories";
+import { getLocalizedProducts, type Product } from "@/data/products";
+import { getLocalizedCategories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { defaultVideos } from "@/data/videos";
@@ -49,7 +49,9 @@ function websiteJsonLd(lang: Lang) {
 export default async function HomePage() {
   const lang = await getLangFromRequest();
   const copy = getCopy(lang);
-  let visibleProducts: Product[] = products;
+  const localizedProducts = getLocalizedProducts(lang);
+  const localizedCategories = getLocalizedCategories(lang);
+  let visibleProducts: Product[] = localizedProducts;
   let featuredProducts: Product[] = [];
   let videoItems = defaultVideos.filter((v) => v.visible);
 
@@ -62,7 +64,7 @@ export default async function HomePage() {
     if (custom.length > 0) {
       visibleProducts = custom;
     } else {
-      visibleProducts = products.filter(
+      visibleProducts = localizedProducts.filter(
         (p) => !config.hiddenProducts.includes(p.slug)
       );
     }
@@ -242,7 +244,7 @@ export default async function HomePage() {
           </h2>
 
           {/* Category filter pills */}
-          <HomeProductFilter categories={categories} products={topPicks} />
+          <HomeProductFilter categories={localizedCategories} products={topPicks} />
 
           {/* "View all" link */}
           <div className="mt-4 text-right">

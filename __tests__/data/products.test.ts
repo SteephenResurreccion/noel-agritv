@@ -4,8 +4,20 @@ import {
   getProductBySlug,
   getProductsByCategory,
   getAllSlugs,
+  localizeProduct,
+  type LocalizedString,
 } from "@/data/products";
-import { categories, getCategoryBySlug } from "@/data/categories";
+import {
+  categories,
+  getCategoryBySlug,
+  localizeCategory,
+} from "@/data/categories";
+
+/** Assert a LocalizedString carries non-empty prose in BOTH languages. */
+function expectBilingual(s: LocalizedString) {
+  expect(s.fil.length).toBeGreaterThan(0);
+  expect(s.en.length).toBeGreaterThan(0);
+}
 
 describe("products data", () => {
   it("has exactly 4 products", () => {
@@ -58,6 +70,61 @@ describe("products data", () => {
   });
 });
 
+describe("products bilingual source data", () => {
+  it("every prose field carries non-empty fil AND en", () => {
+    for (const p of products) {
+      expectBilingual(p.oneLiner);
+      expectBilingual(p.description);
+      for (const spec of p.specs) {
+        expectBilingual(spec.label);
+        expectBilingual(spec.value);
+      }
+      for (const crop of p.compatibleCrops) {
+        expectBilingual(crop);
+      }
+      if (p.howToApply) expectBilingual(p.howToApply);
+      if (p.safetyNotes) expectBilingual(p.safetyNotes);
+    }
+  });
+
+  it("localizeProduct('fil') resolves to the fil values from the source", () => {
+    for (const p of products) {
+      const r = localizeProduct(p, "fil");
+      // Non-prose fields pass through unchanged.
+      expect(r.slug).toBe(p.slug);
+      expect(r.name).toBe(p.name);
+      expect(r.categorySlug).toBe(p.categorySlug);
+      expect(r.priceCentavos).toBe(p.priceCentavos);
+      expect(r.priceTiers).toEqual(p.priceTiers);
+      expect(r.youtubeId).toBe(p.youtubeId);
+      // Prose collapses to the fil branch (asserted against the data, never
+      // hardcoded strings).
+      expect(r.oneLiner).toBe(p.oneLiner.fil);
+      expect(r.description).toBe(p.description.fil);
+      expect(r.specs).toEqual(
+        p.specs.map((s) => ({ label: s.label.fil, value: s.value.fil }))
+      );
+      expect(r.compatibleCrops).toEqual(p.compatibleCrops.map((c) => c.fil));
+      expect(r.howToApply).toBe(p.howToApply ? p.howToApply.fil : null);
+      expect(r.safetyNotes).toBe(p.safetyNotes ? p.safetyNotes.fil : null);
+    }
+  });
+
+  it("localizeProduct('en') resolves to the en values from the source", () => {
+    for (const p of products) {
+      const r = localizeProduct(p, "en");
+      expect(r.oneLiner).toBe(p.oneLiner.en);
+      expect(r.description).toBe(p.description.en);
+      expect(r.specs).toEqual(
+        p.specs.map((s) => ({ label: s.label.en, value: s.value.en }))
+      );
+      expect(r.compatibleCrops).toEqual(p.compatibleCrops.map((c) => c.en));
+      expect(r.howToApply).toBe(p.howToApply ? p.howToApply.en : null);
+      expect(r.safetyNotes).toBe(p.safetyNotes ? p.safetyNotes.en : null);
+    }
+  });
+});
+
 describe("categories data", () => {
   it("has exactly 2 categories", () => {
     expect(categories).toHaveLength(2);
@@ -66,8 +133,33 @@ describe("categories data", () => {
   it("getCategoryBySlug returns correct category", () => {
     const category = getCategoryBySlug("seeds");
     expect(category).toBeDefined();
-    // name is Taglish seed data (draft for client review); assert it resolves to
-    // the same record in the categories array rather than a hardcoded English string.
-    expect(category!.name).toBe(categories.find((c) => c.slug === "seeds")!.name);
+    // Source carries a LocalizedString name; assert it resolves to the same
+    // record in the categories array rather than a hardcoded string.
+    expect(category!.name).toEqual(
+      categories.find((c) => c.slug === "seeds")!.name
+    );
+  });
+});
+
+describe("categories bilingual source data", () => {
+  it("every prose field carries non-empty fil AND en", () => {
+    for (const c of categories) {
+      expectBilingual(c.name);
+      expectBilingual(c.subtitle);
+    }
+  });
+
+  it("localizeCategory resolves each language from the source", () => {
+    for (const c of categories) {
+      const fil = localizeCategory(c, "fil");
+      expect(fil.slug).toBe(c.slug);
+      expect(fil.image).toBe(c.image);
+      expect(fil.name).toBe(c.name.fil);
+      expect(fil.subtitle).toBe(c.subtitle.fil);
+
+      const en = localizeCategory(c, "en");
+      expect(en.name).toBe(c.name.en);
+      expect(en.subtitle).toBe(c.subtitle.en);
+    }
   });
 });

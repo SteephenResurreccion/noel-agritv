@@ -130,11 +130,11 @@ const copyFil = {
     nav: (i: number) => `Pumunta sa parangal ${i}`,
     items: [
       "Certificates of Recognition & Appreciation",
-      "Noel AgriTV — The Art of Helping Others",
-      "STELA Magazine — Sustainable Farming & Humanitarian Advocate",
-      "2024 Excellent Filipino Awards — Outstanding Leadership in Agri Business",
-      "2024 Philippines Choice Award — Humanitarian Service in Agri Business",
-      "STELA 2024 — Most Outstanding Agri Business Leader of the Year",
+      "Noel AgriTV: The Art of Helping Others",
+      "STELA Magazine: Sustainable Farming & Humanitarian Advocate",
+      "2024 Excellent Filipino Awards: Outstanding Leadership in Agri Business",
+      "2024 Philippines Choice Award: Humanitarian Service in Agri Business",
+      "STELA 2024: Most Outstanding Agri Business Leader of the Year",
     ],
   },
   videoReel: {

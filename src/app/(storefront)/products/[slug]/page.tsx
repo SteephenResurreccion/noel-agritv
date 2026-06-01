@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { products, getProductBySlug, type Product } from "@/data/products";
-import { getCategoryBySlug } from "@/data/categories";
+import {
+  products,
+  getLocalizedProductBySlug,
+  getLocalizedProducts,
+  type Product,
+} from "@/data/products";
+import { getCategoryBySlug, localizeCategory } from "@/data/categories";
+import type { Lang } from "@/lib/copy";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { getCopy } from "@/lib/copy";
@@ -27,7 +33,10 @@ export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
 
-async function findProduct(slug: string): Promise<Product | undefined> {
+async function findProduct(
+  slug: string,
+  lang: Lang
+): Promise<Product | undefined> {
   // Check custom products first (includes seeded built-in products)
   try {
     const config = await getAdminConfig();
@@ -40,7 +49,7 @@ async function findProduct(slug: string): Promise<Product | undefined> {
   }
 
   // Fallback to hardcoded built-in products (before admin seeds them)
-  return getProductBySlug(slug);
+  return getLocalizedProductBySlug(slug, lang);
 }
 
 export async function generateMetadata({
@@ -49,7 +58,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await findProduct(slug);
+  const lang = await getLangFromRequest();
+  const product = await findProduct(slug, lang);
   if (!product) return {};
 
   return {
@@ -69,14 +79,18 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const copy = getCopy(await getLangFromRequest());
-  const product = await findProduct(slug);
+  const lang = await getLangFromRequest();
+  const copy = getCopy(lang);
+  const product = await findProduct(slug, lang);
   if (!product) notFound();
 
-  const category = getCategoryBySlug(product.categorySlug);
+  const sourceCategory = getCategoryBySlug(product.categorySlug);
+  const category = sourceCategory
+    ? localizeCategory(sourceCategory, lang)
+    : undefined;
 
   // Get all visible products for "related" section
-  let allProducts = products;
+  let allProducts = getLocalizedProducts(lang);
   try {
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? [])
@@ -86,7 +100,7 @@ export default async function ProductDetailPage({
     if (custom.length > 0) {
       allProducts = custom;
     } else {
-      allProducts = products.filter(
+      allProducts = allProducts.filter(
         (p) => !config.hiddenProducts.includes(p.slug)
       );
     }

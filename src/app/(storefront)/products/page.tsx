@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { products, type Product } from "@/data/products";
+import { getLocalizedProducts, type Product } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 import { CategoryFilter } from "@/components/category-filter";
 import { getAdminConfig } from "@/lib/admin-store";
@@ -23,11 +23,13 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
-  const copy = getCopy(await getLangFromRequest());
+  const lang = await getLangFromRequest();
+  const copy = getCopy(lang);
   const params = await searchParams;
   const category = params.category;
 
-  let allProducts: Product[] = products;
+  const localizedProducts = getLocalizedProducts(lang);
+  let allProducts: Product[] = localizedProducts;
 
   try {
     const config = await getAdminConfig();
@@ -40,7 +42,7 @@ export default async function ProductsPage({
       allProducts = custom;
     } else {
       // Fallback to built-in products (before admin seeds them)
-      allProducts = products.filter(
+      allProducts = localizedProducts.filter(
         (p) => !config.hiddenProducts.includes(p.slug)
       );
     }

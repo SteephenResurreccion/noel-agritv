@@ -4,10 +4,10 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
-import { categories } from "@/data/categories";
+import { getLocalizedCategories } from "@/data/categories";
 import { CartBadge } from "@/components/cart-badge";
 import { LangSwitcher } from "@/components/lang-switcher";
-import { useCopy } from "@/lib/lang-context";
+import { useCopy, useLang } from "@/lib/lang-context";
 
 interface SearchProduct {
   slug: string;
@@ -18,6 +18,9 @@ interface SearchProduct {
 
 export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct[] }) {
   const copy = useCopy();
+  const { lang } = useLang();
+  // Category pills re-localize client-side on language switch (~100 bytes).
+  const categories = getLocalizedCategories(lang);
   const TRENDING_SEARCHES = copy.header.trendingTerms;
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");

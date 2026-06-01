@@ -6,7 +6,7 @@ import { Trash2, Loader2, Pencil, X, Plus, Star } from "lucide-react";
 import type { AdminProduct } from "@/lib/admin-store";
 import type { PriceTier } from "@/lib/pricing";
 import type { Category } from "@/data/categories";
-import { getCategoryBySlug } from "@/data/categories";
+import { getCategoryBySlug, localizeCategory } from "@/data/categories";
 import { compressImage } from "@/lib/compress-image";
 import {
   toggleCustomProductVisibility,
@@ -58,7 +58,11 @@ export function CustomProductRow({
   isFeatured?: boolean;
   categories: Category[];
 }) {
-  const category = getCategoryBySlug(product.categorySlug);
+  // Admin UI is English-only, so resolve the category name to English.
+  const sourceCategory = getCategoryBySlug(product.categorySlug);
+  const category = sourceCategory
+    ? localizeCategory(sourceCategory, "en")
+    : undefined;
   const [isPending, startTransition] = useTransition();
   const [optimisticVisible, setOptimisticVisible] = useOptimistic(
     product.visible

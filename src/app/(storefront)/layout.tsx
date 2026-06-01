@@ -4,16 +4,18 @@ import { Footer } from "@/components/footer";
 import { MobileBottomBar } from "@/components/mobile-bottom-bar";
 import { CheckoutBar } from "@/components/checkout-bar";
 import { LanguageModal } from "@/components/language-modal";
-import { products } from "@/data/products";
+import { getLocalizedProducts } from "@/data/products";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
+import { getLangFromRequest } from "@/lib/lang";
 
 export default async function StorefrontLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  let allProducts = products;
+  const lang = await getLangFromRequest();
+  let allProducts = getLocalizedProducts(lang);
   try {
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? [])
