@@ -70,7 +70,12 @@ export default async function ProductsPage({
         ) : (
           <div className="grid grid-cols-1 gap-[var(--spacing-grid-gap)] min-[375px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1200px]:grid-cols-4">
             {filtered.map((product) => (
-              <ProductCard key={product.slug} product={product} />
+              <ProductCard
+                key={product.slug}
+                product={product}
+                wholesaleLabel={copy.productCard.wholesaleAvailable}
+                messengerLabel={copy.common.messenger}
+              />
             ))}
           </div>
         )}

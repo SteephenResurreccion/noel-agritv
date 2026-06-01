@@ -49,7 +49,12 @@ export function HomeProductFilter({
       {/* Product cards grid */}
       <div className="mt-6 grid grid-cols-2 gap-[var(--spacing-grid-gap)] min-[1000px]:grid-cols-4">
         {filtered.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+          <ProductCard
+            key={product.slug}
+            product={product}
+            wholesaleLabel={copy.productCard.wholesaleAvailable}
+            messengerLabel={copy.common.messenger}
+          />
         ))}
       </div>
     </>

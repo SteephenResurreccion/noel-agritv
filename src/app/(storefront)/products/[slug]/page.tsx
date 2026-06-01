@@ -341,7 +341,11 @@ export default async function ProductDetailPage({
                   key={rp.slug}
                   className="w-[240px] shrink-0 min-[1000px]:w-auto min-[1000px]:flex-1"
                 >
-                  <ProductCard product={rp} />
+                  <ProductCard
+                    product={rp}
+                    wholesaleLabel={copy.productCard.wholesaleAvailable}
+                    messengerLabel={copy.common.messenger}
+                  />
                 </div>
               ))}
             </div>

@@ -1,19 +1,23 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/data/products";
 import { formatCentavos } from "@/lib/utils";
-import { useCopy } from "@/lib/lang-context";
 import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "./messenger-cta";
 
 interface ProductCardProps {
   product: Product;
+  /** Localized "Wholesale available" badge label (copy.productCard.wholesaleAvailable). */
+  wholesaleLabel: string;
+  /** Localized Messenger CTA label (copy.common.messenger). */
+  messengerLabel: string;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
-  const copy = useCopy();
+export function ProductCard({
+  product,
+  wholesaleLabel,
+  messengerLabel,
+}: ProductCardProps) {
   const isExternal = product.image.startsWith("http") || product.image.startsWith("/api/blob-image");
 
   return (
@@ -54,7 +58,7 @@ export function ProductCard({ product }: ProductCardProps) {
               </p>
               {product.priceTiers && product.priceTiers.length > 0 && (
                 <span className="rounded-full bg-bg-wheat px-2.5 py-1 text-xs font-semibold text-brand-accent">
-                  {copy.productCard.wholesaleAvailable}
+                  {wholesaleLabel}
                 </span>
               )}
             </div>
@@ -72,7 +76,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <MessengerCTA
               productName={product.name}
               packSize=""
-              label={copy.common.messenger}
+              label={messengerLabel}
               variant="default"
               size="default"
               context="catalog"
