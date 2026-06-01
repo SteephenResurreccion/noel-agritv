@@ -166,6 +166,33 @@ describe("LanguageModal — dismissal defaults to Filipino", () => {
   });
 });
 
+describe("LanguageModal — layering & scroll lock", () => {
+  it("backdrop sits above the sticky bottom bar (z-[60] > z-50)", async () => {
+    const { LanguageModal } = await import("@/components/language-modal");
+    render(<LanguageModal />);
+    const backdrop = screen.getByTestId("language-modal-backdrop");
+    expect(backdrop.className).toContain("z-[60]");
+  });
+
+  it("locks body scroll while open and restores it after dismissal", async () => {
+    // Seed a prior inline value so we can assert it's restored, not blanked.
+    document.body.style.overflow = "auto";
+    const { LanguageModal } = await import("@/components/language-modal");
+    const { container } = render(<LanguageModal />);
+
+    // Open → scroll locked.
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(document.body.style.overflow).toBe("hidden");
+
+    // Dismiss → previous value restored.
+    act(() => {
+      fireEvent.keyDown(document, { key: "Escape" });
+    });
+    expect(container).toBeEmptyDOMElement();
+    expect(document.body.style.overflow).toBe("auto");
+  });
+});
+
 describe("LanguageModal — focus trap", () => {
   it("Tab from the last focusable wraps to the first", async () => {
     const { LanguageModal } = await import("@/components/language-modal");

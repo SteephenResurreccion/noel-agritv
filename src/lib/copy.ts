@@ -552,7 +552,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
   announcementBar: {
     items: [
       "Bio-organic products trusted by 250k+ Filipino farmers",
-      "Message us on Facebook to order — nationwide delivery via J&T",
+      "Message us on Facebook to order. Nationwide delivery via J&T",
       "Natural crop care solutions since 2021",
     ],
   },
@@ -574,8 +574,8 @@ const copyEn: DeepWiden<typeof copyFil> = {
     viewAll: "View all Products →",
     missionEyebrow: "Our Mission",
     missionQuote:
-      "“I started Noel AgriTV to help Filipino farmers grow more with less — using natural, affordable solutions that actually work in our soil and climate.”",
-    missionAttribution: "Noel Tolentino — Founder",
+      "“I started Noel AgriTV to help Filipino farmers grow more with less, using natural, affordable solutions that actually work in our soil and climate.”",
+    missionAttribution: "Noel Tolentino, Founder",
     ourStory: "Our Story →",
     missionImageAlt: "Noel Tolentino holding fresh harvested vegetables",
   },
@@ -590,15 +590,15 @@ const copyEn: DeepWiden<typeof copyFil> = {
     nav: (i: number) => `Go to award ${i}`,
     items: [
       "Certificates of Recognition & Appreciation",
-      "Noel AgriTV — The Art of Helping Others",
-      "STELA Magazine — Sustainable Farming & Humanitarian Advocate",
-      "2024 Excellent Filipino Awards — Outstanding Leadership in Agri Business",
-      "2024 Philippines Choice Award — Humanitarian Service in Agri Business",
-      "STELA 2024 — Most Outstanding Agri Business Leader of the Year",
+      "Noel AgriTV: The Art of Helping Others",
+      "STELA Magazine: Sustainable Farming & Humanitarian Advocate",
+      "2024 Excellent Filipino Awards: Outstanding Leadership in Agri Business",
+      "2024 Philippines Choice Award: Humanitarian Service in Agri Business",
+      "STELA 2024: Most Outstanding Agri Business Leader of the Year",
     ],
   },
   videoReel: {
-    title: "See It From the Farm — Come Take a Peek!",
+    title: "See It From the Farm. Come Take a Peek!",
     scrollLeftAriaLabel: "Scroll left",
     scrollRightAriaLabel: "Scroll right",
     seeAllOnFacebook: "See all videos on Facebook →",
@@ -621,7 +621,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
     compatibleCrops: "Compatible Crops",
     safety: "Safety & Handling",
     watch: "Watch",
-    demoVideoSuffix: (name: string) => `${name} — Demo Video`,
+    demoVideoSuffix: (name: string) => `${name}: Demo Video`,
     related: "You May Also Like",
   },
   productCard: {
@@ -635,9 +635,9 @@ const copyEn: DeepWiden<typeof copyFil> = {
     decreaseQuantityAriaLabel: "Decrease quantity",
     increaseQuantityAriaLabel: "Increase quantity",
     addWithTotal: (total: string) => `Add to cart · ${total}`,
-    wholesaleHint: "Wholesale price — buy more, save more",
+    wholesaleHint: "Wholesale price: buy more, save more",
     tipid: "Tipid sa dami.",
-    discountAuto: "Discount applies automatically — no code needed.",
+    discountAuto: "Discount applies automatically. No code needed.",
   },
   tierTable: {
     qty: "Quantity",
@@ -737,12 +737,12 @@ const copyEn: DeepWiden<typeof copyFil> = {
     missionEyebrow: "Our Mission",
     heroHeading: "Helping Filipino farmers grow more with natural solutions",
     heroBody:
-      "Since 2021, Noel AgriTV has been sharing practical, affordable bio-organic farming techniques that work in Philippine soil and climate — and selling only the products we trust.",
+      "Since 2021, Noel AgriTV has been sharing practical, affordable bio-organic farming techniques that work in Philippine soil and climate, and selling only the products we trust.",
     storyHeading: "The Story",
     storyP1:
       "Noel Tolentino started Noel AgriTV in 2021 with a simple goal: share practical, affordable bio-organic farming techniques that actually work in Philippine soil and climate. What began as a Facebook page grew into a community of over 250,000 farmers, gardeners, and agriculture enthusiasts across the country.",
     storyP2:
-      "Every product we carry has been tested on Noel's own farm. We only sell what we believe in — natural solutions that improve yields, reduce chemical dependence, and fit within the budget of the everyday Filipino farmer.",
+      "Every product we carry has been tested on Noel's own farm. We only sell what we believe in: natural solutions that improve yields, reduce chemical dependence, and fit within the budget of the everyday Filipino farmer.",
     storyP3: "From seed to harvest, we're here to help you grow.",
     byTheNumbersHeading: "By the Numbers",
     statFollowers: "Facebook Followers",
@@ -764,7 +764,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
       },
       {
         title: "Teach, don’t just sell",
-        desc: "Free farming tips and tutorials on Facebook and YouTube — because knowledge grows harvests.",
+        desc: "Free farming tips and tutorials on Facebook and YouTube, because knowledge grows harvests.",
       },
     ],
     joinEyebrow: "Join the Community",
@@ -783,7 +783,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
       "We typically reply within a few hours (Mon–Sat, 8am–6pm PHT)",
     messengerCta: "Message Us on Facebook →",
     phoneTitle: "Phone",
-    phoneHelp: (phone: string) => `${phone} — Tap to call`,
+    phoneHelp: (phone: string) => `${phone}. Tap to call`,
     facebookPageTitle: "Facebook Page",
     facebookPageHandle: "facebook.com/noeltolentino2728",
     emailTitle: "Email",
@@ -796,15 +796,15 @@ const copyEn: DeepWiden<typeof copyFil> = {
   faq: [
     {
       q: "Is this the same Noel AgriTV from Facebook?",
-      a: "Yes, this is the official website of Noel AgriTV. You can verify by checking our Facebook page — the link is the same one Noel shares in his videos.",
+      a: "Yes, this is the official website of Noel AgriTV. You can verify by checking our Facebook page. The link is the same one Noel shares in his videos.",
     },
     {
       q: "Do you deliver nationwide?",
-      a: "Yes, we deliver nationwide through J&T Express. Delivery times vary by province — typically 3-7 business days depending on your location.",
+      a: "Yes, we deliver nationwide through J&T Express. Delivery times vary by province, typically 3-7 business days depending on your location.",
     },
     {
       q: "How do I order?",
-      a: "Message us on Facebook or call — we'll confirm your order and arrange delivery via J&T.",
+      a: "Message us on Facebook or call. We'll confirm your order and arrange delivery via J&T.",
     },
     {
       q: "How long does delivery take?",
@@ -813,7 +813,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
   ],
   notFound: {
     code: "404",
-    message: "Page not found — this link may have been moved or removed.",
+    message: "Page not found. This link may have been moved or removed.",
     home: "Go Home",
     // browse CTA reuses copy.common.browseProducts ("Browse Products")
   },
@@ -840,11 +840,11 @@ const copyEn: DeepWiden<typeof copyFil> = {
     locating: "Locating…",
     geocoding: "Finding your address…",
     matching: "Matching to provinces…",
-    success: "Address pre-filled — please verify each field.",
-    denied: "Location permission denied — pick manually below.",
+    success: "Address pre-filled. Please verify each field.",
+    denied: "Location permission denied. Pick manually below.",
     unavailable: "We couldn't find your location. Please pick manually below.",
     noMatch:
-      "We located you, but couldn't auto-fill — please pick manually below.",
+      "We located you, but couldn't auto-fill. Please pick manually below.",
   },
   wholesaleBanner: {
     eyebrow: "Wholesale",
@@ -861,7 +861,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
   meta: {
     // SEO metadata + JSON-LD text. The title template "%s" and the "| Noel AgriTV"
     // brand suffix are load-bearing (keep them). Brand "Noel AgriTV" kept inside.
-    rootTitleDefault: "Noel AgriTV — Natural Solutions for Better Harvests",
+    rootTitleDefault: "Noel AgriTV: Natural Solutions for Better Harvests",
     rootTitleTemplate: "%s | Noel AgriTV",
     rootDescription:
       "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021. Browse our products and message us to order.",
@@ -873,10 +873,10 @@ const copyEn: DeepWiden<typeof copyFil> = {
       "Browse Noel AgriTV's bio-organic crop care products and quality rice seeds. Message us to order.",
     aboutTitle: "About Noel | Noel AgriTV",
     aboutDescription:
-      "Learn about Noel Tolentino and Noel AgriTV — helping Filipino farmers grow more with natural, bio-organic solutions since 2021.",
+      "Learn about Noel Tolentino and Noel AgriTV, helping Filipino farmers grow more with natural, bio-organic solutions since 2021.",
     contactTitle: "Contact | Noel AgriTV",
     contactDescription:
-      "Get in touch with Noel AgriTV. Message us on Facebook Messenger, call, or email — we'd love to hear from you.",
+      "Get in touch with Noel AgriTV. Message us on Facebook Messenger, call, or email. We'd love to hear from you.",
     breadcrumbHome: "Home",
     breadcrumbProducts: "Products",
   },
@@ -895,7 +895,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
     // ⚠ EM-DASH variant, lowercase "please", NO trailing period — distinct from
     // common.antiSpam ("Anti-spam check failed. Please retry."). Used ONLY by the
     // checkout schema's Turnstile token validator. Do NOT merge the two spellings.
-    antiSpam: "Anti-spam check failed — please retry",
+    antiSpam: "Anti-spam check failed, please retry",
     // Lookup schema (src/lib/lookup.ts): Zod validation messages.
     orderFormat: "Order number format is NAG-YYYYMMDD-XXXX",
     last4: "Enter the last 4 digits of your phone",
@@ -904,10 +904,10 @@ const copyEn: DeepWiden<typeof copyFil> = {
     lookupFormCheck: "Please double-check the form and try again.",
     itemUnavailable: "An item in your cart is no longer available.",
     submitFailed:
-      "We couldn't submit your order right now — please message us to complete it.",
+      "We couldn't submit your order right now. Please message us to complete it.",
     tooManyLookups: "Too many lookups. Please try again in a minute.",
     logUnreachable:
-      "We can't reach the order log right now — please message us.",
+      "We can't reach the order log right now. Please message us.",
     orderNotFound:
       "Order not found. Double-check your order number and phone number, or message us.",
     // Track page empty-submit hint, surfaced on the track-page error path.

@@ -126,13 +126,25 @@ export function LanguageModal(): React.ReactElement | null {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, dismiss]);
 
+  // Lock body scroll while the modal is open so the page can't scroll behind it.
+  // Capture and restore the prior inline value so we never clobber a lock set by
+  // some other overlay that happens to be open at the same time.
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
     <div
       data-testid="language-modal-backdrop"
       onClick={dismiss}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-4 sm:items-center"
       style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
     >
       <div
