@@ -27,10 +27,10 @@ import type { Lang } from "@/lib/copy";
  * are likewise neutral.
  *
  * Layout: the parent controls placement (desktop header cluster vs. mobile
- * drawer). Each item is ≥48px effective tall on mobile (`min-h-[44px]` + the
- * group's `p-0.5`) so it satisfies the touch-target budget in the drawer, and
- * ~36px on desktop (`lg:min-h-[32px]`). The breakpoint is `lg:` to match the
- * header's mobile↔desktop split.
+ * drawer). Each item is `min-h-12` (48px) tall on mobile so the button's own
+ * hit area satisfies the touch-target budget in the drawer, and ~36px on
+ * desktop (`lg:min-h-[32px]`). The breakpoint is `lg:` to match the header's
+ * mobile↔desktop split.
  */
 
 const SEGMENTS: { value: Lang; label: string; aria: string }[] = [
@@ -57,7 +57,7 @@ export function LangSwitcher(): React.ReactElement {
           key={seg.value}
           value={seg.value}
           aria-label={seg.aria}
-          className="min-h-[44px] min-w-12 lg:min-h-[32px]"
+          className="min-h-12 min-w-12 lg:min-h-[32px]"
         >
           {seg.label}
         </ToggleGroupItem>
