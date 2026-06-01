@@ -4,14 +4,14 @@
  * Phase 1: a behavior-identical English refactor extracted every customer-facing
  * string into this single module.
  * Phase 2 (current): values are translated to natural Taglish. KEYS and function
- * SIGNATURES are frozen — every storefront consumer references these keys, so the
+ * SIGNATURES are frozen. Every storefront consumer references these keys, so the
  * shape MUST stay identical for TypeScript to compile.
  *
  * Rules:
  *   - Storefront copy only. Admin (`src/app/(admin)`, `admin-*` components) stays
  *     English and MUST NOT consume this module.
- *   - Plain TS, no side effects — safe to import from both server and client
- *     components. Do NOT add "use client" or any server-only import here.
+ *   - Plain TS, no side effects (safe to import from both server and client
+ *     components). Do NOT add "use client" or any server-only import here.
  *   - `brand` is kept untranslated everywhere.
  *   - Brand/commerce/unit terms stay English: Cart, GCash, Maya, GrabPay, QR Ph,
  *     COD, J&T, Noel AgriTV, ml, L, kg, pcs, Subtotal.
@@ -86,7 +86,7 @@ export const copy = {
   announcementBar: {
     items: [
       "Bio-organic na produkto, pinagkakatiwalaan ng 250k+ na Pilipinong magsasaka",
-      "I-message kami sa Facebook para mag-order — delivery sa buong bansa via J&T",
+      "I-message kami sa Facebook para mag-order. Delivery sa buong bansa via J&T",
       "Natural na crop care solutions mula pa 2021",
     ],
   },
@@ -108,8 +108,8 @@ export const copy = {
     viewAll: "Tingnan lahat ng Produkto →",
     missionEyebrow: "Ang Misyon Namin",
     missionQuote:
-      "“Sinimulan ko ang Noel AgriTV para tulungan ang mga Pilipinong magsasaka na umani nang mas marami sa mas kaunti — gamit ang natural at abot-kayang solusyon na talagang umuubra sa ating lupa at klima.”",
-    missionAttribution: "Noel Tolentino — Founder",
+      "“Sinimulan ko ang Noel AgriTV para tulungan ang mga Pilipinong magsasaka na umani nang mas marami sa mas kaunti, gamit ang natural at abot-kayang solusyon na talagang umuubra sa ating lupa at klima.”",
+    missionAttribution: "Noel Tolentino, Founder",
     ourStory: "Ang Kuwento Namin →",
     missionImageAlt: "Si Noel Tolentino na may hawak na sariwang aning gulay",
   },
@@ -132,14 +132,14 @@ export const copy = {
     ],
   },
   videoReel: {
-    title: "Silipin Mula sa Bukid — Halika at Tingnan!",
+    title: "Silipin Mula sa Bukid, Halika at Tingnan!",
     scrollLeftAriaLabel: "Mag-scroll pakaliwa",
     scrollRightAriaLabel: "Mag-scroll pakanan",
     seeAllOnFacebook: "Panoorin lahat ng video sa Facebook →",
   },
 
   // ─── Home: Video facade (lazy-load YouTube embed) ───────────────
-  // ${title} is video DATA passed in by the component — fixed UI text only here.
+  // ${title} is video DATA passed in by the component (fixed UI text only here).
   videoFacade: {
     thumbnail: (title: string) => `Thumbnail para sa ${title}`,
     play: (title: string) => `Panoorin ang ${title}`,
@@ -155,7 +155,7 @@ export const copy = {
     compatibleCrops: "Mga Tugmang Pananim",
     safety: "Kaligtasan at Paggamit",
     watch: "Panoorin",
-    demoVideoSuffix: (name: string) => `${name} — Demo Video`,
+    demoVideoSuffix: (name: string) => `${name}: Demo Video`,
     related: "Baka Magustuhan Mo Rin",
   },
   productCard: {
@@ -169,9 +169,9 @@ export const copy = {
     decreaseQuantityAriaLabel: "Bawasan ang dami",
     increaseQuantityAriaLabel: "Dagdagan ang dami",
     addWithTotal: (total: string) => `Idagdag sa Cart · ${total}`,
-    wholesaleHint: "Wholesale price — bumili nang marami, mas mura",
+    wholesaleHint: "Wholesale price: bumili nang marami, mas mura",
     tipid: "Tipid sa dami.",
-    discountAuto: "Awtomatik na nababawas ang diskwento — walang code na kailangan.",
+    discountAuto: "Awtomatik na nababawas ang diskwento. Walang code na kailangan.",
   },
   tierTable: {
     qty: "Dami",
@@ -180,7 +180,7 @@ export const copy = {
   cart: {
     empty: "Walang laman ang Cart mo",
     // ⚠ Verbatim cart text is "Browse products" (lowercase p). copy.common.browseProducts
-    // is "Browse Products" (capital P) — different rendered casing, so this is a SEPARATE key.
+    // is "Browse Products" (capital P), different rendered casing, so this is a SEPARATE key.
     browse: "Tingnan ang mga produkto",
     title: "Ang Cart mo",
     itemCount: (n: number) => `${n} item`,
@@ -214,7 +214,7 @@ export const copy = {
     orderNotes: "Mga tala sa order",
     notesLabel: "Tala para sa team (opsyonal)",
     payment: "Bayad",
-    cod: "COD — Bayad pagdating",
+    cod: "COD: Bayad pagdating",
     privacy: "Privacy",
     privacyNotice:
       "Sa pag-order, sumasang-ayon kang gagamitin ng Noel AgriTV ang iyong pangalan, numero ng telepono, at address para lamang iproseso at ihatid ang iyong order, ayon sa Data Privacy Act of 2012 (RA 10173).",
@@ -241,7 +241,7 @@ export const copy = {
     checkStatus: "I-check ang status kahit kailan",
   },
   lookup: {
-    // title reuses copy.common.findMyOrder ("Hanapin ang order ko") — same byte-for-byte
+    // title reuses copy.common.findMyOrder ("Hanapin ang order ko"), same byte-for-byte
     help: "Ilagay ang order number mo at ang huling 4 na digit ng numerong ginamit mo sa checkout para makita ang status ng order mo.",
     loadingForm: "Nilo-load ang lookup form…",
     orderNumber: "Order number",
@@ -271,12 +271,12 @@ export const copy = {
     missionEyebrow: "Ang Misyon Namin",
     heroHeading: "Tinutulungan ang mga Pilipinong magsasaka na umani nang mas marami gamit ang natural na solusyon",
     heroBody:
-      "Mula 2021, ibinabahagi ng Noel AgriTV ang praktikal at abot-kayang bio-organic na pamamaraan sa pagsasaka na umuubra sa lupa at klima ng Pilipinas — at ipinagbibili lang ang mga produktong pinagkakatiwalaan namin.",
+      "Mula 2021, ibinabahagi ng Noel AgriTV ang praktikal at abot-kayang bio-organic na pamamaraan sa pagsasaka na umuubra sa lupa at klima ng Pilipinas, at ipinagbibili lang ang mga produktong pinagkakatiwalaan namin.",
     storyHeading: "Ang Kuwento",
     storyP1:
       "Sinimulan ni Noel Tolentino ang Noel AgriTV noong 2021 na may simpleng layunin: ibahagi ang praktikal at abot-kayang bio-organic na pamamaraan sa pagsasaka na talagang umuubra sa lupa at klima ng Pilipinas. Ang nagsimula bilang isang Facebook page ay lumago na komunidad ng mahigit 250,000 na magsasaka, hardinero, at mga mahilig sa agrikultura sa buong bansa.",
     storyP2:
-      "Bawat produktong dala namin ay nasubok na sa sariling bukid ni Noel. Ipinagbibili lang namin ang pinaniniwalaan namin — natural na solusyon na nagpapataas ng ani, nagbabawas ng pag-asa sa kemikal, at kasya sa budget ng ordinaryong Pilipinong magsasaka.",
+      "Bawat produktong dala namin ay nasubok na sa sariling bukid ni Noel. Ipinagbibili lang namin ang pinaniniwalaan namin: natural na solusyon na nagpapataas ng ani, nagbabawas ng pag-asa sa kemikal, at kasya sa budget ng ordinaryong Pilipinong magsasaka.",
     storyP3: "Mula binhi hanggang ani, nandito kami para tulungan kang umani.",
     byTheNumbersHeading: "Sa mga Numero",
     statFollowers: "Mga Facebook Follower",
@@ -298,7 +298,7 @@ export const copy = {
       },
       {
         title: "Magturo, hindi lang magbenta",
-        desc: "Libreng farming tips at tutorial sa Facebook at YouTube — dahil ang kaalaman ay nagpapayabong ng ani.",
+        desc: "Libreng farming tips at tutorial sa Facebook at YouTube, dahil ang kaalaman ay nagpapayabong ng ani.",
       },
     ],
     joinEyebrow: "Sumali sa Komunidad",
@@ -317,7 +317,7 @@ export const copy = {
       "Karaniwang sumasagot kami sa loob ng ilang oras (Lun–Sab, 8am–6pm PHT)",
     messengerCta: "I-message Kami sa Facebook →",
     phoneTitle: "Telepono",
-    phoneHelp: (phone: string) => `${phone} — I-tap para tumawag`,
+    phoneHelp: (phone: string) => `${phone}. I-tap para tumawag`,
     facebookPageTitle: "Facebook Page",
     facebookPageHandle: "facebook.com/noeltolentino2728",
     emailTitle: "Email",
@@ -330,15 +330,15 @@ export const copy = {
   faq: [
     {
       q: "Ito ba ang parehong Noel AgriTV na nasa Facebook?",
-      a: "Oo, ito ang opisyal na website ng Noel AgriTV. Pwede mong i-verify sa pamamagitan ng pag-check sa aming Facebook page — pareho lang ito ng link na ibinabahagi ni Noel sa kanyang mga video.",
+      a: "Oo, ito ang opisyal na website ng Noel AgriTV. Pwede mong i-verify sa pamamagitan ng pag-check sa aming Facebook page. Pareho lang ito ng link na ibinabahagi ni Noel sa kanyang mga video.",
     },
     {
       q: "Naghahatid ba kayo sa buong bansa?",
-      a: "Oo, naghahatid kami sa buong bansa sa pamamagitan ng J&T Express. Nag-iiba ang oras ng delivery depende sa probinsya — karaniwang 3-7 araw ng negosyo depende sa lokasyon mo.",
+      a: "Oo, naghahatid kami sa buong bansa sa pamamagitan ng J&T Express. Nag-iiba ang oras ng delivery depende sa probinsya, karaniwang 3-7 araw ng negosyo depende sa lokasyon mo.",
     },
     {
       q: "Paano ako mag-order?",
-      a: "I-message kami sa Facebook o tumawag — kukumpirmahin namin ang order mo at aayusin ang delivery via J&T.",
+      a: "I-message kami sa Facebook o tumawag. Kukumpirmahin namin ang order mo at aayusin ang delivery via J&T.",
     },
     {
       q: "Gaano katagal ang delivery?",
@@ -347,7 +347,7 @@ export const copy = {
   ],
   notFound: {
     code: "404",
-    message: "Hindi nahanap ang page — baka nailipat o natanggal na ang link na ito.",
+    message: "Hindi nahanap ang page. Baka nailipat o natanggal na ang link na ito.",
     home: "Bumalik sa Home",
     // browse CTA reuses copy.common.browseProducts ("Tingnan ang mga Produkto")
   },
@@ -374,11 +374,11 @@ export const copy = {
     locating: "Hinahanap ang lokasyon…",
     geocoding: "Hinahanap ang address mo…",
     matching: "Itinutugma sa mga probinsya…",
-    success: "Na-pre-fill ang address — pakitsek ang bawat field.",
-    denied: "Tinanggihan ang pahintulot sa lokasyon — pumili nang manu-mano sa baba.",
+    success: "Na-pre-fill ang address. Pakitsek ang bawat field.",
+    denied: "Tinanggihan ang pahintulot sa lokasyon. Pumili nang manu-mano sa baba.",
     unavailable: "Hindi namin nahanap ang lokasyon mo. Pumili nang manu-mano sa baba.",
     noMatch:
-      "Nahanap ka namin, pero hindi ma-auto-fill — pumili nang manu-mano sa baba.",
+      "Nahanap ka namin, pero hindi ma-auto-fill. Pumili nang manu-mano sa baba.",
   },
   wholesaleBanner: {
     eyebrow: "Wholesale",
@@ -394,8 +394,8 @@ export const copy = {
   },
   meta: {
     // SEO metadata + JSON-LD text. The title template "%s" and the "| Noel AgriTV"
-    // brand suffix are load-bearing — keep them. Brand "Noel AgriTV" kept inside.
-    rootTitleDefault: "Noel AgriTV — Natural na Solusyon para sa Mas Masaganang Ani",
+    // brand suffix are load-bearing (keep them). Brand "Noel AgriTV" kept inside.
+    rootTitleDefault: "Noel AgriTV: Natural na Solusyon para sa Mas Masaganang Ani",
     rootTitleTemplate: "%s | Noel AgriTV",
     rootDescription:
       "Bio-organic na crop care products at dekalidad na binhi na pinagkakatiwalaan ng mga Pilipinong magsasaka mula 2021. Tingnan ang mga produkto namin at i-message kami para mag-order.",
@@ -407,15 +407,15 @@ export const copy = {
       "Tingnan ang bio-organic na crop care products at dekalidad na rice seeds ng Noel AgriTV. I-message kami para mag-order.",
     aboutTitle: "Tungkol kay Noel | Noel AgriTV",
     aboutDescription:
-      "Alamin ang tungkol kay Noel Tolentino at sa Noel AgriTV — tinutulungan ang mga Pilipinong magsasaka na umani nang mas marami gamit ang natural at bio-organic na solusyon mula 2021.",
+      "Alamin ang tungkol kay Noel Tolentino at sa Noel AgriTV. Tinutulungan ang mga Pilipinong magsasaka na umani nang mas marami gamit ang natural at bio-organic na solusyon mula 2021.",
     contactTitle: "Kontak | Noel AgriTV",
     contactDescription:
-      "Makipag-ugnayan sa Noel AgriTV. I-message kami sa Facebook Messenger, tumawag, o mag-email — gusto naming marinig ang sa'yo.",
+      "Makipag-ugnayan sa Noel AgriTV. I-message kami sa Facebook Messenger, tumawag, o mag-email. Gusto naming marinig ang sa'yo.",
     breadcrumbHome: "Home",
     breadcrumbProducts: "Mga Produkto",
   },
   errors: {
-    // Checkout schema (src/lib/order.ts) — Zod validation messages.
+    // Checkout schema (src/lib/order.ts): Zod validation messages.
     phone: "Maglagay ng wastong PH mobile number",
     nameRequired: "Kailangan ang pangalan",
     regionInvalid: "Pumili ng wastong rehiyon",
@@ -426,11 +426,11 @@ export const copy = {
     privacyRequired: "Kailangan mong sumang-ayon sa privacy notice",
     cartEmpty: "Walang laman ang Cart mo",
     cartTooMany: "Sobrang dami ng item sa Cart",
-    // ⚠ EM-DASH variant, NO trailing period — distinct from common.antiSpam
+    // ⚠ Variant with NO trailing period, distinct from common.antiSpam
     // ("…Pakisubukan ulit." with a period). Used ONLY by the checkout schema's
     // Turnstile token validator. Do NOT merge the two spellings.
-    antiSpam: "Hindi pumasa ang anti-spam check — pakisubukan ulit",
-    // Lookup schema (src/lib/lookup.ts) — Zod validation messages.
+    antiSpam: "Hindi pumasa ang anti-spam check. Pakisubukan ulit",
+    // Lookup schema (src/lib/lookup.ts): Zod validation messages.
     orderFormat: "Ang format ng order number ay NAG-YYYYMMDD-XXXX",
     last4: "Ilagay ang huling 4 na digit ng numero mo",
     // Server action results (checkout/actions.ts, lookup/actions.ts).
@@ -438,13 +438,13 @@ export const copy = {
     lookupFormCheck: "Pakitsek ulit ang form at subukan muli.",
     itemUnavailable: "May item sa Cart mo na hindi na available.",
     submitFailed:
-      "Hindi namin ma-submit ang order mo ngayon — i-message kami para makumpleto ito.",
+      "Hindi namin ma-submit ang order mo ngayon. I-message kami para makumpleto ito.",
     tooManyLookups: "Sobrang dami ng paghahanap. Subukan ulit pagkalipas ng isang minuto.",
     logUnreachable:
-      "Hindi namin maabot ang order log ngayon — i-message kami.",
+      "Hindi namin maabot ang order log ngayon. I-message kami.",
     orderNotFound:
       "Hindi nahanap ang order. I-double-check ang order number at numero mo, o i-message kami.",
-    // Track page empty-submit hint — surfaced on the track-page error path.
+    // Track page empty-submit hint, surfaced on the track-page error path.
     trackEnterNumber: "Ilagay ang tracking number mo para magpatuloy.",
     // sheets.ts shipping display string surfaced in the lookup result.
     shippingOnCall: "Confirmed on call",
