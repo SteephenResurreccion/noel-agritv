@@ -127,39 +127,11 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               />
             </Link>
 
-            {/* Right — Desktop nav links + Mobile search icon */}
+            {/* Right — Lang switcher + Cart + Mobile search icon.
+                Desktop nav moved to row 2 below so it no longer influences
+                the centered logo (which would otherwise shift between
+                languages as the variable-width nav grew/shrank). */}
             <div className="flex items-center justify-end">
-              {/* Desktop nav */}
-              <nav
-                className="hidden items-center gap-6 lg:flex"
-                aria-label={copy.header.mainNavAriaLabel}
-              >
-                <Link
-                  href="/products"
-                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
-                >
-                  {copy.common.productsNav}
-                </Link>
-                <Link
-                  href="/about"
-                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
-                >
-                  {copy.header.navAbout}
-                </Link>
-                <Link
-                  href="/contact"
-                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
-                >
-                  {copy.header.navContact}
-                </Link>
-                <Link
-                  href="/lookup"
-                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
-                >
-                  {copy.common.findMyOrder}
-                </Link>
-              </nav>
-
               {/* Language switcher (desktop only — mobile lives in the drawer) */}
               <div className="ml-4 hidden lg:block">
                 <LangSwitcher />
@@ -178,6 +150,40 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               </button>
             </div>
           </div>
+
+          {/* Row 2 — Desktop nav (lg+ only), centered across the full
+              container width. Decoupled from the logo so its variable label
+              widths (Filipino runs ~40% longer) never push the logo off
+              center. */}
+          <nav
+            className="hidden h-11 items-center justify-center gap-8 border-t border-border/50 lg:flex"
+            aria-label={copy.header.mainNavAriaLabel}
+          >
+            <Link
+              href="/products"
+              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+            >
+              {copy.common.productsNav}
+            </Link>
+            <Link
+              href="/about"
+              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+            >
+              {copy.header.navAbout}
+            </Link>
+            <Link
+              href="/contact"
+              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+            >
+              {copy.header.navContact}
+            </Link>
+            <Link
+              href="/lookup"
+              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+            >
+              {copy.common.findMyOrder}
+            </Link>
+          </nav>
         </div>
 
       </header>
