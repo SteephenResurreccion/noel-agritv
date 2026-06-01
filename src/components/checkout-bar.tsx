@@ -58,7 +58,7 @@ export function CheckoutBar(): React.ReactElement | null {
     <div
       role="region"
       aria-label={copy.checkoutBar.summaryAria}
-      className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] md:bottom-0"
+      className="fixed inset-x-0 bottom-16 z-40 border-t border-border bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] lg:bottom-0"
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
       <div className="mx-auto flex max-w-screen-md items-center justify-between gap-4 px-4 pt-3">

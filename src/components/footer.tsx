@@ -15,7 +15,7 @@ import { getLangFromRequest } from "@/lib/lang";
 export async function Footer() {
   const copy = getCopy(await getLangFromRequest());
   return (
-    <footer className="bg-brand-darkest pb-16 text-white md:pb-0">
+    <footer className="bg-brand-darkest pb-16 text-white lg:pb-0">
       <div className="container-site py-12">
         {/* Main grid — stacks on mobile, 4 columns on desktop */}
         <div className="grid gap-10 min-[741px]:grid-cols-[1.4fr_1fr_1fr_1fr] min-[741px]:gap-8">
