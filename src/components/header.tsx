@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
 import { categories } from "@/data/categories";
 import { CartBadge } from "@/components/cart-badge";
+import { LangSwitcher } from "@/components/lang-switcher";
 import { useCopy } from "@/lib/lang-context";
 
 interface SearchProduct {
@@ -155,6 +156,11 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   {copy.common.findMyOrder}
                 </Link>
               </nav>
+
+              {/* Language switcher (desktop only — mobile lives in the drawer) */}
+              <div className="ml-6 hidden md:block">
+                <LangSwitcher />
+              </div>
 
               {/* Cart badge */}
               <CartBadge />
@@ -412,6 +418,17 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   </Link>
                 </li>
               </ul>
+
+              {/* Language switcher inside the mobile drawer.
+                  Heading is hardcoded bilingual ("Wika / Language") — it is
+                  language-neutral by design (same rationale as the FIL/EN
+                  labels), so it is not threaded through copy.ts. */}
+              <div className="mt-4 border-t border-border px-3 pt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                  Wika / Language
+                </p>
+                <LangSwitcher />
+              </div>
             </nav>
           </div>
         </div>
