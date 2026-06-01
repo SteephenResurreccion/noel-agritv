@@ -92,13 +92,13 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
       <header className="sticky top-0 z-40 border-b border-border/60 bg-surface/95 backdrop-blur-sm">
         <div className="container-site">
           {/* Main header row — 3-column grid */}
-          <div className="grid h-14 grid-cols-[1fr_auto_1fr] items-center md:h-[72px]">
+          <div className="grid h-14 grid-cols-[1fr_auto_1fr] items-center lg:h-[72px]">
             {/* Left — Search (desktop: input, mobile: hamburger) */}
             <div className="flex items-center">
               {/* Desktop search trigger */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="hidden h-10 w-[280px] items-center justify-between rounded-md border border-text-primary/30 px-4 text-sm text-text-secondary/50 transition-colors hover:border-text-primary/50 md:flex"
+                className="hidden h-10 w-[280px] items-center justify-between rounded-md border border-text-primary/30 px-4 text-sm text-text-secondary/50 transition-colors hover:border-text-primary/50 lg:flex"
                 aria-label={copy.header.searchProductsAriaLabel}
               >
                 <span>{copy.header.searchProductsPlaceholder}</span>
@@ -108,7 +108,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               {/* Mobile: hamburger menu */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="flex h-10 w-10 items-center justify-center md:hidden"
+                className="flex h-10 w-10 items-center justify-center lg:hidden"
                 aria-label={copy.header.openMenuAriaLabel}
               >
                 <Menu className="h-5 w-5 text-text-primary" />
@@ -122,7 +122,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                 alt={copy.header.logoAlt}
                 width={120}
                 height={120}
-                className="h-10 w-10 md:h-14 md:w-14"
+                className="h-10 w-10 lg:h-14 lg:w-14"
                 priority
               />
             </Link>
@@ -131,37 +131,37 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
             <div className="flex items-center justify-end">
               {/* Desktop nav */}
               <nav
-                className="hidden items-center gap-8 md:flex"
+                className="hidden items-center gap-6 lg:flex"
                 aria-label={copy.header.mainNavAriaLabel}
               >
                 <Link
                   href="/products"
-                  className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
                   {copy.common.productsNav}
                 </Link>
                 <Link
                   href="/about"
-                  className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
                   {copy.header.navAbout}
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
                   {copy.header.navContact}
                 </Link>
                 <Link
                   href="/lookup"
-                  className="text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
                 >
                   {copy.common.findMyOrder}
                 </Link>
               </nav>
 
               {/* Language switcher (desktop only — mobile lives in the drawer) */}
-              <div className="ml-6 hidden md:block">
+              <div className="ml-4 hidden lg:block">
                 <LangSwitcher />
               </div>
 
@@ -171,7 +171,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               {/* Mobile search icon */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex h-10 w-10 items-center justify-center md:hidden"
+                className="flex h-10 w-10 items-center justify-center lg:hidden"
                 aria-label={copy.header.searchAriaLabel}
               >
                 <Search className="h-5 w-5 text-text-primary" />
@@ -345,7 +345,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
 
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40"

@@ -250,7 +250,7 @@
 body[data-cart-active="true"] main {
   padding-bottom: calc(4rem + 5rem); /* 64px mobile-bottom-bar + 80px checkout-bar */
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   body[data-cart-active="true"] main {
     padding-bottom: 5rem; /* 80px checkout-bar only — no mobile-bottom-bar */
   }

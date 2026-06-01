@@ -40,13 +40,13 @@ export default async function StorefrontLayout({
       <Header searchProducts={searchProducts} />
       {/*
         Bottom padding strategy:
-        - Base `pb-16` reserves space for the mobile-bottom-bar (md and below).
+        - Base `pb-16` reserves space for the mobile-bottom-bar (below lg).
         - `body[data-cart-active="true"]` toggles extra clearance for the
           CheckoutBar (~80px) when the cart has items + we're not on a hidden
           route. This keeps the empty-cart UX flush — no wasted whitespace.
         - Hook lives in globals.css.
       */}
-      <main className="min-h-screen pb-16 md:pb-0">{children}</main>
+      <main className="min-h-screen pb-16 lg:pb-0">{children}</main>
       <Footer />
       <MobileBottomBar />
       <CheckoutBar />
