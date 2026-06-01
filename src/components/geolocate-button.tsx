@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PH_REGIONS } from "@/lib/ph-regions";
 import { loadRegion, type PsgcRegion } from "@/lib/psgc";
 import { reverseGeocode, type NominatimAddress } from "@/lib/nominatim";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 /**
  * "Use my location" button for the checkout address section.
@@ -40,17 +40,6 @@ type Status =
   | { kind: "denied" }
   | { kind: "unavailable" }
   | { kind: "no-match" };
-
-const STATUS_TEXT: Record<Status["kind"], string> = {
-  idle: "",
-  locating: copy.geolocate.locating,
-  geocoding: copy.geolocate.geocoding,
-  matching: copy.geolocate.matching,
-  success: copy.geolocate.success,
-  denied: copy.geolocate.denied,
-  unavailable: copy.geolocate.unavailable,
-  "no-match": copy.geolocate.noMatch,
-};
 
 /**
  * Map Nominatim's free-form region/state name to a PH_REGIONS value.
@@ -225,6 +214,17 @@ function mapAddressToPsgc(addr: NominatimAddress, data: PsgcRegion) {
 }
 
 export function GeolocateButton({ onPrefill }: GeolocateButtonProps) {
+  const copy = useCopy();
+  const STATUS_TEXT: Record<Status["kind"], string> = {
+    idle: "",
+    locating: copy.geolocate.locating,
+    geocoding: copy.geolocate.geocoding,
+    matching: copy.geolocate.matching,
+    success: copy.geolocate.success,
+    denied: copy.geolocate.denied,
+    unavailable: copy.geolocate.unavailable,
+    "no-match": copy.geolocate.noMatch,
+  };
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   async function handleClick() {

@@ -1,8 +1,10 @@
 import Link from "next/link";
 
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const copy = getCopy(await getLangFromRequest());
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-6 text-center">
       <h1 className="mb-2 text-6xl font-bold text-brand-darkest">

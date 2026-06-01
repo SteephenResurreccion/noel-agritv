@@ -1,28 +1,32 @@
 import type { Metadata } from "next";
 
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 import { ContactPageClient } from "./contact-client";
 
-export const metadata: Metadata = {
-  title: copy.meta.contactTitle,
-  description: copy.meta.contactDescription,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { meta } = getCopy(await getLangFromRequest());
+  return {
+    title: meta.contactTitle,
+    description: meta.contactDescription,
+  };
+}
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: copy.faq.map((item) => ({
-    "@type": "Question",
-    name: item.q,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.a,
-    },
-  })),
-};
-
-export default function ContactPage() {
+export default async function ContactPage() {
+  const copy = getCopy(await getLangFromRequest());
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: copy.faq.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  };
   return (
     <>
       <script

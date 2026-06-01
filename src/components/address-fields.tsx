@@ -8,7 +8,7 @@ import {
   type PsgcProvince,
   type PsgcCity,
 } from "@/lib/psgc";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 /**
  * Cascading address picker for the checkout form.
@@ -64,6 +64,8 @@ export function AddressFields({
   onChange,
   errors,
 }: AddressFieldsProps) {
+  const copy = useCopy();
+  const loadErrorText = copy.addressFields.loadError;
   const [data, setData] = useState<PsgcRegion | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>("");
@@ -103,7 +105,7 @@ export function AddressFields({
         if (cancelled) return;
         setData(null);
         setLoading(false);
-        setLoadError(copy.addressFields.loadError);
+        setLoadError(loadErrorText);
         // Surface for debugging but don't crash.
         console.error("AddressFields loadRegion failed:", e);
       }
@@ -114,7 +116,7 @@ export function AddressFields({
     return () => {
       cancelled = true;
     };
-  }, [region]);
+  }, [region, loadErrorText]);
 
   const provinces: PsgcProvince[] = data?.provinces ?? [];
   const selectedProvince = provinces.find((p) => p.name === province) ?? null;

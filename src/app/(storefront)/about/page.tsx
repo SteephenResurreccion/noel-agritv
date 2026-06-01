@@ -3,20 +3,24 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { FACEBOOK_URL, YOUTUBE_URL, MESSENGER_URL } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 import { AwardsSection } from "@/components/awards-section";
 
-export const metadata: Metadata = {
-  title: copy.meta.aboutTitle,
-  description: copy.meta.aboutDescription,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { meta } = getCopy(await getLangFromRequest());
+  return {
+    title: meta.aboutTitle,
+    description: meta.aboutDescription,
+  };
+}
 
-const stats = [
-  { value: "250k+", label: copy.about.statFollowers },
-  { value: "2021", label: copy.about.statFounded },
-];
-
-export default function AboutPage() {
+export default async function AboutPage() {
+  const copy = getCopy(await getLangFromRequest());
+  const stats = [
+    { value: "250k+", label: copy.about.statFollowers },
+    { value: "2021", label: copy.about.statFounded },
+  ];
   return (
     <>
       {/* ── Hero — founder portrait + mission text side by side ──────── */}
