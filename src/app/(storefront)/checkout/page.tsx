@@ -1,9 +1,11 @@
 import { getAdminConfig } from "@/lib/admin-store";
 import { PH_REGIONS } from "@/lib/ph-regions";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 import { CheckoutForm } from "./checkout-form";
 
 export default async function CheckoutPage() {
+  const copy = getCopy(await getLangFromRequest());
   const config = await getAdminConfig();
   return (
     <div className="container-site py-[var(--spacing-section)]">

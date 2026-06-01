@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-store";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 export function ConfirmationContent() {
+  const copy = useCopy();
   const params = useSearchParams();
   const order = params.get("order") ?? "";
   const [copied, setCopied] = useState(false);

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act } from "@testing-library/react";
+import { renderWithLang as render, screen, waitFor } from "../../test-utils";
 import userEvent from "@testing-library/user-event";
 import { CheckoutForm } from "@/app/(storefront)/checkout/checkout-form";
 import { useCart } from "@/lib/cart-store";
@@ -17,8 +18,9 @@ vi.mock("@/app/(storefront)/checkout/actions", () => ({
 }));
 
 // Next router — we never hit success in this suite, but the form imports it.
+// `refresh` is required by LangProvider (mounted via renderWithLang).
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }),
 }));
 
 // Turnstile is a no-op widget in tests; surface a token immediately so the

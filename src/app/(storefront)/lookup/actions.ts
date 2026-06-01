@@ -4,13 +4,14 @@ import { headers } from "next/headers";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
 import {
-  lookupSchema,
+  makeLookupSchema,
   findOrderInRows,
   summarizeRow,
   type LookupResult,
 } from "@/lib/lookup";
 import { fetchAllOrderRows } from "@/lib/sheets-read";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 /**
  * Buyer self-service order lookup.
@@ -52,8 +53,11 @@ async function clientIp(): Promise<string> {
 }
 
 export async function lookupOrder(payload: unknown): Promise<LookupResult> {
-  // 1. Re-validate.
-  const parsed = lookupSchema.safeParse(payload);
+  const lang = await getLangFromRequest();
+  const copy = getCopy(lang);
+
+  // 1. Re-validate (schema messages localize to the buyer's language).
+  const parsed = makeLookupSchema(copy).safeParse(payload);
   if (!parsed.success) {
     return {
       ok: false,

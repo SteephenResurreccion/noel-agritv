@@ -9,12 +9,12 @@ import { formatCentavos } from "@/lib/utils";
 import { resolveShipping } from "@/lib/shipping";
 import type { ShippingConfig } from "@/lib/admin-store";
 import type { PhRegion } from "@/lib/ph-regions";
-import { checkoutSchema, buildCheckoutPayload } from "@/lib/order";
+import { makeCheckoutSchema, buildCheckoutPayload } from "@/lib/order";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { AddressFields, type AddressField } from "@/components/address-fields";
 import { GeolocateButton } from "@/components/geolocate-button";
 import { MESSENGER_URL } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 import { submitOrder } from "./actions";
 
 export interface CheckoutFormProps {
@@ -73,6 +73,11 @@ const INPUT_CLASS =
 const ERROR_CLASS = "mt-1 text-sm text-destructive";
 
 export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
+  const copy = useCopy();
+  // Language-aware schema so inline validation messages localize. Rebuilt only
+  // when the copy bundle (language) changes. The server (`submitOrder`) rebuilds
+  // its own copy of the schema and stays authoritative.
+  const schema = useMemo(() => makeCheckoutSchema(copy), [copy]);
   const items = useCart((s) => s.items);
   const subtotal = useCart((s) => s.subtotalCentavos());
   const totalUnits = useCart((s) => s.totalItems());
@@ -95,7 +100,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
   );
 
   /**
-   * Re-validate a single top-level field against `checkoutSchema.shape[name]`
+   * Re-validate a single top-level field against `schema.shape[name]`
    * and update the `errors` state. Used by `onChange` handlers so a field's
    * error message clears as soon as the user types a valid value (instead of
    * waiting for the next submit).
@@ -115,7 +120,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
       // the simplest way to avoid showing errors mid-typing on a fresh form.
       setErrors((prev) => {
         if (!prev[name]) return prev;
-        const shape = (checkoutSchema as unknown as ZodObject<Record<string, ZodTypeAny>>)
+        const shape = (schema as unknown as ZodObject<Record<string, ZodTypeAny>>)
           .shape;
         const fieldSchema = shape[name as string];
         if (!fieldSchema) return prev;
@@ -129,7 +134,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
         return next;
       });
     },
-    []
+    [schema]
   );
 
   if (items.length === 0) {
@@ -161,7 +166,7 @@ export function CheckoutForm({ shipping, regions }: CheckoutFormProps) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const payload = buildCheckoutPayload(fields, items, token);
-    const result = checkoutSchema.safeParse(payload);
+    const result = schema.safeParse(payload);
     if (!result.success) {
       setErrors(result.error.flatten().fieldErrors as FieldErrors);
       return;

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { cartItemSchema, type CartItem } from "@/lib/cart-store";
 import { PH_REGIONS } from "@/lib/ph-regions";
-import { copy } from "@/lib/copy";
+import { copy, type Copy } from "@/lib/copy";
 
 /**
  * Normalize a PH mobile number to canonical "+639XXXXXXXXX", or null if invalid.
@@ -22,48 +22,65 @@ export function normalizePhPhone(raw: string): string | null {
   return null;
 }
 
-/** Zod helper that accepts any of the three PH mobile shapes. */
-export const phoneSchema = z
-  .string()
-  .trim()
-  .refine((v) => normalizePhPhone(v) !== null, {
-    message: copy.errors.phone,
-  });
+/**
+ * Build the PH-mobile Zod helper for a given copy bundle, so its validation
+ * message localizes. `phoneSchema` below is the Filipino-default instance kept
+ * for back-compat (existing imports + tests). Server actions validating buyer
+ * input rebuild it via `makePhoneSchema(getCopy(lang))`.
+ */
+export function makePhoneSchema(c: Copy) {
+  return z
+    .string()
+    .trim()
+    .refine((v) => normalizePhPhone(v) !== null, {
+      message: c.errors.phone,
+    });
+}
+
+/** Zod helper that accepts any of the three PH mobile shapes (FIL default). */
+export const phoneSchema = makePhoneSchema(copy);
 
 /**
- * The full checkout payload schema.
+ * Build the full checkout payload schema for a given copy bundle so every
+ * validation message localizes. `checkoutSchema` below is the Filipino-default
+ * instance kept for back-compat (existing imports + tests); the `submitOrder`
+ * server action rebuilds it via `makeCheckoutSchema(getCopy(lang))` so a buyer
+ * gets validation errors in their chosen language.
  *
  * Region values are the `PH_REGIONS` values (validated against the list
  * server-side in Task 6). `consent` is a hard `literal(true)` — the RA 10173
  * privacy notice must be accepted. `items` must be a non-empty cart. The
  * Turnstile token is required client-side; the server re-verifies it.
  */
-export const checkoutSchema = z.object({
-  name: z.string().trim().min(1, copy.errors.nameRequired).max(120),
-  phone: phoneSchema,
-  region: z
-    .string()
-    .trim()
-    .refine((v) => PH_REGIONS.some((r) => r.value === v), {
-      message: copy.errors.regionInvalid,
+export function makeCheckoutSchema(c: Copy) {
+  return z.object({
+    name: z.string().trim().min(1, c.errors.nameRequired).max(120),
+    phone: makePhoneSchema(c),
+    region: z
+      .string()
+      .trim()
+      .refine((v) => PH_REGIONS.some((r) => r.value === v), {
+        message: c.errors.regionInvalid,
+      }),
+    province: z.string().trim().min(1, c.errors.provinceRequired).max(120),
+    city: z.string().trim().min(1, c.errors.cityRequired).max(120),
+    barangay: z.string().trim().min(1, c.errors.barangayRequired).max(120),
+    street: z.string().trim().min(1, c.errors.streetRequired).max(200),
+    landmark: z.string().trim().max(200).optional().default(""),
+    notes: z.string().trim().max(1000).optional().default(""),
+    consent: z.literal(true, {
+      message: c.errors.privacyRequired,
     }),
-  province: z.string().trim().min(1, copy.errors.provinceRequired).max(120),
-  city: z.string().trim().min(1, copy.errors.cityRequired).max(120),
-  barangay: z.string().trim().min(1, copy.errors.barangayRequired).max(120),
-  street: z.string().trim().min(1, copy.errors.streetRequired).max(200),
-  landmark: z.string().trim().max(200).optional().default(""),
-  notes: z.string().trim().max(1000).optional().default(""),
-  consent: z.literal(true, {
-    message: copy.errors.privacyRequired,
-  }),
-  items: z
-    .array(cartItemSchema)
-    .min(1, copy.errors.cartEmpty)
-    .max(50, copy.errors.cartTooMany),
-  turnstileToken: z
-    .string()
-    .min(1, copy.errors.antiSpam),
-});
+    items: z
+      .array(cartItemSchema)
+      .min(1, c.errors.cartEmpty)
+      .max(50, c.errors.cartTooMany),
+    turnstileToken: z.string().min(1, c.errors.antiSpam),
+  });
+}
+
+/** The full checkout payload schema (FIL default). */
+export const checkoutSchema = makeCheckoutSchema(copy);
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 
 /** Number of base-36 chars in the order-number random suffix (new orders). */

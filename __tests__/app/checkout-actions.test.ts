@@ -17,6 +17,15 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * the real `formatCentavos` is used for assertions rather than hardcoded strings.
  */
 
+// submitOrder now resolves the request language via getLangFromRequest(), which
+// reads cookies()/headers() from next/headers — these throw outside a request
+// context. Mock them to empty stores so resolution falls through to the "fil"
+// default → copyFil → the exact same Filipino messages these assertions expect.
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => undefined }),
+  headers: async () => ({ get: () => null }),
+}));
+
 // vi.hoisted: the mock factory is hoisted above top-level consts, so the spy
 // must be created inside a hoisted block to be referenceable from the factory.
 const { appendOrderRow } = vi.hoisted(() => ({

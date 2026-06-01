@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 import { LookupForm } from "./lookup-form";
 
 /**
@@ -24,6 +25,7 @@ interface LookupPageProps {
 }
 
 export default async function LookupPage({ searchParams }: LookupPageProps) {
+  const copy = getCopy(await getLangFromRequest());
   const params = await searchParams;
   const raw = params.order;
   const initialOrderNumber = typeof raw === "string" ? raw : "";

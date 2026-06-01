@@ -1,6 +1,7 @@
 import { JWT } from "google-auth-library";
 import type { ShippingEstimate } from "@/lib/shipping";
 import { formatCentavos } from "@/lib/utils";
+// Intentionally static Filipino: sheet rows are an ops-facing artifact, not buyer UI (bilingual rewire skipped on purpose).
 import { copy } from "@/lib/copy";
 
 export interface OrderRowInput {

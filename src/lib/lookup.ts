@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { copy } from "@/lib/copy";
+import { copy, type Copy } from "@/lib/copy";
 
 /**
  * Canonical order-number shape: `NAG-YYYYMMDD-XXXXXX` where the suffix is 4–6
@@ -34,26 +34,37 @@ export function isOrderNumber(value: string | undefined): boolean {
  * privacy headroom for zero UX gain.
  */
 
-/** Form schema: `lookupOrder` re-validates against this server-side. */
-export const lookupSchema = z.object({
-  orderNumber: z
-    .string()
-    .trim()
-    .regex(ORDER_NUMBER_RE, copy.errors.orderFormat),
-  phoneLast4: z
-    .string()
-    .trim()
-    .regex(/^\d{4}$/, copy.errors.last4),
-  /**
-   * Cloudflare Turnstile token, mirroring `checkoutSchema` in `@/lib/order`.
-   * `lookupOrder` verifies it server-side via `verifyTurnstile` BEFORE any
-   * sheet read, raising the bot cost of order enumeration. Invisible widget,
-   * so a real buyer never sees it. Required and non-empty — an empty/absent
-   * token fails verification anyway, but rejecting it at the schema avoids a
-   * pointless siteverify round-trip.
-   */
-  turnstileToken: z.string().min(1, copy.common.antiSpam),
-});
+/**
+ * Build the lookup form schema for a given copy bundle so its validation
+ * messages localize. `lookupSchema` below is the Filipino-default instance kept
+ * for back-compat (existing imports + tests); the `lookupOrder` server action
+ * rebuilds it via `makeLookupSchema(getCopy(lang))` so a buyer gets validation
+ * errors in their chosen language.
+ */
+export function makeLookupSchema(c: Copy) {
+  return z.object({
+    orderNumber: z
+      .string()
+      .trim()
+      .regex(ORDER_NUMBER_RE, c.errors.orderFormat),
+    phoneLast4: z
+      .string()
+      .trim()
+      .regex(/^\d{4}$/, c.errors.last4),
+    /**
+     * Cloudflare Turnstile token, mirroring `checkoutSchema` in `@/lib/order`.
+     * `lookupOrder` verifies it server-side via `verifyTurnstile` BEFORE any
+     * sheet read, raising the bot cost of order enumeration. Invisible widget,
+     * so a real buyer never sees it. Required and non-empty — an empty/absent
+     * token fails verification anyway, but rejecting it at the schema avoids a
+     * pointless siteverify round-trip.
+     */
+    turnstileToken: z.string().min(1, c.common.antiSpam),
+  });
+}
+
+/** Form schema: `lookupOrder` re-validates against this server-side (FIL default). */
+export const lookupSchema = makeLookupSchema(copy);
 
 export type LookupInput = z.infer<typeof lookupSchema>;
 
