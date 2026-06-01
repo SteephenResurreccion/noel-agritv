@@ -4,6 +4,14 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+## Design conventions — MOBILE-FIRST
+
+**This storefront is mobile-first.** The primary user is a Filipino farmer on a budget Android phone over 3G. Build and verify every UI change at 390px FIRST, then adapt upward. Desktop is secondary: when a desktop layout fights long content, simplify/restructure the desktop layout — never compromise the mobile experience and never shorten client-approved copy to fix a desktop problem.
+
+- The storefront's mobile↔desktop chrome split is **`lg:` (1024px), not `md:`** — header, drawer, mobile-bottom-bar, footer/checkout-bar clearance, and the globals.css cart-clearance media query all key off `lg:`. Any new mobile-chrome element must too.
+- Touch targets: **≥48x48px** on anything tappable (the button's own hit area — container padding does not count).
+- **Layout-check both languages.** Filipino strings run ~40% longer than English; a layout that only works in one language is broken. Verify FIL and EN at 390px and 1024px+ before calling UI work done.
+
 ## Spec deviations from 2026-05-21
 
 The live COD checkout has diverged from the original 2026-05-21 spec in three places. Future agents should treat the running code as canonical; these notes exist so the divergences don't read as bugs.
