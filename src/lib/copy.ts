@@ -3,9 +3,13 @@
  *
  * Phase 1: a behavior-identical English refactor extracted every customer-facing
  * string into this single module.
- * Phase 2 (current): values are translated to natural Taglish. KEYS and function
- * SIGNATURES are frozen. Every storefront consumer references these keys, so the
- * shape MUST stay identical for TypeScript to compile.
+ * Phase 2: values translated to natural Taglish (`copyFil`).
+ * Phase 3 (current): bilingual. Both `copyFil` (Filipino, the default) and
+ * `copyEn` (English) live here with IDENTICAL key shapes. `copyEn` is typed
+ * `: typeof copyFil` so TypeScript hard-fails if the shapes ever diverge.
+ * Pick a language with `getCopy(lang)`. KEYS and function SIGNATURES are frozen.
+ * Every storefront consumer references these keys, so the shape MUST stay
+ * identical for TypeScript to compile.
  *
  * Rules:
  *   - Storefront copy only. Admin (`src/app/(admin)`, `admin-*` components) stays
@@ -15,8 +19,10 @@
  *   - `brand` is kept untranslated everywhere.
  *   - Brand/commerce/unit terms stay English: Cart, GCash, Maya, GrabPay, QR Ph,
  *     COD, J&T, Noel AgriTV, ml, L, kg, pcs, Subtotal.
+ *   - `export const copy = copyFil` is retained for backward compatibility — all
+ *     existing `import { copy }` consumers default to Filipino, unchanged.
  */
-export const copy = {
+const copyFil = {
   common: {
     messenger: "Mag-message sa amin",
     messengerAboutProduct: "I-message kami tungkol sa produktong ito",
@@ -450,3 +456,481 @@ export const copy = {
     shippingOnCall: "Confirmed on call",
   },
 } as const;
+
+/**
+ * Deep-widen the `as const` literal shape of `copyFil` into a structural type:
+ * string/number/boolean literals widen to their base type, functions and their
+ * signatures are preserved, and objects/arrays recurse. This lets `copyEn` hold
+ * DIFFERENT string values while TypeScript still hard-fails on any missing key,
+ * extra key, or function-signature drift — making the two bundles structurally
+ * identical at compile time.
+ */
+type DeepWiden<T> = T extends (...args: infer A) => infer R
+  ? (...args: A) => R
+  : T extends readonly (infer E)[]
+    ? readonly DeepWiden<E>[]
+    : T extends string
+      ? string
+      : T extends number
+        ? number
+        : T extends boolean
+          ? boolean
+          : T extends object
+            ? { readonly [K in keyof T]: DeepWiden<T[K]> }
+            : T;
+
+// English copy. Typed `DeepWiden<typeof copyFil>` (NOT `as const`) so TypeScript
+// hard-fails if a key is missing/extra or a function signature drifts from copyFil,
+// while still allowing the English string values to differ from the Filipino ones.
+const copyEn: DeepWiden<typeof copyFil> = {
+  common: {
+    messenger: "Message Us",
+    messengerAboutProduct: "Message Us About This Product",
+    callToOrder: "Call to Order",
+    browseProducts: "Browse Products",
+    continueShopping: "Continue shopping",
+    findMyOrder: "Find my order",
+    productsNav: "Products",
+    loading: "Loading…",
+    filterAll: "All",
+    antiSpam: "Anti-spam check failed. Please retry.",
+    brand: "Noel AgriTV", // kept untranslated everywhere
+  },
+  header: {
+    searchProductsAriaLabel: "Search products",
+    searchProductsPlaceholder: "Search products...",
+    openMenuAriaLabel: "Open menu",
+    logoAlt: "Noel AgriTV",
+    mainNavAriaLabel: "Main navigation",
+    navAbout: "About",
+    navContact: "Contact",
+    searchAriaLabel: "Search",
+    close: "Close",
+    productsHeading: "Products",
+    noResults: (query: string) => `No products found for “${query}”`,
+    trendingSearches: "Trending Searches",
+    trendingTerms: [
+      "Bio Plant Booster",
+      "Bio Enzyme",
+      "Rice Seeds",
+      "Jasmine",
+      "Mayumi",
+    ],
+    shopByCategory: "Shop By Category",
+    topProducts: "Top Products",
+    mobileNavAriaLabel: "Mobile navigation",
+    navHome: "Home",
+    closeMenuAriaLabel: "Close menu",
+  },
+  footer: {
+    logoAlt: "Noel AgriTV",
+    since: "Since 2021",
+    blurb:
+      "Natural, bio-organic crop care products trusted by Filipino farmers nationwide.",
+    facebookAriaLabel: "Facebook",
+    youtubeAriaLabel: "YouTube",
+    messengerAriaLabel: "Messenger",
+    shop: "Shop",
+    shopLinksAriaLabel: "Footer shop links",
+    allProducts: "All Products",
+    cropCare: "Crop Care",
+    seeds: "Seeds",
+    company: "Company",
+    companyLinksAriaLabel: "Footer company links",
+    aboutNoelAgriTv: "About Noel AgriTV",
+    contactUs: "Contact Us",
+    getInTouch: "Get in Touch",
+    messageUsOnFacebook: "Message us on Facebook",
+    jtExpress: "J&T Express",
+    nationwideDelivery: "Nationwide Delivery",
+    gcash: "GCash",
+    maya: "Maya",
+    cod: "COD",
+    copyright: "© 2026 Noel AgriTV. All rights reserved.",
+    tagline: "Natural farming solutions for the Philippines",
+  },
+  announcementBar: {
+    items: [
+      "Bio-organic products trusted by 250k+ Filipino farmers",
+      "Message us on Facebook to order — nationwide delivery via J&T",
+      "Natural crop care solutions since 2021",
+    ],
+  },
+  mobileBottomBar: {
+    quickActionsAriaLabel: "Quick actions",
+    products: "Products",
+    messenger: "Messenger",
+    sms: "SMS",
+    call: "Call",
+  },
+  home: {
+    heroImageAlt: "Noel Tolentino standing in a rice paddy",
+    heroTaglineLine1: "Bio-organic products",
+    heroTaglineLine2: "trusted by Filipino farmers",
+    heroHeadlineLine1: "Natural Solutions",
+    heroHeadlineLine2: "For Better Harvests",
+    heroSocial: "Since 2021 · 250k+ Followers",
+    topPicks: "Top Picks For You",
+    viewAll: "View all Products →",
+    missionEyebrow: "Our Mission",
+    missionQuote:
+      "“I started Noel AgriTV to help Filipino farmers grow more with less — using natural, affordable solutions that actually work in our soil and climate.”",
+    missionAttribution: "Noel Tolentino — Founder",
+    ourStory: "Our Story →",
+    missionImageAlt: "Noel Tolentino holding fresh harvested vegetables",
+  },
+  socialProof: {
+    strip: "250k+ Followers · Since 2021 · Nationwide via J&T",
+  },
+  awards: {
+    eyebrow: "Awards & Recognition",
+    title: "Recognized for Excellence in Filipino Agriculture",
+    prevAriaLabel: "Previous award",
+    nextAriaLabel: "Next award",
+    nav: (i: number) => `Go to award ${i}`,
+    items: [
+      "Certificates of Recognition & Appreciation",
+      "Noel AgriTV — The Art of Helping Others",
+      "STELA Magazine — Sustainable Farming & Humanitarian Advocate",
+      "2024 Excellent Filipino Awards — Outstanding Leadership in Agri Business",
+      "2024 Philippines Choice Award — Humanitarian Service in Agri Business",
+      "STELA 2024 — Most Outstanding Agri Business Leader of the Year",
+    ],
+  },
+  videoReel: {
+    title: "See It From the Farm — Come Take a Peek!",
+    scrollLeftAriaLabel: "Scroll left",
+    scrollRightAriaLabel: "Scroll right",
+    seeAllOnFacebook: "See all videos on Facebook →",
+  },
+
+  // ─── Home: Video facade (lazy-load YouTube embed) ───────────────
+  // ${title} is video DATA passed in by the component (fixed UI text only here).
+  videoFacade: {
+    thumbnail: (title: string) => `Thumbnail for ${title}`,
+    play: (title: string) => `Play ${title}`,
+  },
+  productList: {
+    title: "All Products",
+    empty: "No products found in this category.",
+  },
+  productDetail: {
+    askOnMessenger: "Ask on Messenger",
+    whatItDoes: "What It Does",
+    howToApply: "How to Apply",
+    compatibleCrops: "Compatible Crops",
+    safety: "Safety & Handling",
+    watch: "Watch",
+    demoVideoSuffix: (name: string) => `${name} — Demo Video`,
+    related: "You May Also Like",
+  },
+  productCard: {
+    wholesaleAvailable: "Wholesale available",
+  },
+  addToCart: {
+    add: "Add to cart",
+    added: "Added ✓",
+    eachAtQty: (qty: number) => `each · at ${qty} pcs`,
+    quantity: "Quantity",
+    decreaseQuantityAriaLabel: "Decrease quantity",
+    increaseQuantityAriaLabel: "Increase quantity",
+    addWithTotal: (total: string) => `Add to cart · ${total}`,
+    wholesaleHint: "Wholesale price — buy more, save more",
+    tipid: "Tipid sa dami.",
+    discountAuto: "Discount applies automatically — no code needed.",
+  },
+  tierTable: {
+    qty: "Quantity",
+    priceEach: "Price each",
+  },
+  cart: {
+    empty: "Your cart is empty",
+    // ⚠ Verbatim cart text is "Browse products" (lowercase p). copy.common.browseProducts
+    // is "Browse Products" (capital P), different rendered casing, so this is a SEPARATE key.
+    browse: "Browse products",
+    title: "Your cart",
+    itemCount: (n: number) => `${n} item${n === 1 ? "" : "s"}`,
+    eachPrice: (price: string) => `${price} each`,
+    removeAria: (name: string) => `Remove ${name}`,
+    nudge: (units: number) => `Add ${units} more`,
+    nudgeEach: (price: string) => `${price} each`,
+    freeUnlocked: "FREE shipping unlocked",
+    freeShippingPrompt: (remaining: number) =>
+      `Add ${remaining} more item${remaining === 1 ? "" : "s"} for FREE shipping`,
+    subtotal: "Subtotal",
+    checkoutWithSubtotal: (subtotal: string) => `Checkout · ${subtotal}`,
+  },
+  checkoutBar: {
+    summaryAria: "Cart summary",
+    count: (n: number) => (n === 1 ? "1 item" : `${n} items`),
+    checkout: "Checkout →",
+  },
+  cartBadge: {
+    label: "Cart",
+    aria: (n: number) => `Cart, ${n} items`,
+    overflow: "99+",
+  },
+  checkout: {
+    title: "Checkout",
+    contact: "Contact",
+    name: "Name",
+    mobile: "Mobile number",
+    phonePlaceholder: "09XXXXXXXXX",
+    deliveryAddress: "Delivery address",
+    orderNotes: "Order notes",
+    notesLabel: "Notes for the team (optional)",
+    payment: "Payment",
+    cod: "Cash on Delivery (COD)",
+    privacy: "Privacy",
+    privacyNotice:
+      "By placing this order you agree that Noel AgriTV will use your name, phone number, and address solely to process and deliver your order, per the Data Privacy Act of 2012 (RA 10173).",
+    orderSummary: "Order summary",
+    lineItem: (unit: string, qty: number) => `${unit} × ${qty}`,
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    free: "FREE",
+    estimatedTotal: "Estimated total",
+    estimatedShipping: "Estimated shipping",
+    shippingOnCall: "Shipping confirmed on the call.",
+    placing: "Placing order…",
+    place: "Place order",
+    messageToComplete: "Message us to complete your order",
+  },
+  confirmation: {
+    received: "Order received",
+    teamWillContact:
+      "Our team will text/call you to confirm your order before shipping.",
+    save: "Save your order number",
+    copyAriaLabel: "Copy order number",
+    copied: "Copied ✓",
+    copy: "Copy",
+    checkStatus: "Check status any time",
+  },
+  lookup: {
+    // title reuses copy.common.findMyOrder ("Find my order") — same byte-for-byte
+    help: "Enter your order number and the last 4 digits of the phone number you used at checkout to see your order status.",
+    loadingForm: "Loading lookup form…",
+    orderNumber: "Order number",
+    orderNumberPlaceholder: "NAG-YYYYMMDD-XXXX",
+    last4: "Last 4 digits of your phone",
+    last4Placeholder: "1234",
+    looking: "Looking up…",
+    // submit (resolved) reuses copy.common.findMyOrder ("Find my order")
+    messageUsOnMessenger: "Message us on Messenger",
+    items: "Items",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    trackJt: "Track shipment on J&T →",
+    confirmedNotice:
+      "Your order is confirmed. We'll text you the tracking number once it's booked with J&T.",
+    messageUs: "Message us",
+  },
+  track: {
+    title: "Track My Order",
+    help: "Enter the tracking number we texted you to follow your order on J&T's official tracker.",
+    waybill: "J&T tracking number",
+    trackOnJt: "Track on J&T",
+    noTrackingYet: "Don't have a tracking number yet?",
+    lookup: "Look up your order",
+  },
+  about: {
+    missionEyebrow: "Our Mission",
+    heroHeading: "Helping Filipino farmers grow more with natural solutions",
+    heroBody:
+      "Since 2021, Noel AgriTV has been sharing practical, affordable bio-organic farming techniques that work in Philippine soil and climate — and selling only the products we trust.",
+    storyHeading: "The Story",
+    storyP1:
+      "Noel Tolentino started Noel AgriTV in 2021 with a simple goal: share practical, affordable bio-organic farming techniques that actually work in Philippine soil and climate. What began as a Facebook page grew into a community of over 250,000 farmers, gardeners, and agriculture enthusiasts across the country.",
+    storyP2:
+      "Every product we carry has been tested on Noel's own farm. We only sell what we believe in — natural solutions that improve yields, reduce chemical dependence, and fit within the budget of the everyday Filipino farmer.",
+    storyP3: "From seed to harvest, we're here to help you grow.",
+    byTheNumbersHeading: "By the Numbers",
+    statFollowers: "Facebook Followers",
+    statFounded: "Founded",
+    portraitAlt: "Noel Tolentino with plants on his farm",
+    believeHeading: "What We Believe",
+    believeItems: [
+      {
+        title: "Test everything ourselves",
+        desc: "Every product is field-tested on Noel’s farm before it reaches yours.",
+      },
+      {
+        title: "Natural first",
+        desc: "Bio-organic solutions that improve yields without harsh chemicals.",
+      },
+      {
+        title: "Affordable for every farmer",
+        desc: "Quality products priced for the everyday Filipino grower, not just large operations.",
+      },
+      {
+        title: "Teach, don’t just sell",
+        desc: "Free farming tips and tutorials on Facebook and YouTube — because knowledge grows harvests.",
+      },
+    ],
+    joinEyebrow: "Join the Community",
+    followHeading: "Follow Noel's journey",
+    followBody:
+      "Daily farming tips, product demonstrations, and behind-the-scenes content from the farm.",
+    facebook: "Facebook",
+    youtube: "YouTube",
+    // "Message Us" CTA reuses copy.common.messenger
+  },
+  contact: {
+    heading: "Get In Touch",
+    subheading: "We'd love to hear from you",
+    messengerTitle: "Facebook Messenger",
+    messengerHours:
+      "We typically reply within a few hours (Mon–Sat, 8am–6pm PHT)",
+    messengerCta: "Message Us on Facebook →",
+    phoneTitle: "Phone",
+    phoneHelp: (phone: string) => `${phone} — Tap to call`,
+    facebookPageTitle: "Facebook Page",
+    facebookPageHandle: "facebook.com/noeltolentino2728",
+    emailTitle: "Email",
+    wholesaleTitle: "Wholesale Inquiries",
+    wholesaleHelp:
+      "Buying in bulk? We offer volume discounts on all products with nationwide J&T delivery. Message us or call for wholesale pricing.",
+    wholesaleCta: "Inquire on Messenger →",
+    faqHeading: "Frequently Asked Questions",
+  },
+  faq: [
+    {
+      q: "Is this the same Noel AgriTV from Facebook?",
+      a: "Yes, this is the official website of Noel AgriTV. You can verify by checking our Facebook page — the link is the same one Noel shares in his videos.",
+    },
+    {
+      q: "Do you deliver nationwide?",
+      a: "Yes, we deliver nationwide through J&T Express. Delivery times vary by province — typically 3-7 business days depending on your location.",
+    },
+    {
+      q: "How do I order?",
+      a: "Message us on Facebook or call — we'll confirm your order and arrange delivery via J&T.",
+    },
+    {
+      q: "How long does delivery take?",
+      a: "Delivery times vary by province. Metro Manila typically receives orders within 2-3 business days. Provincial deliveries usually take 3-7 business days through J&T Express.",
+    },
+  ],
+  notFound: {
+    code: "404",
+    message: "Page not found — this link may have been moved or removed.",
+    home: "Go Home",
+    // browse CTA reuses copy.common.browseProducts ("Browse Products")
+  },
+  addressFields: {
+    region: "Region",
+    province: "Province",
+    city: "City / Municipality",
+    barangay: "Barangay",
+    street: "Street / House no.",
+    landmark: "Landmark (optional)",
+    selectRegion: "Select a region…",
+    selectProvince: "Select a province…",
+    pickRegionFirst: "Pick a region first",
+    selectCity: "Select a city / municipality…",
+    pickProvinceFirst: "Pick a province first",
+    selectBarangay: "Select a barangay…",
+    pickCityFirst: "Pick a city first",
+    loadingProvinces: "Loading provinces…",
+    loadError:
+      "Couldn't load the province list. Please try again or pick a different region.",
+  },
+  geolocate: {
+    use: "Use my location",
+    locating: "Locating…",
+    geocoding: "Finding your address…",
+    matching: "Matching to provinces…",
+    success: "Address pre-filled — please verify each field.",
+    denied: "Location permission denied — pick manually below.",
+    unavailable: "We couldn't find your location. Please pick manually below.",
+    noMatch:
+      "We located you, but couldn't auto-fill — please pick manually below.",
+  },
+  wholesaleBanner: {
+    eyebrow: "Wholesale",
+    title: "Buying in Bulk? We've Got You Covered",
+    benefits: [
+      "Volume discounts available",
+      "Nationwide delivery via J&T",
+      "All products available in bulk",
+      "Message us on Facebook or call to inquire",
+    ],
+    messageCta: "Message Us for Wholesale →",
+    callPhone: (phone: string) => `Call ${phone}`,
+  },
+  meta: {
+    // SEO metadata + JSON-LD text. The title template "%s" and the "| Noel AgriTV"
+    // brand suffix are load-bearing (keep them). Brand "Noel AgriTV" kept inside.
+    rootTitleDefault: "Noel AgriTV — Natural Solutions for Better Harvests",
+    rootTitleTemplate: "%s | Noel AgriTV",
+    rootDescription:
+      "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021. Browse our products and message us to order.",
+    // Org/WebSite JSON-LD description (no trailing "Browse…" sentence).
+    orgDescription:
+      "Bio-organic crop care products and quality seeds trusted by Filipino farmers since 2021.",
+    productsTitle: "All Products",
+    productsDescription:
+      "Browse Noel AgriTV's bio-organic crop care products and quality rice seeds. Message us to order.",
+    aboutTitle: "About Noel | Noel AgriTV",
+    aboutDescription:
+      "Learn about Noel Tolentino and Noel AgriTV — helping Filipino farmers grow more with natural, bio-organic solutions since 2021.",
+    contactTitle: "Contact | Noel AgriTV",
+    contactDescription:
+      "Get in touch with Noel AgriTV. Message us on Facebook Messenger, call, or email — we'd love to hear from you.",
+    breadcrumbHome: "Home",
+    breadcrumbProducts: "Products",
+  },
+  errors: {
+    // Checkout schema (src/lib/order.ts): Zod validation messages.
+    phone: "Enter a valid PH mobile number",
+    nameRequired: "Name is required",
+    regionInvalid: "Select a valid region",
+    provinceRequired: "Province is required",
+    cityRequired: "City/Municipality is required",
+    barangayRequired: "Barangay is required",
+    streetRequired: "Street / house no. is required",
+    privacyRequired: "You must agree to the privacy notice",
+    cartEmpty: "Your cart is empty",
+    cartTooMany: "Too many items in cart",
+    // ⚠ EM-DASH variant, lowercase "please", NO trailing period — distinct from
+    // common.antiSpam ("Anti-spam check failed. Please retry."). Used ONLY by the
+    // checkout schema's Turnstile token validator. Do NOT merge the two spellings.
+    antiSpam: "Anti-spam check failed — please retry",
+    // Lookup schema (src/lib/lookup.ts): Zod validation messages.
+    orderFormat: "Order number format is NAG-YYYYMMDD-XXXX",
+    last4: "Enter the last 4 digits of your phone",
+    // Server action results (checkout/actions.ts, lookup/actions.ts).
+    formCheck: "Please check the form and try again.",
+    lookupFormCheck: "Please double-check the form and try again.",
+    itemUnavailable: "An item in your cart is no longer available.",
+    submitFailed:
+      "We couldn't submit your order right now — please message us to complete it.",
+    tooManyLookups: "Too many lookups. Please try again in a minute.",
+    logUnreachable:
+      "We can't reach the order log right now — please message us.",
+    orderNotFound:
+      "Order not found. Double-check your order number and phone number, or message us.",
+    // Track page empty-submit hint, surfaced on the track-page error path.
+    trackEnterNumber: "Enter your tracking number to continue.",
+    // sheets.ts shipping display string surfaced in the lookup result.
+    shippingOnCall: "Confirmed on call",
+  },
+};
+
+export type Lang = "fil" | "en";
+
+/**
+ * The public copy shape: the structurally-widened form of `copyFil` (string
+ * values, function signatures, arrays — not the frozen Filipino literals). Both
+ * `copyFil` and `copyEn` satisfy it, so `getCopy` can return either branch.
+ */
+export type Copy = DeepWiden<typeof copyFil>;
+
+/** Pick the copy bundle for a language. Filipino is the default. */
+export function getCopy(lang: Lang): Copy {
+  return lang === "en" ? copyEn : copyFil;
+}
+
+// Backward compatibility: existing `import { copy }` consumers default to Filipino.
+export const copy = copyFil;
+export { copyFil, copyEn };
