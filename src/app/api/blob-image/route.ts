@@ -8,9 +8,10 @@ import { NextRequest, NextResponse } from "next/server";
  * SSRF hardening (red-team R1, fix #1):
  *   1. The incoming `url` is validated to be a well-formed HTTPS Vercel Blob URL.
  *   2. When `BLOB_STORE_ID` is set we require an EXACT host match against THIS
- *      store's host (`<id>.public.blob.vercel-storage.com` /
- *      `<id>.blob.vercel-storage.com`) — a foreign `*.blob.vercel-storage.com`
- *      host (an attacker's own store, or a cross-tenant public blob) is rejected.
+ *      store's host (`<id>.public.blob.vercel-storage.com`,
+ *      `<id>.private.blob.vercel-storage.com`, or `<id>.blob.vercel-storage.com`)
+ *      — a foreign `*.blob.vercel-storage.com` host (an attacker's own store,
+ *      or a cross-tenant public blob) is rejected.
  *   3. We then call `get(pathname, { access: "private" })` with the PATHNAME
  *      form, never the attacker-controlled URL. The library reconstructs the
  *      host from the RW token's own store, so the host can't be steered even if
@@ -46,13 +47,16 @@ export async function GET(request: NextRequest) {
 
   // Bind to THIS store: when BLOB_STORE_ID is configured, require an exact
   // host match. Vercel Blob hosts are `<id>.public.blob.vercel-storage.com`
-  // (public) or `<id>.blob.vercel-storage.com` (private). The app stores
-  // private blobs, but accept either form belonging to this store. Compare
-  // lowercased on both sides (hostnames are case-insensitive).
+  // (public) or `<id>.private.blob.vercel-storage.com` (private); the legacy
+  // `<id>.blob.vercel-storage.com` form is also accepted. The app stores
+  // private blobs (`put(..., { access: "private" })` returns the `.private.`
+  // host), but accept any form belonging to this store. Compare lowercased on
+  // both sides (hostnames are case-insensitive).
   const storeId = process.env.BLOB_STORE_ID?.toLowerCase();
   if (storeId) {
     const allowedHosts = [
       `${storeId}.public.blob.vercel-storage.com`,
+      `${storeId}.private.blob.vercel-storage.com`,
       `${storeId}.blob.vercel-storage.com`,
     ];
     if (!allowedHosts.includes(hostname)) {

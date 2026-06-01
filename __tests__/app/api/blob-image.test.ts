@@ -121,6 +121,37 @@ describe("/api/blob-image SSRF hardening", () => {
     });
   });
 
+  // Regression: `put(..., { access: "private" })` returns the `.private.` host
+  // form, which the admin image-upload flow stores. The store-ID allowlist must
+  // accept it or every owner-uploaded product image 403s on the live proxy.
+  it("accepts the private store-host form", async () => {
+    const { GET } = await loadRoute();
+    const res = await GET(
+      makeReq(
+        `https://${STORE_ID}.private.blob.vercel-storage.com/products/bio-plant-booster-1775673831867.webp`
+      )
+    );
+    expect(res.status).toBe(200);
+    expect(getMock).toHaveBeenCalledWith(
+      "products/bio-plant-booster-1775673831867.webp",
+      { access: "private" }
+    );
+  });
+
+  // Security posture preserved: the `.private.` form of a FOREIGN store
+  // (different store ID) must still be rejected — the allowlist binds to THIS
+  // store, so a cross-tenant private host is not trusted just because it parses.
+  it("rejects a foreign .private. store-host (403)", async () => {
+    const { GET } = await loadRoute();
+    const res = await GET(
+      makeReq(
+        "https://attacker-store.private.blob.vercel-storage.com/products/evil.webp"
+      )
+    );
+    expect(res.status).toBe(403);
+    expect(getMock).not.toHaveBeenCalled();
+  });
+
   // Path allowlist (red-team R3, CRITICAL): the unauthenticated proxy must NOT
   // stream the private `admin/config.json` (manager emails = PII) that sits at a
   // fixed key in this same store, even though the host check passes.
