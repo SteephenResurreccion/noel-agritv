@@ -1,5 +1,31 @@
-import { describe, it, expect } from "vitest";
-import { resolveLangFromAcceptLanguage } from "@/lib/lang";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { resolveLangFromAcceptLanguage, getLangFromRequest } from "@/lib/lang";
+
+// Mock next/headers so getLangFromRequest can be exercised without a request.
+// Each test sets the cookie value and accept-language header these stores return.
+const mockCookieGet = vi.fn();
+const mockHeaderGet = vi.fn();
+
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: mockCookieGet }),
+  headers: async () => ({ get: mockHeaderGet }),
+}));
+
+/** Seed the mocked cookie + Accept-Language header for one getLangFromRequest call. */
+function seedRequest({
+  cookie,
+  acceptLanguage,
+}: {
+  cookie?: string;
+  acceptLanguage?: string | null;
+}): void {
+  mockCookieGet.mockReturnValue(
+    cookie === undefined ? undefined : { value: cookie },
+  );
+  mockHeaderGet.mockImplementation((name: string) =>
+    name === "accept-language" ? (acceptLanguage ?? null) : null,
+  );
+}
 
 /**
  * Accept-Language resolution rules (locked product decisions):
@@ -92,5 +118,40 @@ describe("resolveLangFromAcceptLanguage", () => {
 
   it("falls back to 'fil' when only unrecognized tags are present", () => {
     expect(resolveLangFromAcceptLanguage("fr-FR,de,es;q=0.9")).toBe("fil");
+  });
+});
+
+/**
+ * getLangFromRequest precedence (cookie wins over header; falls back to header;
+ * defaults to "fil"). next/headers is mocked above.
+ */
+describe("getLangFromRequest", () => {
+  beforeEach(() => {
+    mockCookieGet.mockReset();
+    mockHeaderGet.mockReset();
+  });
+
+  it("lets a valid naf_lang=en cookie win over a Filipino Accept-Language header", async () => {
+    seedRequest({ cookie: "en", acceptLanguage: "fil-PH,fil;q=0.9" });
+    expect(await getLangFromRequest()).toBe("en");
+  });
+
+  it("falls through to Accept-Language when the cookie value is invalid", async () => {
+    // "es" is not a valid Lang → ignored; header has no opt-in → default "fil".
+    seedRequest({ cookie: "es", acceptLanguage: "es-ES,es;q=0.9" });
+    expect(await getLangFromRequest()).toBe("fil");
+    // Invalid cookie but an en-PH header → English from the header.
+    seedRequest({ cookie: "es", acceptLanguage: "en-PH" });
+    expect(await getLangFromRequest()).toBe("en");
+  });
+
+  it("defaults to 'fil' with no cookie and no Accept-Language header", async () => {
+    seedRequest({ cookie: undefined, acceptLanguage: null });
+    expect(await getLangFromRequest()).toBe("fil");
+  });
+
+  it("lets naf_lang=fil cookie win over an en-PH Accept-Language header", async () => {
+    seedRequest({ cookie: "fil", acceptLanguage: "en-PH" });
+    expect(await getLangFromRequest()).toBe("fil");
   });
 });
