@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { FACEBOOK_URL } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 interface VideoItem {
   title: string;
@@ -13,6 +13,7 @@ interface VideoItem {
 }
 
 export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
+  const copy = useCopy();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   if (videos.length === 0) return null;

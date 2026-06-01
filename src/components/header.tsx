@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
 import { categories } from "@/data/categories";
 import { CartBadge } from "@/components/cart-badge";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 interface SearchProduct {
   slug: string;
@@ -15,9 +15,9 @@ interface SearchProduct {
   image: string;
 }
 
-const TRENDING_SEARCHES = copy.header.trendingTerms;
-
 export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct[] }) {
+  const copy = useCopy();
+  const TRENDING_SEARCHES = copy.header.trendingTerms;
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

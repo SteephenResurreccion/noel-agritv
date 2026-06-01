@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FACEBOOK_URL } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 export type AnnouncementItem = {
   text: string;
@@ -8,21 +9,22 @@ export type AnnouncementItem = {
   external?: boolean;
 };
 
-const defaultAnnouncements: AnnouncementItem[] = [
-  { text: copy.announcementBar.items[0], href: "/products" },
-  { text: copy.announcementBar.items[1], href: FACEBOOK_URL, external: true },
-  { text: copy.announcementBar.items[2], href: "/about" },
-];
-
-export function AnnouncementBar({
-  announcements = defaultAnnouncements,
+export async function AnnouncementBar({
+  announcements,
   direction = "left",
 }: {
   announcements?: AnnouncementItem[];
   direction?: "left" | "right";
 } = {}) {
+  const copy = getCopy(await getLangFromRequest());
+  const defaultAnnouncements: AnnouncementItem[] = [
+    { text: copy.announcementBar.items[0], href: "/products" },
+    { text: copy.announcementBar.items[1], href: FACEBOOK_URL, external: true },
+    { text: copy.announcementBar.items[2], href: "/about" },
+  ];
+  const resolvedAnnouncements = announcements ?? defaultAnnouncements;
   // Duplicate 4x for seamless loop on wide screens
-  const items = [...announcements, ...announcements, ...announcements, ...announcements];
+  const items = [...resolvedAnnouncements, ...resolvedAnnouncements, ...resolvedAnnouncements, ...resolvedAnnouncements];
 
   return (
     <div className="overflow-hidden bg-brand-darkest text-white">

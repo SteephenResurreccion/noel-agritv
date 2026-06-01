@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { Play } from "lucide-react";
 import { trackVideoPlay } from "@/lib/analytics";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 interface YouTubeFacadeProps {
   videoId: string;
@@ -12,6 +12,7 @@ interface YouTubeFacadeProps {
 }
 
 export function YouTubeFacade({ videoId, title, className }: YouTubeFacadeProps) {
+  const copy = useCopy();
   const [playing, setPlaying] = useState(false);
 
   // Sanitize videoId — only allow alphanumeric, hyphens, underscores (standard YouTube ID chars)

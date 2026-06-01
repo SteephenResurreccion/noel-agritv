@@ -13,32 +13,42 @@ import { categories } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { defaultVideos } from "@/data/videos";
-import { copy } from "@/lib/copy";
+import { getCopy, type Lang } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
-export const metadata: Metadata = {
-  title: copy.meta.rootTitleDefault,
-  description: copy.meta.rootDescription,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { meta } = getCopy(await getLangFromRequest());
+  return {
+    title: meta.rootTitleDefault,
+    description: meta.rootDescription,
+  };
+}
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com";
 
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: copy.common.brand,
-  url: siteUrl,
-  description: copy.meta.orgDescription,
-  publisher: {
-    "@type": "Organization",
+/** WebSite JSON-LD for a language. Non-copy fields are constant. */
+function websiteJsonLd(lang: Lang) {
+  const copy = getCopy(lang);
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
     name: copy.common.brand,
     url: siteUrl,
-    sameAs: [FACEBOOK_URL, YOUTUBE_URL],
-  },
-};
+    description: copy.meta.orgDescription,
+    publisher: {
+      "@type": "Organization",
+      name: copy.common.brand,
+      url: siteUrl,
+      sameAs: [FACEBOOK_URL, YOUTUBE_URL],
+    },
+  };
+}
 
 export default async function HomePage() {
+  const lang = await getLangFromRequest();
+  const copy = getCopy(lang);
   let visibleProducts: Product[] = products;
   let featuredProducts: Product[] = [];
   let videoItems = defaultVideos.filter((v) => v.visible);
@@ -82,7 +92,7 @@ export default async function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd(lang)) }}
       />
       {/* ── Section 1: Hero Banner — TBOF style ── */}
       <section className="relative overflow-hidden bg-bg pb-[100px] min-[741px]:pb-[130px]">

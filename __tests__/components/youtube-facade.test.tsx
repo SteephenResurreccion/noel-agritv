@@ -1,9 +1,15 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { renderWithLang as render, screen, fireEvent } from "../test-utils";
 import { YouTubeFacade } from "@/components/youtube-facade";
 import { copy } from "@/lib/copy";
 
 vi.mock("@vercel/analytics", () => ({ track: vi.fn() }));
+
+// The render wrapper (renderWithLang) mounts LangProvider, which calls
+// useRouter() on every render — stub it so the App Router context isn't required.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: () => {} }),
+}));
 
 describe("YouTubeFacade", () => {
   it("renders thumbnail image, not iframe, on initial load", () => {
