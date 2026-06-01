@@ -1,5 +1,6 @@
 "use client";
 
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useLang } from "@/lib/lang-context";
 import type { Lang } from "@/lib/copy";
 
@@ -7,20 +8,29 @@ import type { Lang } from "@/lib/copy";
  * Compact FIL / EN segmented control — the persistent way to switch language
  * after the first-visit chooser (`language-modal.tsx`) has been dismissed.
  *
- * Two real `<button>` segments in a `role="group"`. The active language is
- * filled (gold brand accent, matching the modal's primary button) and carries
- * `aria-pressed="true"`; tapping it is a no-op. Tapping the inactive segment
- * calls `setLang(...)` from `useLang()`, which writes the `naf_lang` cookie and
- * triggers `router.refresh()` so Server Components re-render in the new language.
+ * Built on Base UI's single-select ToggleGroup (`@/components/ui/toggle-group`),
+ * the repo's official UI primitive. The group is a padded pill whose active item
+ * (gold brand accent, matching the modal's primary button) is inset inside the
+ * container's rounded corners, so the fill can never bleed past the border. Each
+ * item renders a real `<button aria-pressed=…>`; the active language reflects
+ * `useLang().lang`.
+ *
+ * Selecting the inactive item calls `setLang(...)` from `useLang()`, which writes
+ * the `naf_lang` cookie and triggers `router.refresh()` so Server Components
+ * re-render in the new language. Re-selecting the active item is a no-op: Base UI
+ * would deselect it to an empty array, but we ignore that case so the group is
+ * never empty (always exactly one language pressed).
  *
  * The "FIL" / "EN" labels are language-NEUTRAL abbreviations — identical in both
  * languages — so they're hardcoded here rather than threaded through copy.ts.
- * `aria-label`s ("Filipino" / "English") are likewise neutral.
+ * `aria-label`s ("Filipino" / "English") and the group label ("Language / Wika")
+ * are likewise neutral.
  *
  * Layout: the parent controls placement (desktop header cluster vs. mobile
- * drawer). The control itself is full-content-width and keeps a quiet, utility
- * appearance. Each segment is ≥48px tall (`min-h-12`) so it satisfies the
- * touch-target budget when rendered in the mobile drawer.
+ * drawer). Each item is `min-h-12` (48px) tall on mobile so the button's own
+ * hit area satisfies the touch-target budget in the drawer, and ~36px on
+ * desktop (`lg:min-h-[32px]`). The breakpoint is `lg:` to match the header's
+ * mobile↔desktop split.
  */
 
 const SEGMENTS: { value: Lang; label: string; aria: string }[] = [
@@ -32,33 +42,26 @@ export function LangSwitcher(): React.ReactElement {
   const { lang, setLang } = useLang();
 
   return (
-    <div
-      role="group"
+    <ToggleGroup
       aria-label="Language / Wika"
-      className="inline-flex items-center overflow-hidden rounded-md border border-border"
+      value={[lang]}
+      onValueChange={(value) => {
+        // Single-select: `value` is [] when the active item is re-tapped
+        // (Base UI deselects). Ignore that — never allow an empty group.
+        const next = value[0];
+        if (next && next !== lang) setLang(next as Lang);
+      }}
     >
-      {SEGMENTS.map((seg) => {
-        const active = lang === seg.value;
-        return (
-          <button
-            key={seg.value}
-            type="button"
-            aria-label={seg.aria}
-            aria-pressed={active}
-            onClick={() => {
-              if (!active) setLang(seg.value);
-            }}
-            className={
-              "flex min-h-12 min-w-12 items-center justify-center px-2.5 text-xs font-semibold uppercase tracking-wide transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent md:min-h-9 " +
-              (active
-                ? "bg-brand-accent text-white"
-                : "text-text-secondary hover:text-text-primary")
-            }
-          >
-            {seg.label}
-          </button>
-        );
-      })}
-    </div>
+      {SEGMENTS.map((seg) => (
+        <ToggleGroupItem
+          key={seg.value}
+          value={seg.value}
+          aria-label={seg.aria}
+          className="min-h-12 min-w-12 lg:min-h-[32px]"
+        >
+          {seg.label}
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
   );
 }

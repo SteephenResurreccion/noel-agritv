@@ -84,7 +84,7 @@ describe("LangSwitcher", () => {
     expect(document.cookie).not.toContain("naf_lang=fil");
   });
 
-  it("each segment meets the mobile touch-target budget (min-h-12 = 48px)", () => {
+  it("each segment meets the mobile touch-target budget (48px item via min-h-12)", () => {
     render(<LangSwitcher />);
     for (const name of ["Filipino", "English"]) {
       expect(screen.getByRole("button", { name })).toHaveClass("min-h-12");
