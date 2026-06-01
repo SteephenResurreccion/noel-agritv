@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import type { Lang } from "@/lib/copy";
 
@@ -82,12 +83,17 @@ export function resolveLangFromAcceptLanguage(header: string | null): Lang {
  *
  * Precedence: a valid `naf_lang` cookie wins; otherwise fall back to parsing
  * the `Accept-Language` header; otherwise default to Filipino.
+ *
+ * Wrapped in React's `cache()` so that many server components calling this
+ * independently within a single request share one resolution instead of each
+ * re-reading `cookies()` / `headers()`. The memo is scoped to the React request
+ * lifetime, so different requests still resolve independently.
  */
-export async function getLangFromRequest(): Promise<Lang> {
+export const getLangFromRequest = cache(async (): Promise<Lang> => {
   const cookieStore = await cookies();
   const fromCookie = asLang(cookieStore.get(LANG_COOKIE)?.value);
   if (fromCookie) return fromCookie;
 
   const headerStore = await headers();
   return resolveLangFromAcceptLanguage(headerStore.get("accept-language"));
-}
+});

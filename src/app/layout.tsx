@@ -67,9 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: meta.rootTitleTemplate,
     },
     description: meta.rootDescription,
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL || "https://noelagritv.com"
-    ),
+    metadataBase: new URL(siteUrl),
     icons: {
       icon: "/icon.png",
       apple: "/icon.png",
