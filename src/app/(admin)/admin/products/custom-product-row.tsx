@@ -71,6 +71,11 @@ export function CustomProductRow({
   const [specs, setSpecs] = useState(product.specs ?? []);
   const [crops, setCrops] = useState(product.compatibleCrops ?? []);
   const [cropInput, setCropInput] = useState("");
+  // English (optional) counterparts, seeded from the product's existing En
+  // fields. Mirror the Filipino editors: parallel spec rows + crop tag list.
+  const [specsEn, setSpecsEn] = useState(product.specsEn ?? []);
+  const [cropsEn, setCropsEn] = useState(product.compatibleCropsEn ?? []);
+  const [cropEnInput, setCropEnInput] = useState("");
   // Volume tiers, held in pesos for the inputs. Initialized from the product's
   // existing centavos tiers so a routine edit re-submits (preserves) them.
   const [tiers, setTiers] = useState(() => tiersToPesos(product.priceTiers));
@@ -123,6 +128,17 @@ export function CustomProductRow({
       formData.set("compatibleCrops", JSON.stringify(crops));
     }
 
+    // English (optional) structured data. Only set when filled — an emptied
+    // English list is left unset, which the server reads as "cleared" (the En
+    // field is then omitted from the saved product, falling back to Filipino).
+    const validSpecsEn = specsEn.filter((s) => s.label.trim() && s.value.trim());
+    if (validSpecsEn.length > 0) {
+      formData.set("specsEn", JSON.stringify(validSpecsEn));
+    }
+    if (cropsEn.length > 0) {
+      formData.set("compatibleCropsEn", JSON.stringify(cropsEn));
+    }
+
     // ALWAYS submit tiers — even when untouched — so a routine edit preserves
     // the existing ladder. updateProduct fully replaces tiers from this field;
     // omitting it would silently revert the product to flat pricing.
@@ -145,6 +161,9 @@ export function CustomProductRow({
     setSpecs(product.specs ?? []);
     setCrops(product.compatibleCrops ?? []);
     setCropInput("");
+    setSpecsEn(product.specsEn ?? []);
+    setCropsEn(product.compatibleCropsEn ?? []);
+    setCropEnInput("");
     setTiers(tiersToPesos(product.priceTiers));
     setEditing(true);
   }
@@ -198,7 +217,7 @@ export function CustomProductRow({
               </div>
               <div className="md:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-text-secondary">
-                  Short Description *
+                  Short Description (Filipino) *
                 </label>
                 <textarea
                   name="description"
@@ -206,6 +225,18 @@ export function CustomProductRow({
                   rows={3}
                   defaultValue={product.description}
                   className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-xs font-semibold text-text-secondary">
+                  Short Description (English)
+                </label>
+                <textarea
+                  name="descriptionEn"
+                  rows={3}
+                  defaultValue={product.descriptionEn ?? ""}
+                  placeholder="Optional — falls back to Filipino if empty"
+                  className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
                 />
               </div>
               <div className="md:col-span-2">
@@ -323,11 +354,11 @@ export function CustomProductRow({
               </div>
             </div>
 
-            {/* Specs */}
+            {/* Specs (Filipino) */}
             <div className="border-t border-border pt-4">
               <div className="mb-2 flex items-center justify-between">
                 <label className="text-xs font-semibold text-text-secondary">
-                  Product Specs
+                  Product Specs (Filipino)
                 </label>
                 <button
                   type="button"
@@ -376,10 +407,66 @@ export function CustomProductRow({
               </div>
             </div>
 
-            {/* How to Apply */}
+            {/* Specs (English) */}
+            <div className="border-t border-border pt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-xs font-semibold text-text-secondary">
+                  Product Specs (English)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setSpecsEn([...specsEn, { label: "", value: "" }])}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent hover:underline"
+                >
+                  <Plus className="h-3 w-3" /> Add Spec
+                </button>
+              </div>
+              <p className="mb-2 text-xs text-text-secondary/60">
+                Optional — falls back to Filipino specs if empty.
+              </p>
+              <div className="space-y-2">
+                {specsEn.map((spec, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      placeholder="Label"
+                      value={spec.label}
+                      onChange={(e) =>
+                        setSpecsEn(
+                          specsEn.map((s, j) =>
+                            j === i ? { ...s, label: e.target.value } : s
+                          )
+                        )
+                      }
+                      className="h-8 w-1/3 rounded-md border border-border bg-bg px-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+                    />
+                    <input
+                      placeholder="Value"
+                      value={spec.value}
+                      onChange={(e) =>
+                        setSpecsEn(
+                          specsEn.map((s, j) =>
+                            j === i ? { ...s, value: e.target.value } : s
+                          )
+                        )
+                      }
+                      className="h-8 flex-1 rounded-md border border-border bg-bg px-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSpecsEn(specsEn.filter((_, j) => j !== i))}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-red-50 hover:text-red-600"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* How to Apply (Filipino) */}
             <div>
               <label className="mb-1 block text-xs font-semibold text-text-secondary">
-                How to Apply
+                How to Apply (Filipino)
               </label>
               <textarea
                 name="howToApply"
@@ -389,14 +476,28 @@ export function CustomProductRow({
               />
             </div>
 
-            {/* Compatible Crops */}
+            {/* How to Apply (English) */}
             <div>
               <label className="mb-1 block text-xs font-semibold text-text-secondary">
-                Compatible Crops
+                How to Apply (English)
+              </label>
+              <textarea
+                name="howToApplyEn"
+                rows={2}
+                defaultValue={product.howToApplyEn ?? ""}
+                placeholder="Optional — falls back to Filipino if empty"
+                className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+              />
+            </div>
+
+            {/* Compatible Crops (Filipino) */}
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-text-secondary">
+                Compatible Crops (Filipino)
               </label>
               <div className="flex items-center gap-2">
                 <input
-                  placeholder="e.g. Rice"
+                  placeholder="e.g. Palay"
                   value={cropInput}
                   onChange={(e) => setCropInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -448,16 +549,92 @@ export function CustomProductRow({
               )}
             </div>
 
-            {/* Safety Notes */}
+            {/* Compatible Crops (English) */}
             <div>
               <label className="mb-1 block text-xs font-semibold text-text-secondary">
-                Safety &amp; Handling Notes
+                Compatible Crops (English)
+              </label>
+              <p className="mb-1 text-xs text-text-secondary/60">
+                Optional — falls back to Filipino crops if empty.
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  placeholder="e.g. Rice"
+                  value={cropEnInput}
+                  onChange={(e) => setCropEnInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const trimmed = cropEnInput.trim();
+                      if (trimmed && !cropsEn.includes(trimmed)) {
+                        setCropsEn([...cropsEn, trimmed]);
+                        setCropEnInput("");
+                      }
+                    }
+                  }}
+                  className="h-8 flex-1 rounded-md border border-border bg-bg px-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const trimmed = cropEnInput.trim();
+                    if (trimmed && !cropsEn.includes(trimmed)) {
+                      setCropsEn([...cropsEn, trimmed]);
+                      setCropEnInput("");
+                    }
+                  }}
+                  className="h-8 rounded-md bg-bg px-3 text-xs font-semibold text-text-secondary hover:bg-border"
+                >
+                  Add
+                </button>
+              </div>
+              {cropsEn.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {cropsEn.map((crop) => (
+                    <span
+                      key={crop}
+                      className="inline-flex items-center gap-1 rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-medium text-brand-accent"
+                    >
+                      {crop}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCropsEn(cropsEn.filter((c) => c !== crop))
+                        }
+                        className="hover:text-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Safety Notes (Filipino) */}
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-text-secondary">
+                Safety &amp; Handling Notes (Filipino)
               </label>
               <textarea
                 name="safetyNotes"
                 rows={2}
                 defaultValue={product.safetyNotes ?? ""}
                 className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-brand-accent focus:outline-none"
+              />
+            </div>
+
+            {/* Safety Notes (English) */}
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-text-secondary">
+                Safety &amp; Handling Notes (English)
+              </label>
+              <textarea
+                name="safetyNotesEn"
+                rows={2}
+                defaultValue={product.safetyNotesEn ?? ""}
+                placeholder="Optional — falls back to Filipino if empty"
+                className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
               />
             </div>
 

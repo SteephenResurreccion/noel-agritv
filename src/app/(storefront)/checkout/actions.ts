@@ -53,7 +53,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
   >();
   const custom = (config.customProducts ?? [])
     .filter((p) => p.visible)
-    .map(adminToProduct);
+    .map((p) => adminToProduct(p, lang));
   const source = custom.length > 0 ? custom : products;
   for (const p of source) {
     if (p.priceCentavos !== undefined) {

@@ -43,7 +43,7 @@ async function findProduct(
     const custom = (config.customProducts ?? []).find(
       (p) => p.slug === slug && p.visible
     );
-    if (custom) return adminToProduct(custom);
+    if (custom) return adminToProduct(custom, lang);
   } catch {
     // Blob not configured
   }
@@ -95,7 +95,7 @@ export default async function ProductDetailPage({
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map(adminToProduct);
+      .map((p) => adminToProduct(p, lang));
 
     if (custom.length > 0) {
       allProducts = custom;

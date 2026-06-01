@@ -35,7 +35,7 @@ export default async function ProductsPage({
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map(adminToProduct);
+      .map((p) => adminToProduct(p, lang));
 
     if (custom.length > 0) {
       // Custom products exist (seeded or admin-created) — use them as source of truth

@@ -59,7 +59,7 @@ export default async function HomePage() {
     const config = await getAdminConfig();
     const custom: Product[] = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map(adminToProduct);
+      .map((p) => adminToProduct(p, lang));
 
     if (custom.length > 0) {
       visibleProducts = custom;
@@ -75,7 +75,7 @@ export default async function HomePage() {
       featuredProducts = featuredIds
         .map((id) => {
           const cp = (config.customProducts ?? []).find((p) => p.id === id && p.visible);
-          return cp ? adminToProduct(cp) : undefined;
+          return cp ? adminToProduct(cp, lang) : undefined;
         })
         .filter(Boolean) as Product[];
     }

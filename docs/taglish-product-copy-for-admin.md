@@ -263,4 +263,50 @@ Ilang interface text na judgment call — sabihin lang **keep** o **palitan ng _
 
 ---
 
+## Bilingual product content (Filipino + English)
+
+The storefront now lets each buyer choose their language, and your product
+content follows that choice. Here is what changed and what (if anything) you
+need to do.
+
+**How buyers see it.** Every visitor picks Filipino or English (a one-time
+prompt on first visit, plus a FIL / EN switch in the header). Product pages then
+show that buyer's language — description, specs, how-to-apply, compatible crops,
+and safety notes.
+
+**Your existing products keep working — nothing breaks.** Any product already in
+the admin shows its current (Filipino) text to **all** buyers, in both languages,
+until you add English. There is no blank state and no migration to run: a product
+with only Filipino simply shows Filipino to everyone.
+
+**The 4 built-in products get both languages automatically.** When you click
+**Seed** on the Products page (or re-seed), the built-in products
+(Bio Plant Booster, Bio Enzyme, Jasmine 479, Mayumi) now load with **both**
+Filipino and English already filled in. No copy-paste needed for these four.
+
+**For any other product, add English when you're ready.** Open the product in the
+admin (Add Product or the edit pencil) and you'll see each text field twice:
+- **"(Filipino)"** — the existing text. This is required and is what already
+  shows today.
+- **"(English)"** — a new, **optional** field right below it. Fill it in to give
+  English-language buyers a proper English version.
+
+**Blank English = automatic fallback, per field.** Each English field falls back
+on its own. If you translate the Description into English but leave the Safety
+Notes English field blank, an English buyer sees your English description and the
+Filipino safety notes. You never get an empty section — anything you leave blank
+quietly falls back to its Filipino counterpart. So a half-finished translation is
+safe to save; finish the rest whenever you like.
+
+**Specs and Compatible Crops have a separate English list.** Under the Filipino
+specs rows there's a parallel **"Product Specs (English)"** set of rows, and
+under the Filipino crops there's a **"Compatible Crops (English)"** tag box. Fill
+these in to translate spec labels/values and crop names; leave them empty to fall
+back to the Filipino specs/crops.
+
+> The admin panel itself stays **English** (by design). Only the storefront that
+> customers see is bilingual.
+
+---
+
 *Reference files (para sa dev team): `src/data/products.ts`, `src/data/categories.ts`, `src/lib/copy.ts`, `src/lib/admin-to-product.ts`, `src/lib/admin-store.ts`.*
