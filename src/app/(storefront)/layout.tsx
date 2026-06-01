@@ -3,21 +3,24 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { MobileBottomBar } from "@/components/mobile-bottom-bar";
 import { CheckoutBar } from "@/components/checkout-bar";
-import { products } from "@/data/products";
+import { LanguageModal } from "@/components/language-modal";
+import { getLocalizedProducts } from "@/data/products";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
+import { getLangFromRequest } from "@/lib/lang";
 
 export default async function StorefrontLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  let allProducts = products;
+  const lang = await getLangFromRequest();
+  let allProducts = getLocalizedProducts(lang);
   try {
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map(adminToProduct);
+      .map((p) => adminToProduct(p, lang));
     if (custom.length > 0) allProducts = custom;
   } catch {
     // fallback to built-in
@@ -47,6 +50,7 @@ export default async function StorefrontLayout({
       <Footer />
       <MobileBottomBar />
       <CheckoutBar />
+      <LanguageModal />
     </>
   );
 }

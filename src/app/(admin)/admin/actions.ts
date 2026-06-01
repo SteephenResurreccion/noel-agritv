@@ -83,6 +83,55 @@ function parseJsonField(raw: string): unknown {
   return JSON.parse(raw);
 }
 
+/**
+ * Parse the OPTIONAL English prose fields shared by addProduct/updateProduct.
+ * Each field is independent and may be blank — a blank English field is stored
+ * as `undefined` so it is OMITTED from the AdminProduct JSON, letting the
+ * storefront fall back to the Filipino value per-field. Parsed with the same
+ * Zod limits as the Filipino base fields.
+ */
+function parseEnglishProseFields(formData: FormData): {
+  descriptionEn?: string;
+  specsEn?: { label: string; value: string }[];
+  howToApplyEn?: string | null;
+  compatibleCropsEn?: string[];
+  safetyNotesEn?: string | null;
+} {
+  const descriptionRaw = z.string().trim().max(2000).optional()
+    .parse(formData.get("descriptionEn") ?? undefined);
+  const descriptionEn = descriptionRaw && descriptionRaw.length > 0 ? descriptionRaw : undefined;
+
+  const howToApplyEn = z.string().trim().max(2000).optional().nullable()
+    .transform((v) => v || null)
+    .parse(formData.get("howToApplyEn") || null) ?? null;
+
+  const safetyNotesEn = z.string().trim().max(2000).optional().nullable()
+    .transform((v) => v || null)
+    .parse(formData.get("safetyNotesEn") || null) ?? null;
+
+  const specsJson = formData.get("specsEn") as string | null;
+  const specsParsed = specsJson
+    ? z.array(productSpecSchema).max(20).parse(parseJsonField(specsJson))
+    : [];
+  const specsEn = specsParsed.length > 0 ? specsParsed : undefined;
+
+  const cropsJson = formData.get("compatibleCropsEn") as string | null;
+  const cropsParsed = cropsJson
+    ? z.array(z.string().trim().min(1).max(100)).max(50).parse(parseJsonField(cropsJson))
+    : [];
+  const compatibleCropsEn = cropsParsed.length > 0 ? cropsParsed : undefined;
+
+  return {
+    descriptionEn,
+    specsEn,
+    // Null ⇒ omit (storefront falls back to Filipino). Keep as null only when
+    // explicitly empty so the spread below drops it.
+    howToApplyEn: howToApplyEn ?? undefined,
+    compatibleCropsEn,
+    safetyNotesEn: safetyNotesEn ?? undefined,
+  };
+}
+
 function validateImageFile(file: File): void {
   if (file.size > MAX_FILE_SIZE) {
     throw new Error("Image must be under 5MB.");
@@ -120,7 +169,9 @@ function revalidateStorefront() {
 export async function seedBuiltInProducts() {
   await requireAuth();
   try {
-    const { products: builtInProducts } = await import("@/data/products");
+    const { products: builtInProducts, localizeProduct } = await import(
+      "@/data/products"
+    );
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
@@ -128,23 +179,38 @@ export async function seedBuiltInProducts() {
       (config.customProducts ?? []).map((p) => p.slug)
     );
 
+    // AdminProduct now carries BOTH languages: the base fields hold Filipino
+    // (the live default) and the `*En` fields hold English. Seeding resolves
+    // the bilingual source once per language so the owner gets instant
+    // bilingual content for the 4 built-in products on (re-)seed.
     const newProducts: AdminProduct[] = builtInProducts
       .filter((p) => !existingSlugs.has(p.slug))
-      .map((p) => ({
-        id: crypto.randomUUID(),
-        slug: p.slug,
-        name: p.name,
-        description: p.oneLiner,
-        image: p.image,
-        categorySlug: p.categorySlug,
-        visible: true,
-        priceCentavos: p.priceCentavos,
-        priceTiers: p.priceTiers,
-        specs: p.specs,
-        howToApply: p.howToApply,
-        compatibleCrops: p.compatibleCrops,
-        safetyNotes: p.safetyNotes,
-      }));
+      .map((source) => {
+        const fil = localizeProduct(source, "fil");
+        const en = localizeProduct(source, "en");
+        return {
+          id: crypto.randomUUID(),
+          slug: fil.slug,
+          name: fil.name,
+          description: fil.oneLiner,
+          image: fil.image,
+          categorySlug: fil.categorySlug,
+          visible: true,
+          priceCentavos: fil.priceCentavos,
+          priceTiers: fil.priceTiers,
+          specs: fil.specs,
+          howToApply: fil.howToApply,
+          compatibleCrops: fil.compatibleCrops,
+          safetyNotes: fil.safetyNotes,
+          // English counterparts — fall back to Filipino on the storefront if
+          // ever absent, but seeding always supplies both.
+          descriptionEn: en.oneLiner,
+          specsEn: en.specs,
+          howToApplyEn: en.howToApply,
+          compatibleCropsEn: en.compatibleCrops,
+          safetyNotesEn: en.safetyNotes,
+        };
+      });
 
     if (newProducts.length === 0) return;
 
@@ -210,6 +276,10 @@ export async function addProduct(formData: FormData) {
       ? z.array(z.string().trim().min(1).max(100)).max(50).parse(parseJsonField(cropsJson))
       : [];
 
+    // English counterparts (all optional — blank ⇒ falls back to Filipino on
+    // the storefront). Parsed identically to the base fields.
+    const en = parseEnglishProseFields(formData);
+
     const tiersJson = formData.get("priceTiers") as string | null;
     const priceTiers = tiersJson
       ? priceTierSchema.parse(parseJsonField(tiersJson))
@@ -265,6 +335,8 @@ export async function addProduct(formData: FormData) {
       howToApply,
       compatibleCrops,
       safetyNotes,
+      // Optional English fields — undefined keys are omitted from the JSON.
+      ...en,
     };
 
     config.customProducts = [...(config.customProducts ?? []), newProduct];
@@ -301,6 +373,11 @@ export async function updateProduct(id: string, formData: FormData) {
     const compatibleCrops = cropsJson
       ? z.array(z.string().trim().min(1).max(100)).max(50).parse(parseJsonField(cropsJson))
       : [];
+
+    // English counterparts (optional; blank ⇒ omitted ⇒ storefront falls back
+    // to Filipino). The edit form always resubmits these, so a blanked English
+    // field clears the stored value — mirroring how base fields behave.
+    const en = parseEnglishProseFields(formData);
 
     const tiersJson = formData.get("priceTiers") as string | null;
     const priceTiers = tiersJson
@@ -364,6 +441,14 @@ export async function updateProduct(id: string, formData: FormData) {
       howToApply,
       compatibleCrops,
       safetyNotes,
+      // English fields: the edit form always resubmits them, so a blanked field
+      // (parsed to undefined) explicitly CLEARS the stored value rather than
+      // leaving the stale `...existing` value behind.
+      descriptionEn: en.descriptionEn,
+      specsEn: en.specsEn,
+      howToApplyEn: en.howToApplyEn,
+      compatibleCropsEn: en.compatibleCropsEn,
+      safetyNotesEn: en.safetyNotesEn,
     };
 
     await saveAdminConfig(config, ver);

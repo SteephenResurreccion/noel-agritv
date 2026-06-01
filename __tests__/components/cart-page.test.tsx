@@ -1,8 +1,14 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { renderWithLang as render, screen } from "../test-utils";
 import { useCart } from "@/lib/cart-store";
 import CartPage from "@/app/(storefront)/cart/page";
 import { copy } from "@/lib/copy";
+
+// The render wrapper (renderWithLang) mounts LangProvider, which calls
+// useRouter() on every render — stub it so the App Router context isn't required.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: () => {} }),
+}));
 
 // The nudge text ("Magdagdag pa ng N") is split across child nodes inside one
 // <p>, so a plain getByText(string) misses it. This matcher targets the single

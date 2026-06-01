@@ -5,9 +5,10 @@ import { ShoppingBag, MessageCircle, Phone, Send } from "lucide-react";
 import { MESSENGER_URL, PHONE_NUMBER, PHONE_TEL } from "@/lib/constants";
 import { trackMessengerClick, trackCallClick } from "@/lib/analytics";
 import { openMessenger } from "@/lib/open-messenger";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 export function MobileBottomBar() {
+  const copy = useCopy();
   return (
     <nav
       role="navigation"

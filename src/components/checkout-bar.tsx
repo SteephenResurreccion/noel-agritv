@@ -7,7 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHasMounted } from "@/lib/use-has-mounted";
 import { formatCentavos } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 /**
  * Lazada/Shopee-style sticky checkout bar.
@@ -22,6 +22,7 @@ import { copy } from "@/lib/copy";
  * is actually visible — no wasted bottom padding for empty-cart users.
  */
 export function CheckoutBar(): React.ReactElement | null {
+  const copy = useCopy();
   const mounted = useHasMounted();
   const count = useCart((s) => s.totalItems());
   const subtotal = useCart((s) => s.subtotalCentavos());

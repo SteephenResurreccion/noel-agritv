@@ -9,9 +9,11 @@ import {
   PHONE_TEL,
   EMAIL,
 } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
-export function Footer() {
+export async function Footer() {
+  const copy = getCopy(await getLangFromRequest());
   return (
     <footer className="bg-brand-darkest pb-16 text-white md:pb-0">
       <div className="container-site py-12">

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { MESSENGER_WHOLESALE_URL, PHONE_TEL, PHONE_NUMBER } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
-const benefits = copy.wholesaleBanner.benefits;
-
-export function WholesaleBanner() {
+export async function WholesaleBanner() {
+  const copy = getCopy(await getLangFromRequest());
+  const benefits = copy.wholesaleBanner.benefits;
   return (
     <section className="bg-brand-darkest px-[var(--spacing-container-gutter)] py-[var(--spacing-section)]">
       <div className="container-site mx-auto max-w-xl text-center">

@@ -1,8 +1,13 @@
 import { describe, it, expect, beforeEach, afterAll, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { renderWithLang as render, screen } from "../../test-utils";
 import userEvent from "@testing-library/user-event";
 import TrackPage from "@/app/(storefront)/track/page";
 import { copy } from "@/lib/copy";
+
+// LangProvider (mounted via renderWithLang) calls useRouter().refresh; stub it.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
 
 // jsdom's window.location does not let `.assign` be spied on directly because the
 // Location object is not configurable. Replace it with a stub for the suite.

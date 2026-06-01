@@ -4,9 +4,10 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
-import { categories } from "@/data/categories";
+import { getLocalizedCategories } from "@/data/categories";
 import { CartBadge } from "@/components/cart-badge";
-import { copy } from "@/lib/copy";
+import { LangSwitcher } from "@/components/lang-switcher";
+import { useCopy, useLang } from "@/lib/lang-context";
 
 interface SearchProduct {
   slug: string;
@@ -15,9 +16,12 @@ interface SearchProduct {
   image: string;
 }
 
-const TRENDING_SEARCHES = copy.header.trendingTerms;
-
 export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct[] }) {
+  const copy = useCopy();
+  const { lang } = useLang();
+  // Category pills re-localize client-side on language switch (~100 bytes).
+  const categories = getLocalizedCategories(lang);
+  const TRENDING_SEARCHES = copy.header.trendingTerms;
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -155,6 +159,11 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   {copy.common.findMyOrder}
                 </Link>
               </nav>
+
+              {/* Language switcher (desktop only — mobile lives in the drawer) */}
+              <div className="ml-6 hidden md:block">
+                <LangSwitcher />
+              </div>
 
               {/* Cart badge */}
               <CartBadge />
@@ -412,6 +421,17 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   </Link>
                 </li>
               </ul>
+
+              {/* Language switcher inside the mobile drawer.
+                  Heading is hardcoded bilingual ("Wika / Language") — it is
+                  language-neutral by design (same rationale as the FIL/EN
+                  labels), so it is not threaded through copy.ts. */}
+              <div className="mt-4 border-t border-border px-3 pt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                  Wika / Language
+                </p>
+                <LangSwitcher />
+              </div>
             </nav>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 /**
  * Official J&T Express Philippines tracking URL — links DIRECT to the tracking result.
@@ -18,6 +18,7 @@ const JT_TRACK_URL = "https://www.jtexpress.ph/trajectoryQuery";
 const JT_TRACK_PARAM = "waybillNo";
 
 export default function TrackPage() {
+  const copy = useCopy();
   const [value, setValue] = useState("");
   const [showHint, setShowHint] = useState(false);
 

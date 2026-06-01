@@ -1,10 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { renderWithLang as render, screen, waitFor } from "../test-utils";
 import userEvent from "@testing-library/user-event";
 import { AddressFields } from "@/components/address-fields";
 import { PH_REGIONS } from "@/lib/ph-regions";
 import { clearPsgcCache } from "@/lib/psgc";
 import { copy } from "@/lib/copy";
+
+// LangProvider (mounted by renderWithLang) calls useRouter() on every render.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: () => {} }),
+}));
 
 const NCR_FIXTURE = {
   region: "NCR",

@@ -1,8 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { renderWithLang as render, screen, waitFor } from "../../test-utils";
 import userEvent from "@testing-library/user-event";
 import { LookupForm } from "@/app/(storefront)/lookup/lookup-form";
 import { copy } from "@/lib/copy";
+
+// The lookupOrder server action is fully mocked, so its getLangFromRequest()
+// never runs here — no next/headers mock is needed. The next/navigation mock
+// below is required only because LangProvider (mounted via renderWithLang)
+// calls useRouter().refresh.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
 
 vi.mock("@/app/(storefront)/lookup/actions", () => ({
   lookupOrder: vi.fn(),

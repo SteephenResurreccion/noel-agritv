@@ -1,9 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { renderWithLang as render, screen } from "../test-utils";
 import { MessengerCTA } from "@/components/messenger-cta";
 import { copy } from "@/lib/copy";
 
 vi.mock("@vercel/analytics", () => ({ track: vi.fn() }));
+
+// LangProvider (mounted by renderWithLang) calls useRouter() on every render.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: () => {} }),
+}));
 
 describe("MessengerCTA", () => {
   it("renders with default text", () => {

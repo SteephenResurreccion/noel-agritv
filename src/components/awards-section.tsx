@@ -3,22 +3,22 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 interface AwardsSectionProps {
   variant?: "compact" | "full";
 }
 
-const awards = [
-  { src: "/images/awards/certificates.webp", label: copy.awards.items[0] },
-  { src: "/images/awards/magazine-noelagritv.webp", label: copy.awards.items[1] },
-  { src: "/images/awards/magazine-stela.webp", label: copy.awards.items[2] },
-  { src: "/images/awards/plaque-2024.webp", label: copy.awards.items[3] },
-  { src: "/images/awards/plaque-recognition.webp", label: copy.awards.items[4] },
-  { src: "/images/awards/stela-trophy.webp", label: copy.awards.items[5] },
-];
-
 export function AwardsSection({ variant = "compact" }: AwardsSectionProps) {
+  const copy = useCopy();
+  const awards = [
+    { src: "/images/awards/certificates.webp", label: copy.awards.items[0] },
+    { src: "/images/awards/magazine-noelagritv.webp", label: copy.awards.items[1] },
+    { src: "/images/awards/magazine-stela.webp", label: copy.awards.items[2] },
+    { src: "/images/awards/plaque-2024.webp", label: copy.awards.items[3] },
+    { src: "/images/awards/plaque-recognition.webp", label: copy.awards.items[4] },
+    { src: "/images/awards/stela-trophy.webp", label: copy.awards.items[5] },
+  ];
   const isCompact = variant === "compact";
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

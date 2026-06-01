@@ -33,6 +33,11 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
   );
   const [crops, setCrops] = useState<string[]>([]);
   const [cropInput, setCropInput] = useState("");
+  // English (optional) counterparts. Specs are mirrored as a parallel set of
+  // rows; crops as a parallel tag list. Blank ⇒ storefront falls back to Filipino.
+  const [specsEn, setSpecsEn] = useState<{ label: string; value: string }[]>([]);
+  const [cropsEn, setCropsEn] = useState<string[]>([]);
+  const [cropEnInput, setCropEnInput] = useState("");
   const router = useRouter();
 
   function handleCategoryChange(slug: string) {
@@ -70,6 +75,30 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
     setCrops(crops.filter((c) => c !== crop));
   }
 
+  function addSpecEn() {
+    setSpecsEn([...specsEn, { label: "", value: "" }]);
+  }
+
+  function removeSpecEn(index: number) {
+    setSpecsEn(specsEn.filter((_, i) => i !== index));
+  }
+
+  function updateSpecEn(index: number, field: "label" | "value", val: string) {
+    setSpecsEn(specsEn.map((s, i) => (i === index ? { ...s, [field]: val } : s)));
+  }
+
+  function addCropEn() {
+    const trimmed = cropEnInput.trim();
+    if (trimmed && !cropsEn.includes(trimmed)) {
+      setCropsEn([...cropsEn, trimmed]);
+      setCropEnInput("");
+    }
+  }
+
+  function removeCropEn(crop: string) {
+    setCropsEn(cropsEn.filter((c) => c !== crop));
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -91,6 +120,15 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
       formData.set("compatibleCrops", JSON.stringify(crops));
     }
 
+    // English (optional) structured data — only submit when filled.
+    const validSpecsEn = specsEn.filter((s) => s.label.trim() && s.value.trim());
+    if (validSpecsEn.length > 0) {
+      formData.set("specsEn", JSON.stringify(validSpecsEn));
+    }
+    if (cropsEn.length > 0) {
+      formData.set("compatibleCropsEn", JSON.stringify(cropsEn));
+    }
+
     startTransition(async () => {
       await addProduct(formData);
       router.refresh();
@@ -99,6 +137,9 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
       setSpecs(CATEGORY_SPECS[categories[0]?.slug]?.map((s) => ({ ...s })) ?? []);
       setCrops([]);
       setCropInput("");
+      setSpecsEn([]);
+      setCropsEn([]);
+      setCropEnInput("");
       setShowForm(false);
     });
   }
@@ -155,13 +196,24 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
             </div>
             <div className="md:col-span-2">
               <label className="mb-1 block text-xs font-semibold text-text-secondary">
-                Short Description *
+                Short Description (Filipino) *
               </label>
               <textarea
                 name="description"
                 required
                 rows={3}
                 placeholder="What this product does (shown on product detail page)"
+                className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-text-secondary">
+                Short Description (English)
+              </label>
+              <textarea
+                name="descriptionEn"
+                rows={3}
+                placeholder="Optional — falls back to Filipino if empty"
                 className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
               />
             </div>
@@ -192,11 +244,11 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
             </div>
           </div>
 
-          {/* Specs */}
+          {/* Specs (Filipino) */}
           <div className="mt-6 border-t border-border pt-4">
             <div className="mb-2 flex items-center justify-between">
               <label className="text-xs font-semibold text-text-secondary">
-                Product Specs
+                Product Specs (Filipino)
               </label>
               <button
                 type="button"
@@ -210,13 +262,13 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
               {specs.map((spec, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <input
-                    placeholder="Label (e.g. Type)"
+                    placeholder="Label (e.g. Uri)"
                     value={spec.label}
                     onChange={(e) => updateSpec(i, "label", e.target.value)}
                     className="h-8 w-1/3 rounded-md border border-border bg-bg px-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
                   />
                   <input
-                    placeholder="Value (e.g. Liquid)"
+                    placeholder="Value (e.g. Likido)"
                     value={spec.value}
                     onChange={(e) => updateSpec(i, "value", e.target.value)}
                     className="h-8 flex-1 rounded-md border border-border bg-bg px-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
@@ -233,10 +285,54 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
             </div>
           </div>
 
-          {/* How to Apply */}
+          {/* Specs (English) */}
+          <div className="mt-4 border-t border-border pt-4">
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-xs font-semibold text-text-secondary">
+                Product Specs (English)
+              </label>
+              <button
+                type="button"
+                onClick={addSpecEn}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent hover:underline"
+              >
+                <Plus className="h-3 w-3" /> Add Spec
+              </button>
+            </div>
+            <p className="mb-2 text-xs text-text-secondary/60">
+              Optional — falls back to Filipino specs if empty.
+            </p>
+            <div className="space-y-2">
+              {specsEn.map((spec, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    placeholder="Label (e.g. Type)"
+                    value={spec.label}
+                    onChange={(e) => updateSpecEn(i, "label", e.target.value)}
+                    className="h-8 w-1/3 rounded-md border border-border bg-bg px-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+                  />
+                  <input
+                    placeholder="Value (e.g. Liquid)"
+                    value={spec.value}
+                    onChange={(e) => updateSpecEn(i, "value", e.target.value)}
+                    className="h-8 flex-1 rounded-md border border-border bg-bg px-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSpecEn(i)}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-red-50 hover:text-red-600"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* How to Apply (Filipino) */}
           <div className="mt-4">
             <label className="mb-1 block text-xs font-semibold text-text-secondary">
-              How to Apply
+              How to Apply (Filipino)
             </label>
             <textarea
               name="howToApply"
@@ -246,14 +342,27 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
             />
           </div>
 
-          {/* Compatible Crops */}
+          {/* How to Apply (English) */}
           <div className="mt-4">
             <label className="mb-1 block text-xs font-semibold text-text-secondary">
-              Compatible Crops
+              How to Apply (English)
+            </label>
+            <textarea
+              name="howToApplyEn"
+              rows={2}
+              placeholder="Optional — falls back to Filipino if empty"
+              className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+            />
+          </div>
+
+          {/* Compatible Crops (Filipino) */}
+          <div className="mt-4">
+            <label className="mb-1 block text-xs font-semibold text-text-secondary">
+              Compatible Crops (Filipino)
             </label>
             <div className="flex items-center gap-2">
               <input
-                placeholder="e.g. Rice"
+                placeholder="e.g. Palay"
                 value={cropInput}
                 onChange={(e) => setCropInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -293,15 +402,78 @@ export function AddProductForm({ categories }: { categories: Category[] }) {
             )}
           </div>
 
-          {/* Safety Notes */}
+          {/* Compatible Crops (English) */}
           <div className="mt-4">
             <label className="mb-1 block text-xs font-semibold text-text-secondary">
-              Safety &amp; Handling Notes
+              Compatible Crops (English)
+            </label>
+            <p className="mb-1 text-xs text-text-secondary/60">
+              Optional — falls back to Filipino crops if empty.
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                placeholder="e.g. Rice"
+                value={cropEnInput}
+                onChange={(e) => setCropEnInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCropEn();
+                  }
+                }}
+                className="h-8 flex-1 rounded-md border border-border bg-bg px-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={addCropEn}
+                className="h-8 rounded-md bg-bg px-3 text-xs font-semibold text-text-secondary hover:bg-border"
+              >
+                Add
+              </button>
+            </div>
+            {cropsEn.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {cropsEn.map((crop) => (
+                  <span
+                    key={crop}
+                    className="inline-flex items-center gap-1 rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-medium text-brand-accent"
+                  >
+                    {crop}
+                    <button
+                      type="button"
+                      onClick={() => removeCropEn(crop)}
+                      className="hover:text-red-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Safety Notes (Filipino) */}
+          <div className="mt-4">
+            <label className="mb-1 block text-xs font-semibold text-text-secondary">
+              Safety &amp; Handling Notes (Filipino)
             </label>
             <textarea
               name="safetyNotes"
               rows={2}
               placeholder="Storage and safety instructions (optional)"
+              className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
+            />
+          </div>
+
+          {/* Safety Notes (English) */}
+          <div className="mt-4">
+            <label className="mb-1 block text-xs font-semibold text-text-secondary">
+              Safety &amp; Handling Notes (English)
+            </label>
+            <textarea
+              name="safetyNotesEn"
+              rows={2}
+              placeholder="Optional — falls back to Filipino if empty"
               className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-brand-accent focus:outline-none"
             />
           </div>

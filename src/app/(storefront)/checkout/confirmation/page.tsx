@@ -1,10 +1,11 @@
 "use client";
 
 import { Suspense } from "react";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 import { ConfirmationContent } from "./confirmation-content";
 
 export default function ConfirmationPage() {
+  const copy = useCopy();
   return (
     <Suspense
       fallback={

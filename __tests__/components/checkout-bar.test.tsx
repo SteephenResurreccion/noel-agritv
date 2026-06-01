@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { renderWithLang as render, screen } from "../test-utils";
 import { useCart } from "@/lib/cart-store";
 import { copy } from "@/lib/copy";
 
 // Default mock — overridden inside individual describes via vi.doMock.
+// `useRouter` is stubbed because the test render wrapper (renderWithLang)
+// mounts LangProvider, which calls useRouter() on every render.
 vi.mock("next/navigation", () => ({
   usePathname: () => "/products",
+  useRouter: () => ({ refresh: () => {} }),
 }));
 
 const sampleItem = {
@@ -65,14 +68,22 @@ describe("CheckoutBar — hidden routes", () => {
   });
 
   it("is hidden on /cart", async () => {
-    vi.doMock("next/navigation", () => ({ usePathname: () => "/cart" }));
+    vi.doMock("next/navigation", () => ({
+      usePathname: () => "/cart",
+      useRouter: () => ({ refresh: () => {} }),
+    }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     const { container } = render(<CheckoutBar />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it("is hidden on /checkout", async () => {
-    vi.doMock("next/navigation", () => ({ usePathname: () => "/checkout" }));
+    vi.doMock("next/navigation", () => ({
+      usePathname: () => "/checkout",
+      useRouter: () => ({ refresh: () => {} }),
+    }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     const { container } = render(<CheckoutBar />);
     expect(container).toBeEmptyDOMElement();
@@ -81,7 +92,9 @@ describe("CheckoutBar — hidden routes", () => {
   it("is hidden on /checkout/confirmation", async () => {
     vi.doMock("next/navigation", () => ({
       usePathname: () => "/checkout/confirmation",
+      useRouter: () => ({ refresh: () => {} }),
     }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     const { container } = render(<CheckoutBar />);
     expect(container).toBeEmptyDOMElement();
@@ -90,7 +103,9 @@ describe("CheckoutBar — hidden routes", () => {
   it("is hidden on /admin/* routes", async () => {
     vi.doMock("next/navigation", () => ({
       usePathname: () => "/admin/orders",
+      useRouter: () => ({ refresh: () => {} }),
     }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     const { container } = render(<CheckoutBar />);
     expect(container).toBeEmptyDOMElement();
@@ -105,7 +120,11 @@ describe("CheckoutBar — visible routes", () => {
   });
 
   it("is visible on /products", async () => {
-    vi.doMock("next/navigation", () => ({ usePathname: () => "/products" }));
+    vi.doMock("next/navigation", () => ({
+      usePathname: () => "/products",
+      useRouter: () => ({ refresh: () => {} }),
+    }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     render(<CheckoutBar />);
     expect(screen.getByRole("link", { name: /checkout/i })).toBeInTheDocument();
@@ -114,14 +133,20 @@ describe("CheckoutBar — visible routes", () => {
   it("is visible on /products/[slug]", async () => {
     vi.doMock("next/navigation", () => ({
       usePathname: () => "/products/bio-plant-booster",
+      useRouter: () => ({ refresh: () => {} }),
     }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     render(<CheckoutBar />);
     expect(screen.getByRole("link", { name: /checkout/i })).toBeInTheDocument();
   });
 
   it("is visible on /", async () => {
-    vi.doMock("next/navigation", () => ({ usePathname: () => "/" }));
+    vi.doMock("next/navigation", () => ({
+      usePathname: () => "/",
+      useRouter: () => ({ refresh: () => {} }),
+    }));
+    const { renderWithLang: render } = await import("../test-utils");
     const { CheckoutBar } = await import("@/components/checkout-bar");
     render(<CheckoutBar />);
     expect(screen.getByRole("link", { name: /checkout/i })).toBeInTheDocument();

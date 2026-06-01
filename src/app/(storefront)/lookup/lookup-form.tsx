@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
+import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { MESSENGER_URL } from "@/lib/constants";
-import { copy } from "@/lib/copy";
-import { lookupSchema, type LookupResult } from "@/lib/lookup";
+import { useCopy } from "@/lib/lang-context";
+import { makeLookupSchema, type LookupResult } from "@/lib/lookup";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { lookupOrder } from "./actions";
 
@@ -48,6 +48,10 @@ const INPUT_CLASS =
 const ERROR_CLASS = "mt-1 text-sm text-destructive";
 
 export function LookupForm({ initialOrderNumber }: LookupFormProps) {
+  const copy = useCopy();
+  // Language-aware schema so inline validation messages localize. The server
+  // (`lookupOrder`) rebuilds its own copy and stays authoritative.
+  const schema = useMemo(() => makeLookupSchema(copy), [copy]);
   const [orderNumber, setOrderNumber] = useState(initialOrderNumber);
   const [phoneLast4, setPhoneLast4] = useState("");
   const [token, setToken] = useState<string>("");
@@ -63,7 +67,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
       phoneLast4: phoneLast4.trim(),
       turnstileToken: token,
     };
-    const parsed = lookupSchema.safeParse(payload);
+    const parsed = schema.safeParse(payload);
     if (!parsed.success) {
       // Pull out the first error per field for the inline message. The
       // turnstileToken field isn't surfaced inline (the submit button is
@@ -179,6 +183,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
 }
 
 function LookupResultPanel({ result }: { result: LookupResult }) {
+  const copy = useCopy();
   if (!result.ok) {
     return (
       <div

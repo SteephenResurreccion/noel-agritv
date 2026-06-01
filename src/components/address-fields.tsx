@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PhRegion } from "@/lib/ph-regions";
 import {
   loadRegion,
@@ -8,7 +8,7 @@ import {
   type PsgcProvince,
   type PsgcCity,
 } from "@/lib/psgc";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 /**
  * Cascading address picker for the checkout form.
@@ -64,6 +64,16 @@ export function AddressFields({
   onChange,
   errors,
 }: AddressFieldsProps) {
+  const copy = useCopy();
+  const loadErrorText = copy.addressFields.loadError;
+  // Keep the latest localized error text in a ref so the fetch effect can read
+  // it without depending on it. Otherwise a mid-checkout language switch would
+  // change `loadErrorText`, re-fire the effect, and pointlessly re-fetch the
+  // PSGC region JSON (and flash the loader) even though `region` is unchanged.
+  const loadErrorTextRef = useRef(loadErrorText);
+  useEffect(() => {
+    loadErrorTextRef.current = loadErrorText;
+  });
   const [data, setData] = useState<PsgcRegion | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>("");
@@ -103,7 +113,7 @@ export function AddressFields({
         if (cancelled) return;
         setData(null);
         setLoading(false);
-        setLoadError(copy.addressFields.loadError);
+        setLoadError(loadErrorTextRef.current);
         // Surface for debugging but don't crash.
         console.error("AddressFields loadRegion failed:", e);
       }

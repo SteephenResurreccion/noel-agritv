@@ -17,9 +17,10 @@ import {
   PHONE_NUMBER,
   PHONE_TEL,
 } from "@/lib/constants";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 export function ContactPageClient() {
+  const copy = useCopy();
   return (
     <>
       {/* ── Heading ────────────────────────────────────────────────────── */}

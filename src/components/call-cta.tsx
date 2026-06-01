@@ -5,7 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { PHONE_TEL } from "@/lib/constants";
 import { trackCallClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 interface CallCTAProps {
   label?: string;
@@ -16,12 +16,14 @@ interface CallCTAProps {
 }
 
 export function CallCTA({
-  label = copy.common.callToOrder,
+  label,
   variant = "outline",
   size = "default",
   className,
   context,
 }: CallCTAProps) {
+  const copy = useCopy();
+  const displayLabel = label ?? copy.common.callToOrder;
   return (
     <a
       href={PHONE_TEL}
@@ -29,7 +31,7 @@ export function CallCTA({
       onClick={() => trackCallClick(context ?? "general")}
     >
       <Phone className="mr-2 h-4 w-4 shrink-0" />
-      {label}
+      {displayLabel}
     </a>
   );
 }

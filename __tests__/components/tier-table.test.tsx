@@ -1,6 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { renderWithLang as render, screen } from "../test-utils";
 import { TierTable } from "@/components/tier-table";
+
+// The render wrapper (renderWithLang) mounts LangProvider, which calls
+// useRouter() on every render — stub it so the App Router context isn't required.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: () => {} }),
+}));
 
 const tiers = [
   { minQty: 1, priceCentavos: 54800 },

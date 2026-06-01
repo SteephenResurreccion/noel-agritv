@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { products, getProductBySlug, type Product } from "@/data/products";
-import { getCategoryBySlug } from "@/data/categories";
+import {
+  products,
+  getLocalizedProductBySlug,
+  getLocalizedProducts,
+  type Product,
+} from "@/data/products";
+import { getCategoryBySlug, localizeCategory } from "@/data/categories";
+import type { Lang } from "@/lib/copy";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "@/components/messenger-cta";
 import { CallCTA } from "@/components/call-cta";
@@ -26,20 +33,23 @@ export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
 
-async function findProduct(slug: string): Promise<Product | undefined> {
+async function findProduct(
+  slug: string,
+  lang: Lang
+): Promise<Product | undefined> {
   // Check custom products first (includes seeded built-in products)
   try {
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? []).find(
       (p) => p.slug === slug && p.visible
     );
-    if (custom) return adminToProduct(custom);
+    if (custom) return adminToProduct(custom, lang);
   } catch {
     // Blob not configured
   }
 
   // Fallback to hardcoded built-in products (before admin seeds them)
-  return getProductBySlug(slug);
+  return getLocalizedProductBySlug(slug, lang);
 }
 
 export async function generateMetadata({
@@ -48,13 +58,18 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await findProduct(slug);
+  const lang = await getLangFromRequest();
+  const product = await findProduct(slug, lang);
   if (!product) return {};
 
   return {
     title: product.name,
     description: product.oneLiner,
     openGraph: {
+      // Next.js metadata openGraph objects REPLACE the root layout's (no deep
+      // merge), so re-declare the PH locale here or product pages emit none.
+      // Mirrors the root layout's OG_LOCALE map (fil -> fil_PH, en -> en_PH).
+      locale: lang === "en" ? "en_PH" : "fil_PH",
       title: `${product.name} | Noel AgriTV`,
       description: product.oneLiner,
       images: [{ url: product.imageLarge, width: 1000, height: 1250 }],
@@ -68,23 +83,28 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await findProduct(slug);
+  const lang = await getLangFromRequest();
+  const copy = getCopy(lang);
+  const product = await findProduct(slug, lang);
   if (!product) notFound();
 
-  const category = getCategoryBySlug(product.categorySlug);
+  const sourceCategory = getCategoryBySlug(product.categorySlug);
+  const category = sourceCategory
+    ? localizeCategory(sourceCategory, lang)
+    : undefined;
 
   // Get all visible products for "related" section
-  let allProducts = products;
+  let allProducts = getLocalizedProducts(lang);
   try {
     const config = await getAdminConfig();
     const custom = (config.customProducts ?? [])
       .filter((p) => p.visible)
-      .map(adminToProduct);
+      .map((p) => adminToProduct(p, lang));
 
     if (custom.length > 0) {
       allProducts = custom;
     } else {
-      allProducts = products.filter(
+      allProducts = allProducts.filter(
         (p) => !config.hiddenProducts.includes(p.slug)
       );
     }
@@ -339,7 +359,11 @@ export default async function ProductDetailPage({
                   key={rp.slug}
                   className="w-[240px] shrink-0 min-[1000px]:w-auto min-[1000px]:flex-1"
                 >
-                  <ProductCard product={rp} />
+                  <ProductCard
+                    product={rp}
+                    wholesaleLabel={copy.productCard.wholesaleAvailable}
+                    messengerLabel={copy.common.messenger}
+                  />
                 </div>
               ))}
             </div>

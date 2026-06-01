@@ -64,6 +64,20 @@ export interface AdminProduct {
   howToApply?: string | null;
   compatibleCrops?: string[];
   safetyNotes?: string | null;
+  /**
+   * Optional English counterparts of every prose field. The non-`En` fields
+   * above hold the Filipino text (the live, default language). These `En`
+   * fields are ADDITIVE and OPTIONAL — old Blob records that predate bilingual
+   * support simply omit them and keep working unchanged. When the storefront
+   * resolves a product for English, each `En` field falls back INDEPENDENTLY
+   * to its Filipino counterpart if absent (see `adminToProduct`). There is no
+   * `oneLinerEn` because oneLiner is derived from `description`, not stored.
+   */
+  descriptionEn?: string;
+  specsEn?: AdminProductSpec[];
+  howToApplyEn?: string | null;
+  compatibleCropsEn?: string[];
+  safetyNotesEn?: string | null;
 }
 
 const DEFAULT_CONFIG: AdminConfig = {

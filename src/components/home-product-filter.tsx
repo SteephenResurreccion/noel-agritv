@@ -5,7 +5,7 @@ import type { Category } from "@/data/categories";
 import type { Product } from "@/data/products";
 import { ProductCard } from "./product-card";
 import { cn } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 interface HomeProductFilterProps {
   categories: Category[];
@@ -16,6 +16,7 @@ export function HomeProductFilter({
   categories,
   products,
 }: HomeProductFilterProps) {
+  const copy = useCopy();
   const [active, setActive] = useState("all");
 
   const filtered =
@@ -48,7 +49,12 @@ export function HomeProductFilter({
       {/* Product cards grid */}
       <div className="mt-6 grid grid-cols-2 gap-[var(--spacing-grid-gap)] min-[1000px]:grid-cols-4">
         {filtered.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+          <ProductCard
+            key={product.slug}
+            product={product}
+            wholesaleLabel={copy.productCard.wholesaleAvailable}
+            messengerLabel={copy.common.messenger}
+          />
         ))}
       </div>
     </>

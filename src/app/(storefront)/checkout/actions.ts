@@ -1,7 +1,7 @@
 "use server";
 
 import {
-  checkoutSchema,
+  makeCheckoutSchema,
   generateOrderNumber,
   normalizePhPhone,
   type SubmitResult,
@@ -14,11 +14,15 @@ import { adminToProduct } from "@/lib/admin-to-product";
 import { products } from "@/data/products";
 import { priceForQuantity } from "@/lib/pricing";
 import { appendOrderRow, buildSheetRow } from "@/lib/sheets";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 export async function submitOrder(payload: unknown): Promise<SubmitResult> {
-  // 1. Validate
-  const parsed = checkoutSchema.safeParse(payload);
+  const lang = await getLangFromRequest();
+  const copy = getCopy(lang);
+
+  // 1. Validate (schema messages localize to the buyer's language)
+  const parsed = makeCheckoutSchema(copy).safeParse(payload);
   if (!parsed.success) {
     return {
       ok: false,
@@ -49,7 +53,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
   >();
   const custom = (config.customProducts ?? [])
     .filter((p) => p.visible)
-    .map(adminToProduct);
+    .map((p) => adminToProduct(p, lang));
   const source = custom.length > 0 ? custom : products;
   for (const p of source) {
     if (p.priceCentavos !== undefined) {

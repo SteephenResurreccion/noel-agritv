@@ -1,10 +1,12 @@
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 interface SocialProofStripProps {
   variant?: "light" | "dark";
 }
 
-export function SocialProofStrip({ variant = "light" }: SocialProofStripProps) {
+export async function SocialProofStrip({ variant = "light" }: SocialProofStripProps) {
+  const copy = getCopy(await getLangFromRequest());
   return (
     <p
       className={`text-[length:var(--font-size-meta)] font-semibold uppercase tracking-widest ${
