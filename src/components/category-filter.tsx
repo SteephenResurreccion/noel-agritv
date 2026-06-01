@@ -4,9 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { categories } from "@/data/categories";
 import { trackCategoryFilter } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 export function CategoryFilter() {
+  const copy = useCopy();
   const router = useRouter();
   const searchParams = useSearchParams();
   const active = searchParams.get("category") ?? "all";

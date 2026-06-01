@@ -1,6 +1,6 @@
 import { type PriceTier } from "@/lib/pricing";
 import { cn, formatCentavos } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 export interface TierTableProps {
   tiers: PriceTier[];
@@ -31,6 +31,7 @@ function activeTierIndex(tiers: PriceTier[], activeQty: number): number {
  * the last tier renders `${minQty}+`.
  */
 export function TierTable({ tiers, activeQty }: TierTableProps) {
+  const copy = useCopy();
   const activeIdx = activeTierIndex(tiers, activeQty);
 
   return (

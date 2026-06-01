@@ -4,9 +4,10 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHasMounted } from "@/lib/use-has-mounted";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 export function CartBadge() {
+  const copy = useCopy();
   const mounted = useHasMounted();
   const count = useCart((s) => s.totalItems());
 

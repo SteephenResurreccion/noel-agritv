@@ -1,13 +1,15 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { renderWithLang as render, screen } from "../test-utils";
 import { CategoryFilter } from "@/components/category-filter";
 import { copy } from "@/lib/copy";
 import { categories } from "@/data/categories";
 
 vi.mock("@vercel/analytics", () => ({ track: vi.fn() }));
 
+// `refresh` is included because the render wrapper (renderWithLang) mounts
+// LangProvider, which calls useRouter().refresh on language change.
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), refresh: () => {} }),
   useSearchParams: () => new URLSearchParams(""),
 }));
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart-store";
 import { priceForQuantity, type PriceTier } from "@/lib/pricing";
 import { formatCentavos } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 import { TierTable } from "@/components/tier-table";
 
 export interface AddToCartProps {
@@ -26,6 +26,7 @@ export function AddToCart({
   priceTiers,
   layout = "detail",
 }: AddToCartProps) {
+  const copy = useCopy();
   const addItem = useCart((s) => s.addItem);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);

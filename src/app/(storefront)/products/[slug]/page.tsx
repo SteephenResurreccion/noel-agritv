@@ -5,7 +5,8 @@ import { products, getProductBySlug, type Product } from "@/data/products";
 import { getCategoryBySlug } from "@/data/categories";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "@/components/messenger-cta";
 import { CallCTA } from "@/components/call-cta";
@@ -68,6 +69,7 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const copy = getCopy(await getLangFromRequest());
   const product = await findProduct(slug);
   if (!product) notFound();
 

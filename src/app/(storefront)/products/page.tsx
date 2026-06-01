@@ -5,20 +5,25 @@ import { ProductCard } from "@/components/product-card";
 import { CategoryFilter } from "@/components/category-filter";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
-import { copy } from "@/lib/copy";
+import { getCopy } from "@/lib/copy";
+import { getLangFromRequest } from "@/lib/lang";
 
 export const revalidate = 30; // ISR: revalidate every 30s instead of force-dynamic
 
-export const metadata: Metadata = {
-  title: copy.meta.productsTitle,
-  description: copy.meta.productsDescription,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { meta } = getCopy(await getLangFromRequest());
+  return {
+    title: meta.productsTitle,
+    description: meta.productsDescription,
+  };
+}
 
 export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
+  const copy = getCopy(await getLangFromRequest());
   const params = await searchParams;
   const category = params.category;
 

@@ -9,7 +9,7 @@ import {
 } from "@/lib/cart-store";
 import { nextTierInfo, FREE_SHIPPING_MIN_UNITS } from "@/lib/pricing";
 import { formatCentavos } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 
 /**
  * Per-line "buy a little more, save more" nudge. Renders ONLY when the line is
@@ -18,6 +18,7 @@ import { copy } from "@/lib/copy";
  * Arrow glyph is muted (ink .38); the target price is gold + bold.
  */
 function CartLineNudge({ item }: { item: CartItem }) {
+  const copy = useCopy();
   const next = nextTierInfo(item, item.qty);
   if (!next || next.unitsToNext > 2) return null;
   return (
@@ -38,6 +39,7 @@ function CartLineNudge({ item }: { item: CartItem }) {
  * no progress bar. The server remains authoritative for the actual waiver.
  */
 function FreeShippingLine({ totalUnits }: { totalUnits: number }) {
+  const copy = useCopy();
   if (totalUnits >= FREE_SHIPPING_MIN_UNITS) {
     return (
       <p aria-live="polite" className="mt-2 text-sm font-bold text-brand-mid">
@@ -54,6 +56,7 @@ function FreeShippingLine({ totalUnits }: { totalUnits: number }) {
 }
 
 export default function CartPage() {
+  const copy = useCopy();
   const items = useCart((s) => s.items);
   const setQty = useCart((s) => s.setQty);
   const removeItem = useCart((s) => s.removeItem);

@@ -1,8 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/data/products";
 import { formatCentavos } from "@/lib/utils";
-import { copy } from "@/lib/copy";
+import { useCopy } from "@/lib/lang-context";
 import { AddToCart } from "@/components/add-to-cart";
 import { MessengerCTA } from "./messenger-cta";
 
@@ -11,6 +13,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const copy = useCopy();
   const isExternal = product.image.startsWith("http") || product.image.startsWith("/api/blob-image");
 
   return (
