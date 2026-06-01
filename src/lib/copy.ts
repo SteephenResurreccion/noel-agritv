@@ -636,7 +636,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
     increaseQuantityAriaLabel: "Increase quantity",
     addWithTotal: (total: string) => `Add to cart · ${total}`,
     wholesaleHint: "Wholesale price: buy more, save more",
-    tipid: "Tipid sa dami.",
+    tipid: "Save more when you buy more.",
     discountAuto: "Discount applies automatically. No code needed.",
   },
   tierTable: {

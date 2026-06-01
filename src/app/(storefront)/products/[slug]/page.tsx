@@ -66,6 +66,10 @@ export async function generateMetadata({
     title: product.name,
     description: product.oneLiner,
     openGraph: {
+      // Next.js metadata openGraph objects REPLACE the root layout's (no deep
+      // merge), so re-declare the PH locale here or product pages emit none.
+      // Mirrors the root layout's OG_LOCALE map (fil -> fil_PH, en -> en_PH).
+      locale: lang === "en" ? "en_PH" : "fil_PH",
       title: `${product.name} | Noel AgriTV`,
       description: product.oneLiner,
       images: [{ url: product.imageLarge, width: 1000, height: 1250 }],

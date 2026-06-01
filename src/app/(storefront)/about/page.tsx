@@ -10,7 +10,10 @@ import { AwardsSection } from "@/components/awards-section";
 export async function generateMetadata(): Promise<Metadata> {
   const { meta } = getCopy(await getLangFromRequest());
   return {
-    title: meta.aboutTitle,
+    // `absolute` bypasses the root layout's "%s | Noel AgriTV" template.
+    // meta.aboutTitle already carries the "| Noel AgriTV" suffix in both
+    // languages, so the template would otherwise double it.
+    title: { absolute: meta.aboutTitle },
     description: meta.aboutDescription,
   };
 }

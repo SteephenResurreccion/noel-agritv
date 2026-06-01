@@ -4,7 +4,12 @@ import { getCopy } from "@/lib/copy";
 import { getLangFromRequest } from "@/lib/lang";
 
 export default async function NotFound() {
-  const copy = getCopy(await getLangFromRequest());
+  // The global not-found path can be invoked outside a normal request scope
+  // (unmatched URLs / streamed notFound responses). If reading request cookies
+  // ever fails there, degrade to the Filipino default instead of letting the
+  // rejection kill the response stream. Happy path stays fully bilingual.
+  const lang = await getLangFromRequest().catch(() => "fil" as const);
+  const copy = getCopy(lang);
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-bg px-6 text-center">
       <h1 className="mb-2 text-6xl font-bold text-brand-darkest">
