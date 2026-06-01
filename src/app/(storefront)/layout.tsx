@@ -3,6 +3,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { MobileBottomBar } from "@/components/mobile-bottom-bar";
 import { CheckoutBar } from "@/components/checkout-bar";
+import { LanguageModal } from "@/components/language-modal";
 import { products } from "@/data/products";
 import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
@@ -47,6 +48,7 @@ export default async function StorefrontLayout({
       <Footer />
       <MobileBottomBar />
       <CheckoutBar />
+      <LanguageModal />
     </>
   );
 }
