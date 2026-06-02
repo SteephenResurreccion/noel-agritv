@@ -5,7 +5,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 // route through it. Harmless for the value-assertion tests below.
 vi.mock("@/lib/order-format", { spy: true });
 
-import { buildOrderEmail } from "@/lib/notify-email";
+import { buildOrderEmail, sendNewOrderEmail } from "@/lib/notify-email";
 import type { OrderRowInput } from "@/lib/sheets";
 import { copy } from "@/lib/copy";
 
@@ -255,5 +255,273 @@ describe("buildOrderEmail — structure, labels, Sheet link (spec §4.3)", () =>
     vi.stubEnv("GOOGLE_SHEET_ID", "");
     const { html } = buildOrderEmail(base);
     expect(html).not.toContain("docs.google.com");
+  });
+});
+
+// ─── sendNewOrderEmail (mocked fetch — spec §4.1 behavior, §8 cases) ─────────
+
+function jsonResponse(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
+/** Both env vars set to a valid single-recipient config. */
+function stubValidEnv(): void {
+  vi.stubEnv("RESEND_API_KEY", "re_test_key");
+  vi.stubEnv("ORDER_NOTIFY_EMAIL", "owner@example.com");
+}
+
+describe("sendNewOrderEmail — step-1 unset-config guard (silent no-op)", () => {
+  it("(a) RESEND_API_KEY unset → no fetch, NO warn, NO error", async () => {
+    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("ORDER_NOTIFY_EMAIL", "owner@example.com");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetchSpy = vi.fn();
+
+    await sendNewOrderEmail(base, fetchSpy as unknown as typeof fetch);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+  });
+
+  it("(b) ORDER_NOTIFY_EMAIL unset → no fetch, NO warn, NO error", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    vi.stubEnv("ORDER_NOTIFY_EMAIL", "");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetchSpy = vi.fn();
+
+    await sendNewOrderEmail(base, fetchSpy as unknown as typeof fetch);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("sendNewOrderEmail — step-2 recipient parsing (misconfig warns)", () => {
+  it("skips invalid entries with a warn and sends to the valid ones", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    vi.stubEnv("ORDER_NOTIFY_EMAIL", "not-an-email, owner@example.com");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const mockFetch = vi.fn(async () => jsonResponse(200, { id: "re_1" }));
+
+    await sendNewOrderEmail(base, mockFetch as unknown as typeof fetch);
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail: skipping invalid recipient",
+      "not-an-email"
+    );
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(
+      (mockFetch.mock.calls[0] as unknown as [string, RequestInit])[1]
+        .body as string
+    );
+    expect(body.to).toEqual(["owner@example.com"]);
+  });
+
+  it("zero valid recipients (all malformed) → distinct 'no valid recipients' warn, no fetch", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    vi.stubEnv("ORDER_NOTIFY_EMAIL", "nope, also-bad@, @bad.com");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.fn();
+
+    await sendNewOrderEmail(base, fetchSpy as unknown as typeof fetch);
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail: ORDER_NOTIFY_EMAIL had no valid recipients, skipping"
+    );
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("', ,' (commas/spaces only — truthy but empty after parsing) → 'no valid recipients' warn, no fetch", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    vi.stubEnv("ORDER_NOTIFY_EMAIL", ", ,");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.fn();
+
+    await sendNewOrderEmail(base, fetchSpy as unknown as typeof fetch);
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail: ORDER_NOTIFY_EMAIL had no valid recipients, skipping"
+    );
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("caps recipients at 5 (spec §4.4.4 forward-looking guard)", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_test_key");
+    vi.stubEnv(
+      "ORDER_NOTIFY_EMAIL",
+      "a@x.com, b@x.com, c@x.com, d@x.com, e@x.com, f@x.com, g@x.com"
+    );
+    const mockFetch = vi.fn(async () => jsonResponse(200, { id: "re_1" }));
+
+    await sendNewOrderEmail(base, mockFetch as unknown as typeof fetch);
+
+    const body = JSON.parse(
+      (mockFetch.mock.calls[0] as unknown as [string, RequestInit])[1]
+        .body as string
+    );
+    expect(body.to).toHaveLength(5);
+    expect(body.to).toEqual([
+      "a@x.com",
+      "b@x.com",
+      "c@x.com",
+      "d@x.com",
+      "e@x.com",
+    ]);
+  });
+});
+
+describe("sendNewOrderEmail — Resend POST and error handling", () => {
+  it("200 success → resolves silently (no warn, no error)", async () => {
+    stubValidEnv();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const mockFetch = vi.fn(async () => jsonResponse(200, { id: "re_1" }));
+
+    await expect(
+      sendNewOrderEmail(base, mockFetch as unknown as typeof fetch)
+    ).resolves.toBeUndefined();
+
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+  });
+
+  it("POSTs to the Resend endpoint with auth header, from, to, subject, html, and text", async () => {
+    stubValidEnv();
+    const mockFetch = vi.fn(async () => jsonResponse(200, { id: "re_1" }));
+
+    await sendNewOrderEmail(base, mockFetch as unknown as typeof fetch);
+
+    const [url, init] = mockFetch.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    expect(url).toBe("https://api.resend.com/emails");
+    expect(init.method).toBe("POST");
+    expect((init.headers as Record<string, string>)["Authorization"]).toBe(
+      "Bearer re_test_key"
+    );
+    // The abort signal MUST be passed (spec §4.1 step 3):
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+    const body = JSON.parse(init.body as string);
+    expect(body.from).toBe("Noel AgriTV <onboarding@resend.dev>");
+    expect(body.to).toEqual(["owner@example.com"]);
+    expect(body.subject).toContain("Bagong Order NAG-");
+    expect(body.html).toContain("<!DOCTYPE html>");
+    expect(body.text).toContain("Pangalan:");
+  });
+
+  it("403 with {error} body → logs status + error name/message, never throws", async () => {
+    stubValidEnv();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const mockFetch = vi.fn(async () =>
+      jsonResponse(403, {
+        error: {
+          name: "validation_error",
+          message: "You can only send testing emails to your own email address",
+        },
+      })
+    );
+
+    await expect(
+      sendNewOrderEmail(base, mockFetch as unknown as typeof fetch)
+    ).resolves.toBeUndefined();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail:",
+      403,
+      "validation_error",
+      "You can only send testing emails to your own email address"
+    );
+  });
+
+  it("429 with {error} body → logs status + error name/message, never throws", async () => {
+    stubValidEnv();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const mockFetch = vi.fn(async () =>
+      jsonResponse(429, {
+        error: { name: "rate_limit_exceeded", message: "Too many requests" },
+      })
+    );
+
+    await expect(
+      sendNewOrderEmail(base, mockFetch as unknown as typeof fetch)
+    ).resolves.toBeUndefined();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail:",
+      429,
+      "rate_limit_exceeded",
+      "Too many requests"
+    );
+  });
+
+  it("non-JSON error body → guarded parse, logs parse-failure, never throws", async () => {
+    stubValidEnv();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const mockFetch = vi.fn(
+      async () => new Response("Internal Server Error", { status: 500 })
+    );
+
+    await expect(
+      sendNewOrderEmail(base, mockFetch as unknown as typeof fetch)
+    ).resolves.toBeUndefined();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail: failed to parse error response",
+      expect.anything()
+    );
+  });
+
+  it("network-level fetch rejection → logged, never throws", async () => {
+    stubValidEnv();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const mockFetch = vi.fn(async () => {
+      throw new TypeError("fetch failed");
+    });
+
+    await expect(
+      sendNewOrderEmail(base, mockFetch as unknown as typeof fetch)
+    ).resolves.toBeUndefined();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail: fetch failed",
+      expect.anything()
+    );
+  });
+
+  it("hung fetch → aborts at 8s and logs the timeout at console.error", async () => {
+    stubValidEnv();
+    vi.useFakeTimers();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    // A fetch that never resolves on its own; it rejects only when the abort
+    // signal fires. If the implementation forgets to pass `signal`, this
+    // promise never settles and the test times out — that failure is the point.
+    const hungFetch = vi.fn(
+      (_url: string | URL | Request, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            const err = new Error("This operation was aborted");
+            err.name = "AbortError";
+            reject(err);
+          });
+        })
+    );
+
+    const promise = sendNewOrderEmail(
+      base,
+      hungFetch as unknown as typeof fetch
+    );
+    await vi.advanceTimersByTimeAsync(8000);
+    await promise;
+
+    expect(errorSpy).toHaveBeenCalledWith("sendNewOrderEmail: timed out after 8s");
+    vi.useRealTimers();
   });
 });

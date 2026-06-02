@@ -137,3 +137,108 @@ export function buildOrderEmail(
 
   return { subject, html, text };
 }
+
+/** Resend API endpoint (spec §4.1 step 3). */
+const RESEND_ENDPOINT = "https://api.resend.com/emails";
+/** Abort the Resend POST after this many ms (spec §4.1 step 3). */
+const SEND_TIMEOUT_MS = 8000;
+/** Max recipients parsed from ORDER_NOTIFY_EMAIL (spec §4.4.4 — forward-looking guard). */
+const MAX_RECIPIENTS = 5;
+/** Minimal shape check for ORDER_NOTIFY_EMAIL entries (spec §4.1 step 2). */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Build and POST the owner notification email to Resend.
+ * Fire-and-forget: never throws to the caller; all failures are logged only.
+ * `fetchImpl` is injectable for tests (same convention as verifyTurnstile).
+ */
+export async function sendNewOrderEmail(
+  order: OrderRowInput,
+  fetchImpl: typeof fetch = fetch
+): Promise<void> {
+  // ── Step 1 (spec §4.1): unset-config guard — BEFORE any parsing. Silent
+  // no-op (no log): unset vars are the default on every deploy/test run, not a
+  // misconfiguration. Warns are reserved for the set-but-invalid path below.
+  const apiKey = process.env.RESEND_API_KEY;
+  const recipientsRaw = process.env.ORDER_NOTIFY_EMAIL;
+  if (!apiKey || !recipientsRaw) return;
+
+  // ── Step 2 (spec §4.1): parse recipients — split on comma → trim → drop
+  // zero-length → validate each → cap at MAX_RECIPIENTS.
+  const entries = recipientsRaw
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+  const valid: string[] = [];
+  for (const entry of entries) {
+    if (EMAIL_RE.test(entry)) {
+      valid.push(entry);
+    } else {
+      console.warn("sendNewOrderEmail: skipping invalid recipient", entry);
+    }
+  }
+  if (valid.length === 0) {
+    console.warn(
+      "sendNewOrderEmail: ORDER_NOTIFY_EMAIL had no valid recipients, skipping"
+    );
+    return;
+  }
+  const to = valid.slice(0, MAX_RECIPIENTS);
+
+  const { subject, html, text } = buildOrderEmail(
+    order,
+    process.env.GOOGLE_SHEET_ID
+  );
+
+  // ── Step 3 (spec §4.1): POST to Resend with an 8s abort timeout. The signal
+  // MUST be passed to fetch; the timer MUST be cleared on every exit path
+  // (success, HTTP error, parse failure, abort, network error) via finally.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
+  try {
+    const response = await fetchImpl(RESEND_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Noel AgriTV <onboarding@resend.dev>",
+        to,
+        subject,
+        html,
+        text,
+      }),
+      signal: controller.signal,
+    });
+
+    // ── Step 4 (spec §4.1): fetch does NOT throw on HTTP error status.
+    if (response.ok) return;
+
+    let parsed: { error?: { name?: string; message?: string } };
+    try {
+      parsed = (await response.json()) as {
+        error?: { name?: string; message?: string };
+      };
+    } catch (e) {
+      console.error("sendNewOrderEmail: failed to parse error response", e);
+      return;
+    }
+    console.error(
+      "sendNewOrderEmail:",
+      response.status,
+      parsed.error?.name,
+      parsed.error?.message
+    );
+  } catch (e) {
+    // controller.signal.aborted distinguishes OUR 8s timeout from a network
+    // failure regardless of the thrown error's class (DOMException vs Error).
+    if (controller.signal.aborted) {
+      console.error("sendNewOrderEmail: timed out after 8s");
+    } else {
+      console.error("sendNewOrderEmail: fetch failed", e);
+    }
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
