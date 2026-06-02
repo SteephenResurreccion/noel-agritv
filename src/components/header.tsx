@@ -89,20 +89,22 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-surface/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-surface/95 backdrop-blur-sm lg:border-b-brand-darkest/10 lg:bg-surface lg:backdrop-blur-none lg:shadow-[0_1px_0_rgba(28,41,32,0.02),0_8px_24px_-18px_rgba(28,41,32,0.45)]">
         <div className="container-site">
           {/* Main header row — 3-column grid */}
-          <div className="grid h-14 grid-cols-[1fr_auto_1fr] items-center lg:h-[72px]">
-            {/* Left — Search (desktop: input, mobile: hamburger) */}
+          <div className="grid h-14 grid-cols-[1fr_auto_1fr] items-center lg:h-[74px]">
+            {/* Left — Search (desktop: icon + label, mobile: hamburger) */}
             <div className="flex items-center">
-              {/* Desktop search trigger */}
+              {/* Desktop search trigger — icon + uppercase label */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="hidden h-10 w-[280px] items-center justify-between rounded-md border border-text-primary/30 px-4 text-sm text-text-secondary/50 transition-colors hover:border-text-primary/50 lg:flex"
+                className="group hidden h-[42px] items-center gap-[9px] text-text-secondary transition-colors hover:text-text-primary lg:flex"
                 aria-label={copy.header.searchProductsAriaLabel}
               >
-                <span>{copy.header.searchProductsPlaceholder}</span>
-                <Search className="h-4 w-4" />
+                <Search className="h-[18px] w-[18px] text-brand-darkest" strokeWidth={1.6} />
+                <span className="text-xs font-semibold uppercase tracking-[0.12em]">
+                  {copy.header.searchLabel}
+                </span>
               </button>
 
               {/* Mobile: hamburger menu */}
@@ -115,16 +117,33 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               </button>
             </div>
 
-            {/* Center — Logo */}
-            <Link href="/" className="flex items-center justify-center">
+            {/* Center — Logo (mobile) / wordmark lockup (desktop) */}
+            <Link href="/" className="flex items-center justify-center" aria-label={copy.header.logoAlt}>
+              {/* Mobile: lone emblem */}
               <Image
                 src="/images/whitebglogo.png"
                 alt={copy.header.logoAlt}
                 width={120}
                 height={120}
-                className="h-10 w-10 lg:h-14 lg:w-14"
+                className="h-10 w-10 lg:hidden"
                 priority
               />
+              {/* Desktop: emblem (30px) + two-tone serif wordmark */}
+              <span className="hidden items-center gap-3 lg:flex">
+                <Image
+                  src="/images/whitebglogo.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={120}
+                  height={120}
+                  className="h-[30px] w-[30px]"
+                  priority
+                />
+                <span className="font-heading text-[30px] font-bold uppercase leading-none tracking-[0.06em]">
+                  <span className="text-brand-darkest">Noel</span>
+                  <span className="text-brand-accent">&nbsp;AgriTV</span>
+                </span>
+              </span>
             </Link>
 
             {/* Right — Lang switcher + Cart + Mobile search icon.
@@ -156,30 +175,30 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               widths (Filipino runs ~40% longer) never push the logo off
               center. */}
           <nav
-            className="hidden h-11 items-center justify-center gap-8 border-t border-border/50 lg:flex"
+            className="hidden h-11 items-center justify-center gap-[30px] border-t border-brand-darkest/[0.07] lg:flex"
             aria-label={copy.header.mainNavAriaLabel}
           >
             <Link
               href="/products"
-              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.common.productsNav}
             </Link>
             <Link
               href="/about"
-              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.header.navAbout}
             </Link>
             <Link
               href="/contact"
-              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.header.navContact}
             </Link>
             <Link
               href="/lookup"
-              className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.common.findMyOrder}
             </Link>

@@ -29,7 +29,7 @@ function ToggleGroup({
     <ToggleGroupPrimitive
       data-slot="toggle-group"
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-lg border border-border bg-surface p-0.5",
+        "inline-flex items-center gap-[2px] rounded-full border border-brand-darkest/[0.12] bg-brand-darkest/[0.05] p-[3px]",
         className
       )}
       {...props}
@@ -45,9 +45,11 @@ function ToggleGroupItem({
     <TogglePrimitive
       data-slot="toggle-group-item"
       className={cn(
-        "flex items-center justify-center rounded-md px-2.5 text-xs font-semibold uppercase tracking-wide transition-colors select-none",
-        "text-text-secondary hover:text-text-primary",
-        "data-pressed:bg-brand-accent data-pressed:text-white",
+        // No transition on the background — Chromium fails to interpolate the
+        // var()-based active fill, so the gold swap must be instant.
+        "flex items-center justify-center rounded-full px-[13px] text-xs font-bold uppercase tracking-[0.04em] select-none",
+        "bg-transparent text-text-secondary hover:text-text-primary",
+        "data-pressed:bg-brand-accent data-pressed:text-surface data-pressed:hover:text-surface",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent",
         className
       )}

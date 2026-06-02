@@ -57,7 +57,7 @@ export function LangSwitcher(): React.ReactElement {
           key={seg.value}
           value={seg.value}
           aria-label={seg.aria}
-          className="min-h-12 min-w-12 lg:min-h-[32px]"
+          className="min-h-12 min-w-12 lg:min-h-[26px] lg:min-w-0"
         >
           {seg.label}
         </ToggleGroupItem>
