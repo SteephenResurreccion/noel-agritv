@@ -13,7 +13,9 @@ import { getAdminConfig } from "@/lib/admin-store";
 import { adminToProduct } from "@/lib/admin-to-product";
 import { products } from "@/data/products";
 import { priceForQuantity } from "@/lib/pricing";
-import { appendOrderRow, buildSheetRow } from "@/lib/sheets";
+import { after } from "next/server";
+import { appendOrderRow, buildSheetRow, type OrderRowInput } from "@/lib/sheets";
+import { sendNewOrderEmail } from "@/lib/notify-email";
 import { getCopy } from "@/lib/copy";
 import { getLangFromRequest } from "@/lib/lang";
 
@@ -114,23 +116,29 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
       message: copy.errors.formCheck,
     };
   }
+
+  // Declared AFTER the normalizedPhone guard (so TS has narrowed string | null
+  // → string) and BEFORE the try (so it is in scope at the after() call below).
+  // The same input feeds the Sheet row AND the owner email.
+  const orderInput: OrderRowInput = {
+    orderNumber,
+    timestampManila,
+    name: data.name,
+    phone: normalizedPhone,
+    region: regionLabel,
+    province: data.province,
+    city: data.city,
+    barangay: data.barangay,
+    street: data.street,
+    landmark: data.landmark ?? "",
+    items,
+    subtotalCentavos,
+    shipping,
+    notes: data.notes ?? "",
+  };
+
   try {
-    const row = buildSheetRow({
-      orderNumber,
-      timestampManila,
-      name: data.name,
-      phone: normalizedPhone,
-      region: regionLabel,
-      province: data.province,
-      city: data.city,
-      barangay: data.barangay,
-      street: data.street,
-      landmark: data.landmark ?? "",
-      items,
-      subtotalCentavos,
-      shipping,
-      notes: data.notes ?? "",
-    });
+    const row = buildSheetRow(orderInput);
     await appendOrderRow(row);
   } catch (e) {
     console.error("submitOrder: sheets append failed", e);
@@ -140,6 +148,21 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
       message: copy.errors.submitFailed,
     };
   }
+
+  // 6. Owner email notification — fire-and-forget AFTER the response is sent.
+  // Sits between the catch close and the success return so it registers ONLY
+  // when the Sheets append succeeded (the failure path returned above). The
+  // try/catch lives INSIDE the callback: after() itself registers synchronously
+  // and never throws, so an outer try/catch would protect nothing. An email
+  // failure can never fail the order — the response is already sent when this
+  // callback runs (spec §4.2).
+  after(async () => {
+    try {
+      await sendNewOrderEmail(orderInput);
+    } catch (e) {
+      console.error("sendNewOrderEmail: failed", e);
+    }
+  });
 
   return { ok: true, orderNumber };
 }

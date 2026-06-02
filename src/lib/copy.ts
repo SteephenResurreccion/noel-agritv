@@ -224,7 +224,7 @@ const copyFil = {
     cod: "COD: Bayad pagdating",
     privacy: "Privacy",
     privacyNotice:
-      "Sa pag-order, sumasang-ayon kang gagamitin ng Noel AgriTV ang iyong pangalan, numero ng telepono, at address para lamang iproseso at ihatid ang iyong order, ayon sa Data Privacy Act of 2012 (RA 10173).",
+      "Sa pag-order, sumasang-ayon kang gagamitin ng Noel AgriTV ang iyong pangalan, numero ng telepono, at address para iproseso at ihatid ang iyong order, at maaaring ipasa ang mga detalyeng ito sa mga third-party service provider (kabilang ang email at delivery providers na maaaring nasa labas ng Pilipinas), ayon sa Data Privacy Act of 2012 (RA 10173).",
     orderSummary: "Buod ng Order",
     lineItem: (unit: string, qty: number) => `${unit} × ${qty}`,
     subtotal: "Subtotal",
@@ -685,7 +685,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
     cod: "Cash on Delivery (COD)",
     privacy: "Privacy",
     privacyNotice:
-      "By placing this order you agree that Noel AgriTV will use your name, phone number, and address solely to process and deliver your order, per the Data Privacy Act of 2012 (RA 10173).",
+      "By placing this order you agree that Noel AgriTV will use your name, phone number, and address to process and deliver your order, and may transmit these details to third-party service providers (including email and delivery providers that may operate outside the Philippines), per the Data Privacy Act of 2012 (RA 10173).",
     orderSummary: "Order summary",
     lineItem: (unit: string, qty: number) => `${unit} × ${qty}`,
     subtotal: "Subtotal",

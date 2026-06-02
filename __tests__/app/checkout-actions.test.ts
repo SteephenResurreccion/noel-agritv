@@ -43,8 +43,31 @@ vi.mock("@/lib/admin-store", () => ({
   })),
 }));
 
+// ── Order email notification (spec §4.2 / §8 integration) ────────────────────
+// The real after() from next/server does workAsyncStorage.getStore() and throws
+// E468 ("`after` was called outside a request scope") under vitest/jsdom — there
+// is no Next request context here. Mock it to run the callback inline.
+// MUST await cb(): the registered callback is async; a synchronous cb() call
+// would only start the promise and assertions would race ahead of
+// sendNewOrderEmail. Awaiting settles it before submitOrder resolves.
+vi.mock("next/server", () => ({
+  after: vi.fn(async (cb: () => void | Promise<void>) => {
+    await cb();
+  }),
+}));
+
+// Spy target for the email assertions. Without this mock the real
+// sendNewOrderEmail runs (a silent no-op under unset env vars) and cannot be
+// asserted on.
+vi.mock("@/lib/notify-email", () => ({
+  sendNewOrderEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { submitOrder } from "@/app/(storefront)/checkout/actions";
 import { formatCentavos } from "@/lib/utils";
+import { buildSheetRow, type OrderRowInput } from "@/lib/sheets";
+import { sendNewOrderEmail } from "@/lib/notify-email";
+import { after } from "next/server";
 
 function payload(items: unknown): unknown {
   return {
@@ -63,6 +86,8 @@ function payload(items: unknown): unknown {
 
 beforeEach(() => {
   appendOrderRow.mockClear();
+  vi.mocked(after).mockClear();
+  vi.mocked(sendNewOrderEmail).mockClear();
 });
 
 describe("submitOrder server authority", () => {
@@ -91,5 +116,79 @@ describe("submitOrder server authority", () => {
 
     // subtotal column = 12 * 52000 = 624000:
     expect(row).toContain(formatCentavos(624000));
+  });
+});
+
+describe("submitOrder → owner email notification via after() (spec §4.2)", () => {
+  // Same valid item shape the existing test uses — server re-derives the real
+  // tier price from the static catalog regardless of these client values.
+  const items = [
+    {
+      slug: "bio-enzyme",
+      name: "hacked",
+      priceCentavos: 100,
+      priceTiers: [{ minQty: 1, priceCentavos: 100 }],
+      qty: 12,
+      image: "/x.png",
+    },
+  ];
+
+  it("(a)+(b) registers after() exactly once and emails the SAME orderInput the Sheet row was built from", async () => {
+    const result = await submitOrder(payload(items));
+    expect(result).toMatchObject({ ok: true });
+
+    // (a) after() called exactly once per successful order:
+    expect(after).toHaveBeenCalledTimes(1);
+
+    // (b) the email's input rebuilds into EXACTLY the row that was appended —
+    // proving both were fed the same orderInput object:
+    expect(sendNewOrderEmail).toHaveBeenCalledTimes(1);
+    const emailInput = vi.mocked(sendNewOrderEmail).mock
+      .calls[0][0] as OrderRowInput;
+    const appendedRow = appendOrderRow.mock.calls[0][0] as string[];
+    expect(buildSheetRow(emailInput)).toEqual(appendedRow);
+
+    // Spot-check the fields actually came through (guards against an empty
+    // object that would also trivially "round-trip"):
+    expect(emailInput).toMatchObject({
+      name: "Juan dela Cruz",
+      phone: "+639171234567",
+      province: "Batangas",
+      city: "Lipa City",
+      barangay: "Sabang",
+      street: "123 Rizal St",
+    });
+    expect(emailInput.orderNumber).toMatch(/^NAG-/);
+    expect(emailInput.subtotalCentavos).toBe(624000); // 12 × ₱520 server tier
+  });
+
+  it("(c) a rejected email send is swallowed by the after() callback — order still succeeds", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(sendNewOrderEmail).mockRejectedValueOnce(
+      new Error("resend down")
+    );
+
+    const result = await submitOrder(payload(items));
+
+    expect(result).toMatchObject({ ok: true });
+    expect(sendNewOrderEmail).toHaveBeenCalledTimes(1);
+    // The callback's internal try/catch logged it:
+    expect(errorSpy).toHaveBeenCalledWith(
+      "sendNewOrderEmail: failed",
+      expect.anything()
+    );
+    errorSpy.mockRestore();
+  });
+
+  it("does NOT register after() or send email when the Sheets append fails", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    appendOrderRow.mockRejectedValueOnce(new Error("sheets down"));
+
+    const result = await submitOrder(payload(items));
+
+    expect(result).toMatchObject({ ok: false, error: "sheets" });
+    expect(after).not.toHaveBeenCalled();
+    expect(sendNewOrderEmail).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });

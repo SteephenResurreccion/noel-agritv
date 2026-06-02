@@ -1,8 +1,7 @@
 import { JWT } from "google-auth-library";
 import type { ShippingEstimate } from "@/lib/shipping";
 import { formatCentavos } from "@/lib/utils";
-// Intentionally static Filipino: sheet rows are an ops-facing artifact, not buyer UI (bilingual rewire skipped on purpose).
-import { copy } from "@/lib/copy";
+import { formatOrderItems, formatShippingLabel } from "@/lib/order-format";
 
 export interface OrderRowInput {
   orderNumber: string;
@@ -24,14 +23,8 @@ export interface OrderRowInput {
 
 /** Build the single sheet row in the EXACT spec §7 column order. */
 export function buildSheetRow(o: OrderRowInput): string[] {
-  const itemsStr = o.items
-    .map((i) => `${i.name} ×${i.qty} @${formatCentavos(i.priceCentavos)}`)
-    .join("; ");
-  const shippingStr = o.shipping.free
-    ? "FREE"
-    : o.shipping.showFee
-      ? formatCentavos(o.shipping.shippingCentavos)
-      : copy.errors.shippingOnCall;
+  const itemsStr = formatOrderItems(o.items);
+  const shippingStr = formatShippingLabel(o.shipping);
   return [
     o.orderNumber, // Order#
     o.timestampManila, // Timestamp (Asia/Manila)
