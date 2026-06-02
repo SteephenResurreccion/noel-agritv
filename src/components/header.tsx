@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Menu } from "lucide-react";
@@ -15,6 +16,17 @@ interface SearchProduct {
   oneLiner: string;
   image: string;
 }
+
+// Lazy-load the search overlay: trending + categories + product grid only ship
+// when a user actually opens search (most farmer sessions never do). ssr:false
+// is safe — the overlay never renders on first paint (gated on searchOpen).
+const HeaderSearchOverlay = dynamic(
+  () =>
+    import("@/components/header-search-overlay").then(
+      (m) => m.HeaderSearchOverlay
+    ),
+  { ssr: false }
+);
 
 export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct[] }) {
   const copy = useCopy();
@@ -207,165 +219,24 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
 
       </header>
 
-      {/* ── Search overlay — full-screen on mobile, dropdown on desktop ── */}
+      {/* ── Search overlay — full-screen on mobile, dropdown on desktop.
+          Lazy-loaded: only mounted (and its chunk fetched) once the user
+          opens search. Refs stay owned here so the parent useEffects above
+          (auto-focus, click-outside, Escape) keep driving it. ── */}
       {searchOpen && (
-        <div
-          ref={searchOverlayRef}
-          className="fixed inset-0 z-50 overflow-y-auto bg-surface"
-        >
-          <div className="container-site py-4">
-            {/* Search input row + Close */}
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={copy.header.searchProductsPlaceholder}
-                  className="h-12 w-full rounded-md border border-border bg-bg pl-9 pr-4 text-base text-text-primary placeholder:text-text-secondary/60 focus:border-brand-accent focus:outline-none md:h-10 md:text-sm"
-                />
-              </div>
-              <button
-                onClick={closeSearch}
-                className="flex h-12 items-center px-3 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
-              >
-                <X className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">{copy.header.close}</span>
-              </button>
-            </div>
-
-            {/* Active search results */}
-            {query.length >= 2 ? (
-              <div className="mt-4">
-                {results.length > 0 ? (
-                  <>
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                      {copy.header.productsHeading}
-                    </p>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                      {results.map((product) => (
-                        <Link
-                          key={product.slug}
-                          href={`/products/${product.slug}`}
-                          onClick={closeSearch}
-                          className="group rounded-lg border border-border bg-bg p-3 transition-shadow hover:shadow-md"
-                        >
-                          <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-md">
-                            {product.image.startsWith("/api/blob-image") || product.image.startsWith("http") ? (
-                              <img
-                                src={product.image}
-                                alt={product.name}
-                                className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                              />
-                            ) : (
-                              <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                className="object-cover transition-transform group-hover:scale-105"
-                                sizes="150px"
-                              />
-                            )}
-                          </div>
-                          <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
-                            {product.name}
-                          </p>
-                          <p className="mt-0.5 text-xs text-text-secondary">
-                            {product.oneLiner}
-                          </p>
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="py-8 text-center text-sm text-text-secondary">
-                    {copy.header.noResults(query)}
-                  </p>
-                )}
-              </div>
-            ) : (
-              /* Default state: trending + categories + top products */
-              <div className="mt-4 space-y-6">
-                {/* Trending Searches */}
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                    {copy.header.trendingSearches}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {TRENDING_SEARCHES.map((term) => (
-                      <button
-                        key={term}
-                        onClick={() => handleTrendingClick(term)}
-                        className="rounded-full border border-border px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent md:px-3 md:py-1.5 md:text-xs"
-                      >
-                        {term}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Shop By Category */}
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                    {copy.header.shopByCategory}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.slug}
-                        href={`/products?category=${cat.slug}`}
-                        onClick={closeSearch}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-brand-accent/30 bg-brand-accent/5 px-4 py-2 text-sm font-semibold text-brand-accent transition-colors hover:bg-brand-accent/10 md:py-1.5 md:text-xs"
-                      >
-                        {cat.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Top Products */}
-                <div>
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                    {copy.header.topProducts}
-                  </p>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    {searchProducts.slice(0, 5).map((product) => (
-                      <Link
-                        key={product.slug}
-                        href={`/products/${product.slug}`}
-                        onClick={closeSearch}
-                        className="group rounded-lg border border-border bg-bg p-3 transition-shadow hover:shadow-md"
-                      >
-                        <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-md">
-                          {product.image.startsWith("/api/blob-image") || product.image.startsWith("http") ? (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                            />
-                          ) : (
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              fill
-                              className="object-cover transition-transform group-hover:scale-105"
-                              sizes="150px"
-                            />
-                          )}
-                        </div>
-                        <p className="mt-2 line-clamp-2 text-sm font-semibold text-text-primary">
-                          {product.name}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <HeaderSearchOverlay
+          copy={copy}
+          query={query}
+          setQuery={setQuery}
+          results={results}
+          categories={categories}
+          searchProducts={searchProducts}
+          trendingSearches={TRENDING_SEARCHES}
+          closeSearch={closeSearch}
+          handleTrendingClick={handleTrendingClick}
+          searchInputRef={searchInputRef}
+          searchOverlayRef={searchOverlayRef}
+        />
       )}
 
       {/* Mobile menu overlay */}
