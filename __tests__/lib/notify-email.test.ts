@@ -6,7 +6,8 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 vi.mock("@/lib/order-format", { spy: true });
 
 import { buildOrderEmail, sendNewOrderEmail } from "@/lib/notify-email";
-import type { OrderRowInput } from "@/lib/sheets";
+import * as orderFormat from "@/lib/order-format";
+import { buildSheetRow, type OrderRowInput } from "@/lib/sheets";
 import { copy } from "@/lib/copy";
 
 const base: OrderRowInput = {
@@ -523,5 +524,31 @@ describe("sendNewOrderEmail — Resend POST and error handling", () => {
 
     expect(errorSpy).toHaveBeenCalledWith("sendNewOrderEmail: timed out after 8s");
     vi.useRealTimers();
+  });
+});
+
+// ─── Import-identity (spec §4.3 formatting drift rule, §8 integration) ───────
+
+describe("import-identity: email and Sheet row share order-format.ts helpers", () => {
+  it("buildOrderEmail routes item + shipping formatting through order-format.ts", () => {
+    vi.mocked(orderFormat.formatOrderItem).mockClear();
+    vi.mocked(orderFormat.formatShippingLabel).mockClear();
+
+    buildOrderEmail(base, "sheet-id");
+
+    // buildOrderEmail renders each item twice — once for the HTML body and once
+    // for the plain-text body — so formatOrderItem fires items.length × 2.
+    expect(orderFormat.formatOrderItem).toHaveBeenCalledTimes(base.items.length * 2);
+    expect(orderFormat.formatShippingLabel).toHaveBeenCalledTimes(1);
+  });
+
+  it("buildSheetRow routes item + shipping formatting through the SAME order-format.ts helpers", () => {
+    vi.mocked(orderFormat.formatOrderItems).mockClear();
+    vi.mocked(orderFormat.formatShippingLabel).mockClear();
+
+    buildSheetRow(base);
+
+    expect(orderFormat.formatOrderItems).toHaveBeenCalledTimes(1);
+    expect(orderFormat.formatShippingLabel).toHaveBeenCalledTimes(1);
   });
 });
