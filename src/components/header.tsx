@@ -180,25 +180,25 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
           >
             <Link
               href="/products"
-              className="whitespace-nowrap border-b-2 border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.common.productsNav}
             </Link>
             <Link
               href="/about"
-              className="whitespace-nowrap border-b-2 border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.header.navAbout}
             </Link>
             <Link
               href="/contact"
-              className="whitespace-nowrap border-b-2 border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.header.navContact}
             </Link>
             <Link
               href="/lookup"
-              className="whitespace-nowrap border-b-2 border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+              className="whitespace-nowrap border-b-[1.5px] border-transparent pb-0.5 text-[12.5px] font-semibold uppercase tracking-[0.13em] text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
             >
               {copy.common.findMyOrder}
             </Link>
