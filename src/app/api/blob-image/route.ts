@@ -1,5 +1,6 @@
 import { get } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
+import { createRateLimiter } from "@/lib/rate-limit";
 
 /**
  * Proxy for private Vercel Blob images — serves them publicly via
@@ -21,8 +22,52 @@ import { NextRequest, NextResponse } from "next/server";
  * `admin/config.json` (PII) lives at a fixed key in this same store, so the
  * pathname must start with `products/` or `videos/` — the only prefixes the app
  * legitimately proxies — before `get()` is called. Path traversal is rejected.
+ *
+ * Egress-abuse safeguard (rate-abuse-1): this is the most-hit unauthenticated
+ * endpoint and streams up to 5 MB out of metered Vercel Blob per GET. Valid
+ * `?url=` values sit in plain HTML on every product page, so they are trivially
+ * harvested and looped — a free Blob/function egress amplifier. We add a per-IP
+ * limiter as a single-instance speed bump (mirrors `/api/geocode`). It is NOT a
+ * real ceiling: the limiter is module-scoped, dies on cold starts, and does not
+ * coordinate across lambdas, and an attacker can spread across IPs. The durable
+ * fixes live outside app code — a Cloudflare edge-cache + WAF rate-rule on
+ * `/api/blob-image` (the response is already `immutable`, so the CDN fully
+ * absorbs repeats), per AGENTS.md. We also normalize the cache key by ignoring
+ * every query param except `url`, so `&x=<rand>` noise can't fragment caching.
  */
+
+// 1 req/sec/IP, 60 req/min/IP — image pages legitimately fire several proxy
+// GETs in a burst (one per product image), so allow more headroom than the
+// geocoder's one-tap path while still capping a tight abuse loop.
+const limiter = createRateLimiter({
+  intervalMs: 0,
+  windowMs: 60_000,
+  maxPerWindow: 60,
+});
+
+function clientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  );
+}
+
 export async function GET(request: NextRequest) {
+  // Skip rate-limiting in non-production. `x-forwarded-for` is set by Vercel in
+  // production; locally it's absent, so every dev request shares the `"unknown"`
+  // bucket and the cap trips on otherwise-legitimate page loads.
+  if (process.env.NODE_ENV === "production") {
+    const rl = limiter.check(clientIp(request));
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: "rate_limited" }), {
+        status: 429,
+        headers: {
+          "content-type": "application/json",
+          "retry-after": String(rl.retryAfterSec),
+        },
+      });
+    }
+  }
+
   const url = request.nextUrl.searchParams.get("url");
   if (!url) {
     return NextResponse.json({ error: "Missing url param" }, { status: 400 });

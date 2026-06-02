@@ -1,12 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   experimental: {
     inlineCss: true,
-    optimizePackageImports: ["lucide-react", "@base-ui/react"],
+    optimizePackageImports: [
+      "lucide-react",
+      "@base-ui/react",
+      "@dnd-kit/core",
+      "@dnd-kit/sortable",
+      "@dnd-kit/utilities",
+    ],
   },
   images: {
-    formats: ["image/webp"],
+    formats: ["image/avif", "image/webp"],
     deviceSizes: [375, 750, 1000, 1500],
     // NOTE: `i.ytimg.com` is intentionally absent here even though it appears in
     // the CSP `img-src`. YouTube thumbnails render via a raw <img> in
@@ -47,6 +54,9 @@ const nextConfig: NextConfig = {
               "connect-src 'self' https://va.vercel-scripts.com https://*.blob.vercel-storage.com https://challenges.cloudflare.com",
               "frame-src https://www.youtube.com https://challenges.cloudflare.com",
               "frame-ancestors 'none'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
             ].join("; "),
           },
         ],

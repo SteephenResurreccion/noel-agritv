@@ -194,4 +194,90 @@ describe("/api/blob-image SSRF hardening", () => {
     expect(res.status).toBe(403);
     expect(getMock).not.toHaveBeenCalled();
   });
+
+  // Cache-key normalization (rate-abuse-1, fix #3): the proxy only reads `url`.
+  // Junk cache-busting params (`&x=<rand>`) must NOT change behaviour or reach
+  // get() — they're ignored, so the served blob is identical regardless of noise.
+  it("ignores query params other than `url`", async () => {
+    const { GET } = await loadRoute();
+    const u = new URL("http://localhost/api/blob-image");
+    u.searchParams.set(
+      "url",
+      `https://${STORE_ID}.blob.vercel-storage.com/products/x.png`
+    );
+    u.searchParams.set("x", "cache-bust-12345");
+    u.searchParams.set("download", "1");
+    const res = await GET(new NextRequest(u));
+    expect(res.status).toBe(200);
+    // Same pathname as the no-noise case — the extra params had no effect.
+    expect(getMock).toHaveBeenCalledWith("products/x.png", {
+      access: "private",
+    });
+  });
+});
+
+/**
+ * Egress-abuse safeguard (rate-abuse-1): a per-IP limiter caps how many times
+ * the same valid blob can be looped out of metered Blob storage. It only engages
+ * in production (matching `/api/geocode`); in dev every request shares the
+ * `"unknown"` bucket, which would falsely throttle legitimate multi-image pages.
+ *
+ * The limiter is module-scoped, so `loadRoute()` (which `vi.resetModules()`s)
+ * yields a FRESH limiter per test — these tests reuse a single loaded route so
+ * the counter accumulates across calls.
+ */
+describe("/api/blob-image rate limiting", () => {
+  const validUrl = `https://${STORE_ID}.blob.vercel-storage.com/products/x.png`;
+
+  beforeEach(() => {
+    vi.stubEnv("BLOB_STORE_ID", STORE_ID);
+    getMock.mockReset();
+    getMock.mockResolvedValue(okBlobResult());
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  function makeReqFromIp(ip: string): NextRequest {
+    const u = new URL("http://localhost/api/blob-image");
+    u.searchParams.set("url", validUrl);
+    return new NextRequest(u, { headers: { "x-forwarded-for": ip } });
+  }
+
+  it("does NOT rate-limit outside production", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    const { GET } = await loadRoute();
+    // Well past the 60/min cap — every one must still serve in dev.
+    for (let i = 0; i < 70; i++) {
+      const res = await GET(makeReqFromIp("1.2.3.4"));
+      expect(res.status).toBe(200);
+    }
+  });
+
+  it("returns 429 with Retry-After once an IP exceeds the per-minute cap", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const { GET } = await loadRoute();
+    // 60 allowed, the 61st from the same IP is throttled.
+    for (let i = 0; i < 60; i++) {
+      const res = await GET(makeReqFromIp("9.9.9.9"));
+      expect(res.status).toBe(200);
+    }
+    const blocked = await GET(makeReqFromIp("9.9.9.9"));
+    expect(blocked.status).toBe(429);
+    expect(blocked.headers.get("retry-after")).toBeTruthy();
+    // The throttled request never reaches Blob storage — no egress charged.
+    expect(getMock).toHaveBeenCalledTimes(60);
+  });
+
+  it("rate-limits per IP — a different IP is unaffected", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const { GET } = await loadRoute();
+    for (let i = 0; i < 60; i++) {
+      await GET(makeReqFromIp("9.9.9.9"));
+    }
+    expect((await GET(makeReqFromIp("9.9.9.9"))).status).toBe(429);
+    // A fresh IP still gets served.
+    expect((await GET(makeReqFromIp("8.8.8.8"))).status).toBe(200);
+  });
 });

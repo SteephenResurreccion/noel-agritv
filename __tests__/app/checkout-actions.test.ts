@@ -68,6 +68,7 @@ import { formatCentavos } from "@/lib/utils";
 import { buildSheetRow, type OrderRowInput } from "@/lib/sheets";
 import { sendNewOrderEmail } from "@/lib/notify-email";
 import { after } from "next/server";
+import { copyFil } from "@/lib/copy";
 
 function payload(items: unknown): unknown {
   return {
@@ -190,5 +191,51 @@ describe("submitOrder → owner email notification via after() (spec §4.2)", ()
     expect(after).not.toHaveBeenCalled();
     expect(sendNewOrderEmail).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+describe("submitOrder rate limiting (finding rate-abuse-3)", () => {
+  const items = [
+    {
+      slug: "bio-enzyme",
+      name: "x",
+      priceCentavos: 100,
+      priceTiers: [{ minQty: 1, priceCentavos: 100 }],
+      qty: 12,
+      image: "/x.png",
+    },
+  ];
+
+  it("blocks the 2nd back-to-back submit from the same identifier in production", async () => {
+    // The in-process limiter is dev-bypassed (NODE_ENV !== production), so the
+    // happy-path tests above never trip it. Force production to exercise the
+    // gate. The mocked next/headers returns no x-forwarded-for ⇒ ip "unknown"
+    // and the constant phone gives a stable key, so the 1-req/sec interval rule
+    // blocks the immediate second submit. Best-effort speed bump only — the real
+    // cross-instance ceiling is a Cloudflare WAF rule (see AGENTS.md hardening).
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubEnv("NODE_ENV", "production");
+    try {
+      const first = await submitOrder(payload(items));
+      expect(first).toMatchObject({ ok: true });
+
+      const second = await submitOrder(payload(items));
+      // Surfaced via the "sheets" channel ⇒ Messenger-fallback banner, with the
+      // existing localized submitFailed copy (default-lang fil under the mock).
+      expect(second).toMatchObject({
+        ok: false,
+        error: "sheets",
+        message: copyFil.errors.submitFailed,
+      });
+      // The blocked submit never reached the Sheet append:
+      expect(appendOrderRow).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "submitOrder: rate limited",
+        expect.anything()
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      warnSpy.mockRestore();
+    }
   });
 });

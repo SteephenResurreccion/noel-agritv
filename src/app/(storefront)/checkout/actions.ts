@@ -1,5 +1,7 @@
 "use server";
 
+import { headers } from "next/headers";
+import { createRateLimiter } from "@/lib/rate-limit";
 import {
   makeCheckoutSchema,
   generateOrderNumber,
@@ -18,6 +20,29 @@ import { appendOrderRow, buildSheetRow, type OrderRowInput } from "@/lib/sheets"
 import { sendNewOrderEmail } from "@/lib/notify-email";
 import { getCopy } from "@/lib/copy";
 import { getLangFromRequest } from "@/lib/lang";
+
+// Per-identifier throttle in FRONT of the Sheet append + Resend email — the two
+// consequential effects of submitOrder. Same module-scoped limiter + same
+// 1-req/sec, 30-req/min budget as `/lookup` (lookup/actions.ts) and `/api/geocode`.
+//
+// ⚠ This is a single-warm-instance SPEED BUMP, not a real flood ceiling: the
+// limiter is module-scoped, so it does NOT survive Vercel cold starts and does
+// NOT coordinate across serverless instances (see @/lib/rate-limit and the
+// "Security hardening" section of AGENTS.md). A Turnstile-solving farm that
+// keeps hitting freshly-spun lambdas routes around it. The REAL cross-instance
+// ceiling for the checkout POST is a Cloudflare WAF rate-rule on the POST path
+// — already documented in AGENTS.md, NOT yet configured. Until that lands this
+// limiter only blunts casual single-client replay/abuse on a warm instance.
+const limiter = createRateLimiter({
+  intervalMs: 1000,
+  windowMs: 60_000,
+  maxPerWindow: 30,
+});
+
+async function clientIp(): Promise<string> {
+  const h = await headers();
+  return h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+}
 
 export async function submitOrder(payload: unknown): Promise<SubmitResult> {
   const lang = await getLangFromRequest();
@@ -43,7 +68,27 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     };
   }
 
-  // 3. Authoritative prices AND names (never trust client)
+  // 3. Rate-limit BEFORE the Sheet append + owner email (production only — dev
+  //    shares the "unknown" bucket, matching /lookup and /api/geocode). Key by
+  //    phone AND IP so neither a single number nor a single source IP can flood
+  //    on a warm instance even with fresh Turnstile tokens. Best-effort only:
+  //    see the limiter note above. On exceed → "sheets" so the form surfaces the
+  //    Messenger-fallback banner (copy.errors.submitFailed), letting a blocked
+  //    buyer still complete the order via Messenger.
+  if (process.env.NODE_ENV === "production") {
+    const ip = await clientIp();
+    const key = `${normalizePhPhone(data.phone) ?? data.phone}|${ip}`;
+    if (!limiter.check(key).allowed) {
+      console.warn("submitOrder: rate limited", { ip });
+      return {
+        ok: false,
+        error: "sheets",
+        message: copy.errors.submitFailed,
+      };
+    }
+  }
+
+  // 4. Authoritative prices AND names (never trust client)
   const config = await getAdminConfig();
   const productBySlug = new Map<
     string,
@@ -88,7 +133,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     });
   }
 
-  // 4. Order number + shipping + region label + timestamp
+  // 5. Order number + shipping + region label + timestamp
   const orderNumber = generateOrderNumber();
   const totalUnits = data.items.reduce((sum, i) => sum + i.qty, 0);
   const shipping = resolveShipping(config.shipping, data.region, totalUnits);
@@ -105,7 +150,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     hour12: false,
   }).format(new Date());
 
-  // 5. Append to Sheet (failure ⇒ Messenger fallback)
+  // 6. Append to Sheet (failure ⇒ Messenger fallback)
   // Fail closed: the schema already refines on normalizePhPhone, so this should
   // be unreachable — but never write a raw, unnormalized phone if it somehow is.
   const normalizedPhone = normalizePhPhone(data.phone);
@@ -149,7 +194,7 @@ export async function submitOrder(payload: unknown): Promise<SubmitResult> {
     };
   }
 
-  // 6. Owner email notification — fire-and-forget AFTER the response is sent.
+  // 7. Owner email notification — fire-and-forget AFTER the response is sent.
   // Sits between the catch close and the success return so it registers ONLY
   // when the Sheets append succeeded (the failure path returned above). The
   // try/catch lives INSIDE the callback: after() itself registers synchronously

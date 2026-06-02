@@ -93,7 +93,6 @@ export default async function RootLayout({
   return (
     <html lang={lang} className={`${sourceSans.variable} ${sourceSerif.variable} antialiased`}>
       <head>
-        <link rel="preconnect" href="https://i.ytimg.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd(lang)) }}

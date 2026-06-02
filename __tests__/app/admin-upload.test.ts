@@ -60,7 +60,8 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-import { addProduct } from "@/app/(admin)/admin/actions";
+import { addProduct, saveFeaturedOrder } from "@/app/(admin)/admin/actions";
+import { getAdminConfig } from "@/lib/admin-store";
 
 /**
  * Build a FormData carrying a malicious-named image file whose extension would
@@ -151,5 +152,59 @@ describe("addProduct upload path-traversal hardening", () => {
       addProduct(maliciousFormData("x.svg", "image/svg+xml"))
     ).rejects.toThrow();
     expect(putMock).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * saveFeaturedOrder input-validation hardening (server-actions-2).
+ *
+ * Before the fix, saveFeaturedOrder wrote the client-supplied string[] straight
+ * to admin/config.json with no Zod and no caps, letting an authenticated admin
+ * bloat the config Blob (read on every storefront render) with a huge array of
+ * arbitrary long strings. The fix validates with a length-capped Zod schema
+ * (mirroring saveVideos) and then keeps only known product IDs, deduped.
+ */
+function configWithProducts(ids: string[]) {
+  return {
+    version: 1,
+    hiddenProducts: [],
+    videos: null,
+    customProducts: ids.map((id) => ({ id })),
+    featuredProductIds: [],
+    managers: [],
+    shipping: {
+      enabled: false,
+      feesCentavos: { ncr: 0, luzon: 0, visayas: 0, mindanao: 0 },
+    },
+  };
+}
+
+describe("saveFeaturedOrder input validation", () => {
+  it("rejects an oversized array without persisting", async () => {
+    vi.mocked(getAdminConfig).mockResolvedValueOnce(
+      configWithProducts(["a", "b"]) as never
+    );
+    const tooMany = Array.from({ length: 51 }, (_, i) => `p${i}`);
+    await expect(saveFeaturedOrder(tooMany)).rejects.toThrow();
+    // The catch re-throws a generic message; nothing should have been saved.
+    expect(savedConfig.current).toBe(null);
+  });
+
+  it("rejects an over-long ID string without persisting", async () => {
+    vi.mocked(getAdminConfig).mockResolvedValueOnce(
+      configWithProducts(["a"]) as never
+    );
+    await expect(saveFeaturedOrder(["x".repeat(101)])).rejects.toThrow();
+    expect(savedConfig.current).toBe(null);
+  });
+
+  it("persists only known product IDs, deduped, dropping unknowns", async () => {
+    vi.mocked(getAdminConfig).mockResolvedValueOnce(
+      configWithProducts(["a", "b", "c"]) as never
+    );
+    // "ghost" is not a known product; "a" appears twice.
+    await saveFeaturedOrder(["b", "ghost", "a", "a"]);
+    const saved = savedConfig.current as { featuredProductIds: string[] };
+    expect(saved.featuredProductIds).toEqual(["b", "a"]);
   });
 });
