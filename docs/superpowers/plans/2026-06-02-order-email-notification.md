@@ -1164,7 +1164,8 @@ Add to the imports at the top of `__tests__/lib/notify-email.test.ts` (after the
 
 ```ts
 import * as orderFormat from "@/lib/order-format";
-import { buildSheetRow } from "@/lib/sheets";
+// Merge with the existing `type OrderRowInput` import from "@/lib/sheets":
+import { buildSheetRow, type OrderRowInput } from "@/lib/sheets";
 ```
 
 Append this describe block at the end of the file:
@@ -1179,7 +1180,9 @@ describe("import-identity: email and Sheet row share order-format.ts helpers", (
 
     buildOrderEmail(base, "sheet-id");
 
-    expect(orderFormat.formatOrderItem).toHaveBeenCalledTimes(base.items.length);
+    // buildOrderEmail renders each item twice — once for the HTML body and once
+    // for the plain-text body — so formatOrderItem fires items.length × 2.
+    expect(orderFormat.formatOrderItem).toHaveBeenCalledTimes(base.items.length * 2);
     expect(orderFormat.formatShippingLabel).toHaveBeenCalledTimes(1);
   });
 
