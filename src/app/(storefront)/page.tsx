@@ -5,6 +5,7 @@ import { FACEBOOK_URL, YOUTUBE_URL } from "@/lib/constants";
 
 import { SocialProofStrip } from "@/components/social-proof-strip";
 import { HomeProductFilter } from "@/components/home-product-filter";
+import { LandscapeDivider } from "@/components/landscape-divider";
 import { VideoReelSection } from "@/components/video-reel-section";
 import { WholesaleBanner } from "@/components/wholesale-banner";
 import { AwardsSection } from "@/components/awards-section";
@@ -150,90 +151,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Decorative farm landscape — thin band at very bottom like TBOF */}
-        <div className="absolute inset-x-0 bottom-0 z-[2]" aria-hidden="true">
-          <svg
-            viewBox="0 0 1440 200"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="block h-[120px] w-full min-[741px]:h-[160px]"
-            preserveAspectRatio="none"
-          >
-            {/* Back hills — lightest brand green */}
-            <path
-              d="M0 80 C160 30,320 60,520 40 C720 20,900 55,1100 35 C1250 20,1380 50,1440 40 L1440 200 L0 200Z"
-              fill="#4D734C"
-            />
-            {/* Middle hills — mid brand green */}
-            <path
-              d="M0 110 C100 70,280 90,460 78 C640 65,780 85,960 72 C1120 62,1300 80,1440 72 L1440 200 L0 200Z"
-              fill="#3B593F"
-            />
-            {/* Front hills — dark brand green */}
-            <path
-              d="M0 140 C180 110,350 125,550 115 C750 105,900 122,1100 112 C1260 104,1380 118,1440 112 L1440 200 L0 200Z"
-              fill="#2A4038"
-            />
-            {/* Ground base */}
-            <rect x="0" y="175" width="1440" height="25" fill="#172621" />
-          </svg>
-
-          {/* Farmer and tree — separate SVG so they don't stretch */}
-          <svg
-            viewBox="0 0 1440 200"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute inset-0 block h-full w-full"
-            preserveAspectRatio="xMidYMax meet"
-          >
-            {/* Tree cluster — far left, two trees clumped together */}
-            <g transform="translate(40,45)" fill="#000000">
-              {/* Smaller tree behind */}
-              <rect x="18" y="70" width="10" height="55" rx="2" />
-              <ellipse cx="23" cy="45" rx="32" ry="28" />
-              <ellipse cx="12" cy="38" rx="22" ry="20" />
-              <ellipse cx="38" cy="42" rx="24" ry="22" />
-              {/* Larger tree in front, overlapping */}
-              <rect x="65" y="60" width="14" height="70" rx="3" />
-              <ellipse cx="72" cy="32" rx="48" ry="38" />
-              <ellipse cx="55" cy="24" rx="34" ry="28" />
-              <ellipse cx="92" cy="30" rx="36" ry="30" />
-              <ellipse cx="108" cy="45" rx="16" ry="12" />
-            </g>
-
-            {/* Tree 3 — center-right, wide spreading, lower position */}
-            <g transform="translate(820,55)" fill="#000000">
-              <rect x="38" y="62" width="12" height="58" rx="2" />
-              <ellipse cx="44" cy="38" rx="46" ry="34" />
-              <ellipse cx="28" cy="28" rx="30" ry="24" />
-              <ellipse cx="64" cy="32" rx="32" ry="26" />
-            </g>
-
-            {/* Tree cluster — right side, two trees close together */}
-            <g transform="translate(1100,20)" fill="#000000">
-              {/* Big tree */}
-              <rect x="48" y="82" width="16" height="78" rx="3" />
-              <path d="M64 96 Q90 76 98 62" stroke="#000000" strokeWidth="4" fill="none" />
-              <ellipse cx="56" cy="46" rx="58" ry="44" />
-              <ellipse cx="38" cy="34" rx="40" ry="34" />
-              <ellipse cx="80" cy="40" rx="42" ry="36" />
-              <ellipse cx="104" cy="56" rx="20" ry="16" />
-              {/* Smaller companion tree, slightly behind and to the right */}
-              <rect x="120" y="75" width="10" height="55" rx="2" />
-              <ellipse cx="125" cy="50" rx="34" ry="28" />
-              <ellipse cx="112" cy="42" rx="24" ry="22" />
-              <ellipse cx="140" cy="46" rx="26" ry="24" />
-            </g>
-
-            {/* Birds */}
-            <g transform="translate(1300,18)" fill="#000000" fillOpacity="0.7">
-              <path d="M0 6 Q4 0 8 4 Q12 0 16 6 Q12 3.5 8 7.5 Q4 3.5 0 6Z" />
-            </g>
-            <g transform="translate(600,28)" fill="#000000" fillOpacity="0.6">
-              <path d="M0 5 Q3.5 0 7 3 Q10.5 0 14 5 Q10.5 3 7 6.5 Q3.5 3 0 5Z" />
-            </g>
-          </svg>
-        </div>
+        {/* Decorative farm landscape — Airy illustration band at very bottom */}
+        <LandscapeDivider className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] w-full select-none" />
       </section>
 
       {/* ── Section 2: Our Products (TBOF-style: filter pills + product cards) */}
