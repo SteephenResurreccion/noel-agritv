@@ -30,14 +30,17 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Airy corner trees — square art, anchored to corners and bleeding off-edge (cropped by section overflow-hidden) */}
+      {/* Corner-rooted trees — square art anchored to its own corner, pulled off-edge so the trunk roots
+          from the corner and the canopy sweeps inward (cropped by the section's overflow-hidden).
+          Offsets scaled from the designer's 360px reference (TL top:-72/left:-86, BR bottom:-86/right:-86).
+          Swap: top-left can use art="topleft-2"; bottom-right can use art="bottomright-mound". */}
       <CornerTree
-        corner="tl"
-        className="pointer-events-none absolute left-0 top-0 z-0 h-[180px] w-[180px] -translate-x-[20%] -translate-y-[20%] min-[741px]:h-[240px] min-[741px]:w-[240px]"
+        art="topleft-1"
+        className="pointer-events-none absolute left-[-45px] top-[-38px] z-0 h-[190px] w-[190px] min-[741px]:left-[-79px] min-[741px]:top-[-66px] min-[741px]:h-[330px] min-[741px]:w-[330px]"
       />
       <CornerTree
-        corner="br"
-        className="pointer-events-none absolute bottom-0 right-0 z-0 h-[180px] w-[180px] translate-x-[20%] translate-y-[20%] min-[741px]:h-[240px] min-[741px]:w-[240px]"
+        art="bottomright-tree"
+        className="pointer-events-none absolute bottom-[-45px] right-[-45px] z-0 h-[190px] w-[190px] min-[741px]:bottom-[-79px] min-[741px]:right-[-79px] min-[741px]:h-[330px] min-[741px]:w-[330px]"
       />
 
       {/* Heading */}
