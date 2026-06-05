@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { FACEBOOK_URL } from "@/lib/constants";
 import { useCopy } from "@/lib/lang-context";
+import { CornerTree } from "@/components/corner-tree";
 
 interface VideoItem {
   title: string;
@@ -29,51 +30,18 @@ export function VideoReelSection({ videos }: { videos: VideoItem[] }) {
 
   return (
     <section className="relative overflow-hidden bg-[#f3f0d2]/40 py-[var(--spacing-section)]">
-      {/* Tree top-left — diagonal trunk from bottom-left corner, wide flat canopy */}
-      <svg
-        className="pointer-events-none absolute left-0 top-0 z-0 h-[180px] w-[160px] -translate-x-[20%] min-[741px]:h-[240px] min-[741px]:w-[210px]"
-        viewBox="0 0 210 200"
-        fill="none"
-        aria-hidden="true"
-      >
-        {/* Diagonal trunk — brown, from bottom-left to canopy */}
-        <path d="M0 200 L8 195 L55 125 L45 118Z" fill="#8B6F47" />
-        {/* Wide flat canopy — muted green, acacia/umbrella shape */}
-        <path
-          d="M30 120 Q20 85 35 60 Q50 38 90 28 Q130 18 170 35 Q200 50 195 80 Q190 108 155 118 Q120 128 80 125 Q50 122 30 120Z"
-          fill="#6B8F5E"
-        />
-        {/* Darker inner canopy for depth */}
-        <path
-          d="M45 112 Q38 85 52 65 Q68 45 100 38 Q135 30 160 45 Q180 58 176 80 Q172 100 145 108 Q115 116 80 114 Q58 112 45 112Z"
-          fill="#4D734C"
-        />
-        {/* Accent dot */}
-        <circle cx="155" cy="42" r="7" fill="#3B593F" fillOpacity="0.6" />
-      </svg>
-
-      {/* Tree bottom-right — diagonal trunk from bottom-right corner, wide flat canopy */}
-      <svg
-        className="pointer-events-none absolute bottom-0 right-0 z-0 h-[170px] w-[150px] translate-x-[20%] min-[741px]:h-[220px] min-[741px]:w-[195px]"
-        viewBox="0 0 195 190"
-        fill="none"
-        aria-hidden="true"
-      >
-        {/* Diagonal trunk — brown, from bottom-right to canopy */}
-        <path d="M195 190 L187 185 L140 118 L150 112Z" fill="#8B6F47" />
-        {/* Wide flat canopy — muted green */}
-        <path
-          d="M165 115 Q175 80 160 55 Q145 32 105 22 Q65 12 25 30 Q-5 45 0 75 Q5 103 40 113 Q75 123 115 120 Q145 117 165 115Z"
-          fill="#6B8F5E"
-        />
-        {/* Darker inner canopy */}
-        <path
-          d="M150 108 Q158 80 145 60 Q130 40 95 32 Q60 24 35 38 Q15 50 18 72 Q22 94 50 104 Q80 112 115 110 Q138 108 150 108Z"
-          fill="#4D734C"
-        />
-        {/* Leaf accent */}
-        <path d="M32 38 Q42 22 36 5 Q50 20 38 36Z" fill="#3B593F" fillOpacity="0.5" />
-      </svg>
+      {/* Corner-rooted trees — square art anchored to its own corner, pulled off-edge so the trunk roots
+          from the corner and the canopy sweeps inward (cropped by the section's overflow-hidden).
+          Offsets scaled from the designer's 360px reference (TL top:-72/left:-86, BR bottom:-86/right:-86).
+          Swap: top-left can use art="topleft-2"; bottom-right can use art="bottomright-mound". */}
+      <CornerTree
+        art="topleft-1"
+        className="pointer-events-none absolute left-[-45px] top-[-38px] z-0 h-[190px] w-[190px] min-[741px]:left-[-79px] min-[741px]:top-[-66px] min-[741px]:h-[330px] min-[741px]:w-[330px]"
+      />
+      <CornerTree
+        art="bottomright-tree"
+        className="pointer-events-none absolute bottom-[-45px] right-[-45px] z-0 h-[190px] w-[190px] min-[741px]:bottom-[-79px] min-[741px]:right-[-79px] min-[741px]:h-[330px] min-[741px]:w-[330px]"
+      />
 
       {/* Heading */}
       <div className="relative z-10 px-[var(--spacing-container-gutter)]">
