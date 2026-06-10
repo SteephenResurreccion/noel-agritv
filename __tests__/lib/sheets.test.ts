@@ -83,7 +83,15 @@ describe("buildSheetRow", () => {
     expect(row[9]).toBe("Near plaza"); // Landmark
     expect(row[13]).toBe("Leave at gate"); // Notes
     expect(row[0]).toBe("NAG-20260521-A7K1"); // Order# (server-generated)
-    expect(row[3]).toBe("+639171234567"); // Phone (server-normalized, not sanitized)
+    expect(row[3]).toBe("'+639171234567"); // Phone (sanitized: leading "+" is a trigger)
+  });
+
+  it("apostrophe-prefixes the normalized phone so CSV/XLSX export keeps it as text", () => {
+    // The server normalizes phones to "+639…"; the leading "+" is a formula
+    // trigger, so without sanitizing, Excel/LibreOffice coerce "+639171234567"
+    // into the number 6.39171E+11 on export and corrupt the COD-critical field.
+    const row = buildSheetRow(base);
+    expect(row[3]).toBe("'+639171234567");
   });
 });
 

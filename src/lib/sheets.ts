@@ -30,8 +30,10 @@ export interface OrderRowInput {
  * (= + - @) or a leading control char (tab / CR / LF), prepend a single
  * apostrophe so importers treat the whole cell as text. The apostrophe is
  * display-invisible in Excel and Sheets, so the owner's view is unchanged.
- * Apply ONLY to buyer-controlled cells — server-generated columns (order#,
- * timestamp, formatted money, fixed strings) can never start with a trigger.
+ * Apply to buyer-controlled cells AND the server-normalized phone — the latter
+ * always starts with a leading "+" (a formula trigger), so an exported CSV/XLSX
+ * would otherwise coerce "+639…" into a number. Other server-generated columns
+ * (order#, timestamp, formatted money, fixed strings) never start with a trigger.
  */
 export function sanitizeCell(value: string): string {
   return /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
@@ -45,7 +47,7 @@ export function buildSheetRow(o: OrderRowInput): string[] {
     o.orderNumber, // Order#
     o.timestampManila, // Timestamp (Asia/Manila)
     sanitizeCell(o.name), // Name (buyer-controlled)
-    o.phone, // Phone (normalized +639…, server-validated)
+    sanitizeCell(o.phone), // Phone (normalized +639… — leading "+" is a formula trigger)
     o.region, // Region (allowlisted against PH_REGIONS server-side)
     sanitizeCell(o.province), // Province (buyer-controlled)
     sanitizeCell(o.city), // City/Municipality (buyer-controlled)
