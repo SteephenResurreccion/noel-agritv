@@ -83,7 +83,6 @@ describe("buildSheetRow", () => {
     expect(row[9]).toBe("Near plaza"); // Landmark
     expect(row[13]).toBe("Leave at gate"); // Notes
     expect(row[0]).toBe("NAG-20260521-A7K1"); // Order# (server-generated)
-    expect(row[3]).toBe("'+639171234567"); // Phone (sanitized: leading "+" is a trigger)
   });
 
   it("apostrophe-prefixes the normalized phone so CSV/XLSX export keeps it as text", () => {
