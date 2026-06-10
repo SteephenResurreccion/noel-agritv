@@ -64,15 +64,34 @@ export const proxy = auth((req) => {
 });
 
 export const config = {
+  // matcher entries are OR'd: a request that matches ANY entry runs the proxy.
   matcher: [
     /*
-     * Run on all HTML routes. Exclude API routes, Next internals, and static
-     * assets that don't need a CSP, and skip link prefetches (no HTML body to
-     * apply a nonce to).
+     * Entry 1 — ADMIN, UNCONDITIONAL. The proxy MUST run on every /admin/*
+     * request (prefetch or not) so the auth redirect AND the x-pathname
+     * overwrite always execute. There are deliberately NO `missing`/`has`
+     * conditions here: with them, a client sending a forged `purpose: prefetch`
+     * or `next-router-prefetch` header would skip the proxy entirely — bypassing
+     * the auth redirect and letting the (admin) layout guard trust a forged
+     * x-pathname (e.g. "/admin/login") to serve admin pages unauthenticated.
+     * Restoring the master invariant (proxy always runs on /admin) closes that
+     * bypass. The CSP nonce is applied on these requests too.
+     */
+    "/admin/:path*",
+    /*
+     * Entry 2 — STOREFRONT (all other HTML routes). Excludes API routes, Next
+     * internals, static assets, and /admin (Entry 1 owns it) so the two entries
+     * are disjoint. Each exclusion token is anchored with `(?:/|$)` so it matches
+     * a whole first segment only — `api` no longer prefix-matches `/apiculture`,
+     * `data` no longer matches `/database`, `admin` no longer matches
+     * `/administrators`. File tokens use escaped dots for an exact match.
+     * The prefetch `missing`-conditions are kept here (doc-sanctioned for nonce
+     * CSP): link prefetches have no HTML body to carry a nonce, and skipping the
+     * proxy on PUBLIC routes is safe because no auth decision rides on it.
      */
     {
       source:
-        "/((?!api|_next/static|_next/image|favicon.ico|icon.png|sitemap.xml|robots.txt|images|data).*)",
+        "/((?!admin(?:/|$)|api(?:/|$)|_next/static(?:/|$)|_next/image(?:/|$)|favicon\\.ico(?:/|$)|icon\\.png(?:/|$)|sitemap\\.xml(?:/|$)|robots\\.txt(?:/|$)|images(?:/|$)|data(?:/|$)).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
