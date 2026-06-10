@@ -537,10 +537,19 @@ export async function saveFeaturedOrder(orderedIds: string[]) {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
+    // Guard a missing/partial config blob: when customProducts is null/undefined
+    // there is no product set to validate the ordering against, and proceeding
+    // would persist featuredProductIds: [] — silently WIPING the saved ordering.
+    // Fail loudly (caught below → generic admin-facing error) instead of writing,
+    // matching how the other mutations in this file signal failure.
+    if (config.customProducts == null) {
+      throw new Error("CONFIG_INCOMPLETE: customProducts unavailable");
+    }
+
     // Keep only known product IDs and dedupe — silently dropping unknown IDs
     // mirrors the storefront's .filter(Boolean) behaviour so stale reorders
     // don't break, while preventing junk from polluting the persisted config.
-    const known = new Set((config.customProducts ?? []).map((p) => p.id));
+    const known = new Set(config.customProducts.map((p) => p.id));
     config.featuredProductIds = [...new Set(ids.filter((id) => known.has(id)))];
 
     await saveAdminConfig(config, ver);

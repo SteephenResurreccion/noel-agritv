@@ -207,4 +207,30 @@ describe("saveFeaturedOrder input validation", () => {
     const saved = savedConfig.current as { featuredProductIds: string[] };
     expect(saved.featuredProductIds).toEqual(["b", "a"]);
   });
+
+  it("errors without persisting when customProducts is null (missing/partial config blob)", async () => {
+    // The two "rejects ..." tests above queue mockResolvedValueOnce values that
+    // they never consume (Zod throws before getAdminConfig is read), leaving
+    // stale entries in the mock queue. Reset so this call gets exactly the
+    // partial config set below.
+    vi.mocked(getAdminConfig).mockReset();
+    // A partial/corrupt config read returns customProducts: null while a real
+    // ordering is still saved. Proceeding would persist featuredProductIds: []
+    // and wipe it; the guard must fail loudly and write NOTHING.
+    vi.mocked(getAdminConfig).mockResolvedValueOnce({
+      version: 1,
+      hiddenProducts: [],
+      videos: null,
+      customProducts: null,
+      featuredProductIds: ["keep-me"],
+      managers: [],
+      shipping: {
+        enabled: false,
+        feesCentavos: { ncr: 0, luzon: 0, visayas: 0, mindanao: 0 },
+      },
+    } as never);
+    await expect(saveFeaturedOrder(["keep-me"])).rejects.toThrow();
+    // No save happened, so the previously-saved ordering is untouched.
+    expect(savedConfig.current).toBe(null);
+  });
 });
