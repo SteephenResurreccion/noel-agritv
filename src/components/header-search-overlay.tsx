@@ -121,7 +121,12 @@ export function HeaderSearchOverlay({
           </div>
           <button
             onClick={closeSearch}
-            className="flex h-12 items-center px-3 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
+            aria-label={copy.header.closeSearchAriaLabel}
+            // Mobile shows only the 20px X icon: px-3.5 (14px each side) makes the
+            // button's own padding box 48px wide (≥48×48 hit target); -mx-0.5 pulls
+            // the margin box back to its original 44px so neither the input nor the
+            // icon's centered position shifts (screenshot baseline stays intact).
+            className="flex h-12 items-center px-3.5 -mx-0.5 text-sm font-semibold text-text-secondary transition-colors hover:text-text-primary"
           >
             <X className="h-5 w-5 md:hidden" />
             <span className="hidden md:inline">{copy.header.close}</span>
