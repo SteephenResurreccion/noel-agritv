@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { put, get } from "@vercel/blob";
 import type { PriceTier } from "@/lib/pricing";
 
@@ -94,11 +95,13 @@ const DEFAULT_CONFIG: AdminConfig = {
 };
 
 /**
- * Read admin config from Blob.
+ * Uncached Blob read of the admin config. Always performs a fresh origin fetch.
  * - Default mode: returns DEFAULT_CONFIG on any error (safe for page rendering).
  * - strict mode: throws on error (use in mutations to prevent overwriting with empty config).
+ *
+ * Callers MUST go through `getAdminConfig` (below), not this fn directly.
  */
-export async function getAdminConfig(
+async function readAdminConfig(
   opts: { strict?: boolean } = {}
 ): Promise<AdminConfig> {
   // If blob token isn't configured, skip blob entirely
@@ -123,6 +126,38 @@ export async function getAdminConfig(
     console.error("Failed to read admin config:", e);
     return DEFAULT_CONFIG;
   }
+}
+
+/**
+ * Request-scoped memo for the NON-STRICT (read-only render) path.
+ *
+ * React's `cache` dedupes within a single server render/request pass only — it
+ * does NOT persist across requests, so admin saves + `revalidatePath` still take
+ * effect on the very next request. This collapses the 3-4 identical Blob reads a
+ * single product/storefront page render fires into ONE origin fetch.
+ *
+ * IMPORTANT: the returned object is a SHARED reference for the request. Treat it
+ * as READ-ONLY. All current render callers only read it (filter/find/map →
+ * new arrays), which is safe. Mutators must use `getAdminConfig({ strict: true })`,
+ * which is NEVER memoized and returns a fresh object every call.
+ */
+const getCachedConfig = cache(() => readAdminConfig({}));
+
+/**
+ * Read admin config from Blob.
+ * - Default (non-strict) reads are request-deduped via React `cache` (one Blob
+ *   fetch per render, shared read-only object).
+ * - strict reads are ALWAYS fresh (never memoized): mutations call this twice
+ *   per request — once before mutating and once inside `saveAdminConfig`'s
+ *   optimistic-lock re-read — and both MUST see the live Blob version, or
+ *   concurrent-write detection silently fails. `resolveRole` likewise needs
+ *   origin-fresh manager auth.
+ */
+export async function getAdminConfig(
+  opts: { strict?: boolean } = {}
+): Promise<AdminConfig> {
+  if (opts.strict) return readAdminConfig({ strict: true });
+  return getCachedConfig();
 }
 
 /**

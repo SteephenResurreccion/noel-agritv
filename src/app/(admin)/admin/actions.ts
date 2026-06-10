@@ -524,12 +524,25 @@ export async function toggleFeaturedProduct(id: string) {
   }
 }
 
+// Cap the client-supplied ordering: IDs are short (~36-char UUIDs), so
+// reject oversized strings/arrays rather than persisting them to the
+// config Blob that every storefront render reads.
+const featuredOrderSchema = z.array(z.string().min(1).max(100)).max(50);
+
 export async function saveFeaturedOrder(orderedIds: string[]) {
   await requireAuth();
   try {
+    const ids = featuredOrderSchema.parse(orderedIds);
+
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
-    config.featuredProductIds = orderedIds;
+
+    // Keep only known product IDs and dedupe — silently dropping unknown IDs
+    // mirrors the storefront's .filter(Boolean) behaviour so stale reorders
+    // don't break, while preventing junk from polluting the persisted config.
+    const known = new Set((config.customProducts ?? []).map((p) => p.id));
+    config.featuredProductIds = [...new Set(ids.filter((id) => known.has(id)))];
+
     await saveAdminConfig(config, ver);
     revalidatePath("/admin/products");
     revalidateStorefront();

@@ -21,6 +21,24 @@ export interface OrderRowInput {
   notes: string;
 }
 
+/**
+ * Neutralize a buyer-controlled TEXT cell against spreadsheet formula/CSV
+ * injection. valueInputOption=RAW stops Google Sheets evaluating the cell in the
+ * live web view, but the dangerous-prefix characters survive verbatim and re-arm
+ * the moment the owner exports to CSV/XLSX and reopens in Excel/LibreOffice.
+ * OWASP-standard defense: if the value's first character is a formula trigger
+ * (= + - @) or a leading control char (tab / CR / LF), prepend a single
+ * apostrophe so importers treat the whole cell as text. The apostrophe is
+ * display-invisible in Excel and Sheets, so the owner's view is unchanged.
+ * Apply to buyer-controlled cells AND the server-normalized phone — the latter
+ * always starts with a leading "+" (a formula trigger), so an exported CSV/XLSX
+ * would otherwise coerce "+639…" into a number. Other server-generated columns
+ * (order#, timestamp, formatted money, fixed strings) never start with a trigger.
+ */
+export function sanitizeCell(value: string): string {
+  return /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
+}
+
 /** Build the single sheet row in the EXACT spec §7 column order. */
 export function buildSheetRow(o: OrderRowInput): string[] {
   const itemsStr = formatOrderItems(o.items);
@@ -28,18 +46,18 @@ export function buildSheetRow(o: OrderRowInput): string[] {
   return [
     o.orderNumber, // Order#
     o.timestampManila, // Timestamp (Asia/Manila)
-    o.name, // Name
-    o.phone, // Phone
-    o.region, // Region
-    o.province, // Province
-    o.city, // City/Municipality
-    o.barangay, // Barangay
-    o.street, // Street
-    o.landmark, // Landmark
+    sanitizeCell(o.name), // Name (buyer-controlled)
+    sanitizeCell(o.phone), // Phone (normalized +639… — leading "+" is a formula trigger)
+    o.region, // Region (allowlisted against PH_REGIONS server-side)
+    sanitizeCell(o.province), // Province (buyer-controlled)
+    sanitizeCell(o.city), // City/Municipality (buyer-controlled)
+    sanitizeCell(o.barangay), // Barangay (buyer-controlled)
+    sanitizeCell(o.street), // Street (buyer-controlled free-text)
+    sanitizeCell(o.landmark), // Landmark (buyer-controlled free-text)
     itemsStr, // Items (name ×qty @₱unit)
     formatCentavos(o.subtotalCentavos), // Subtotal
     shippingStr, // Shipping (est.)
-    o.notes, // Notes
+    sanitizeCell(o.notes), // Notes (buyer-controlled free-text)
     "NEW", // Status
     "", // J&T Tracking#
     "", // Staff notes

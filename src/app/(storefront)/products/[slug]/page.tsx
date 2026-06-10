@@ -211,9 +211,22 @@ export default async function ProductDetailPage({
           {/* Product Image */}
           <div className="overflow-hidden rounded-[var(--radius-card)]">
             {isExternal ? (
+              // Buyer-uploaded Blob image is served same-origin via the
+              // SSRF/PII-hardened /api/blob-image proxy (red-team R1/R3) and can
+              // also be an arbitrary external http host, so it stays a raw <img>
+              // (NOT next/image: the Blob host is deliberately absent from both
+              // next.config images.remotePatterns AND the CSP img-src, and the
+              // optimizer would throw on un-allowlisted external hosts). To still
+              // optimize the product-page LCP element: width/height match the
+              // next/image branch (1000x1000) + aspect-square to reserve the box
+              // and remove CLS, and fetchPriority="high" marks it for early fetch.
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={product.imageLarge}
                 alt={product.name}
+                width={1000}
+                height={1000}
+                fetchPriority="high"
                 className="aspect-square w-full object-cover"
               />
             ) : (
