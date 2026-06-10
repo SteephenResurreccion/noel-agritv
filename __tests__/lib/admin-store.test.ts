@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 /**
  * Guards the request-dedup refactor of `getAdminConfig` (night-audit
@@ -42,7 +42,7 @@ vi.mock("@vercel/blob", () => ({
   put: vi.fn(),
 }));
 
-import { getAdminConfig } from "@/lib/admin-store";
+import { getAdminConfig, resolveRoleStrict } from "@/lib/admin-store";
 
 /** Build a fake `get` result whose stream yields the given config JSON. */
 function blobResultFor(config: unknown) {
@@ -109,5 +109,62 @@ describe("getAdminConfig — request dedup refactor", () => {
     const config = await getAdminConfig();
     expect(config.version).toBe(0);
     expect(getMock).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Proves the STRICT resolver actually propagates a Blob outage as a rejection —
+ * the premise `resolveRoleWithRetry` (src/lib/auth-role.ts) is built on. The
+ * sibling auth-role test mocks `resolveRoleStrict` and asserts the retry/preserve
+ * behavior; this block proves the real `resolveRoleStrict` honors the contract
+ * those mocks assume, closing the false-confidence gap (the prior wrapper called
+ * the swallowing `resolveRole`, which returns null on outage and never rejects,
+ * making every catch/retry/preserve branch unreachable in production).
+ */
+describe("resolveRoleStrict — propagation contract", () => {
+  const ORIGINAL_ADMIN_EMAILS = process.env.ADMIN_EMAILS;
+
+  beforeEach(() => {
+    // Default: one env owner, distinct from the manager emails under test, so
+    // the Blob read path is actually exercised for non-owners.
+    process.env.ADMIN_EMAILS = "owner@noelagritv.com";
+  });
+
+  afterEach(() => {
+    if (ORIGINAL_ADMIN_EMAILS === undefined) {
+      delete process.env.ADMIN_EMAILS;
+    } else {
+      process.env.ADMIN_EMAILS = ORIGINAL_ADMIN_EMAILS;
+    }
+  });
+
+  it("REJECTS when the underlying Blob read fails (outage propagates, not swallowed)", async () => {
+    getMock.mockRejectedValueOnce(new Error("blob down"));
+    await expect(resolveRoleStrict("manager@noelagritv.com")).rejects.toThrow(
+      "blob down"
+    );
+  });
+
+  it("resolves owner-from-env without touching Blob (outage can never lock an owner out)", async () => {
+    const role = await resolveRoleStrict("owner@noelagritv.com");
+    expect(role).toBe("owner");
+    expect(getMock).not.toHaveBeenCalled();
+  });
+
+  it("returns null for an unknown manager on a SUCCESSFUL read (real de-auth, not an outage)", async () => {
+    getMock.mockResolvedValueOnce(
+      blobResultFor({ version: 3, managers: ["someone@noelagritv.com"] })
+    );
+    const role = await resolveRoleStrict("nobody@noelagritv.com");
+    expect(role).toBeNull();
+    expect(getMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns 'manager' for a configured email on a SUCCESSFUL read", async () => {
+    getMock.mockResolvedValueOnce(
+      blobResultFor({ version: 3, managers: ["manager@noelagritv.com"] })
+    );
+    const role = await resolveRoleStrict("manager@noelagritv.com");
+    expect(role).toBe("manager");
   });
 });

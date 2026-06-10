@@ -150,8 +150,8 @@ const getCachedConfig = cache(() => readAdminConfig({}));
  * - strict reads are ALWAYS fresh (never memoized): mutations call this twice
  *   per request — once before mutating and once inside `saveAdminConfig`'s
  *   optimistic-lock re-read — and both MUST see the live Blob version, or
- *   concurrent-write detection silently fails. `resolveRole` likewise needs
- *   origin-fresh manager auth.
+ *   concurrent-write detection silently fails. `resolveRoleStrict` likewise
+ *   needs origin-fresh manager auth.
  */
 export async function getAdminConfig(
   opts: { strict?: boolean } = {}
@@ -173,31 +173,55 @@ export function getOwnerEmails(): string[] {
     .filter(Boolean);
 }
 
-/** Resolve an email to a role, or null if unauthorized */
-export async function resolveRole(
+/**
+ * Strict role resolution — the canonical resolver.
+ *
+ * - Owners come from env (ADMIN_EMAILS) and are resolved BEFORE any Blob read,
+ *   so a Blob outage can never lock the owner out (no Blob is touched for them).
+ * - Managers are resolved from a STRICT admin-config read that PROPAGATES on a
+ *   Blob outage: it REJECTS rather than swallowing the error. A transient blip
+ *   therefore surfaces to the caller (`resolveRoleWithRetry`), which can retry
+ *   and, failing that, preserve a prior successfully-read role.
+ * - On a SUCCESSFUL read: returns "manager" if the email is configured, else
+ *   `null`. A successful `null` is a real de-authorization (revoked manager) —
+ *   it is NOT an outage and must clear the role.
+ *
+ * Never invents, defaults, or widens a role.
+ */
+export async function resolveRoleStrict(
   email: string
 ): Promise<AdminRole | null> {
   const normalized = email.toLowerCase();
 
-  // Owners come from env (ADMIN_EMAILS) and are resolved BEFORE the Blob read,
-  // so a Blob outage can never lock the owner out.
   const owners = getOwnerEmails();
   if (owners.includes(normalized)) return "owner";
 
-  // Manager resolution uses a STRICT read: a Blob read error must NOT be
-  // silently treated as "no managers" (which would also hide a real outage).
-  // On failure we log and deny (return null) rather than trusting an empty
-  // config. Owners are unaffected (already returned above).
+  // Strict read: a Blob outage propagates as a rejection (not swallowed) so the
+  // caller can distinguish "read failed" from "read succeeded, not a manager".
+  const config = await getAdminConfig({ strict: true });
+  if (config.managers.map((e) => e.toLowerCase()).includes(normalized)) {
+    return "manager";
+  }
+  return null;
+}
+
+/**
+ * Sign-in-gate role resolution. Thin wrapper over `resolveRoleStrict` that
+ * SWALLOWS a Blob outage: on failure it logs and denies (returns `null`) rather
+ * than rejecting. Used by the Auth.js `signIn` callback, which only needs a
+ * yes/no gate and must fail closed (deny) on an outage without surfacing a
+ * thrown error. The owner env short-circuit inside `resolveRoleStrict` still
+ * runs first, so an outage never locks an owner out at sign-in.
+ */
+export async function resolveRole(
+  email: string
+): Promise<AdminRole | null> {
   try {
-    const config = await getAdminConfig({ strict: true });
-    if (config.managers.map((e) => e.toLowerCase()).includes(normalized)) {
-      return "manager";
-    }
+    return await resolveRoleStrict(email);
   } catch (e) {
     console.error("resolveRole: strict admin-config read failed:", e);
     return null;
   }
-  return null;
 }
 
 export async function saveAdminConfig(
