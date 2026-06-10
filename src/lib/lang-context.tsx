@@ -47,7 +47,9 @@ export function LangProvider({
 
   const setLang = useCallback(
     (next: Lang) => {
-      document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=${LANG_COOKIE_MAX_AGE}; SameSite=Lax`;
+      // `Secure` keeps the cookie HTTPS-only in production. Chromium treats
+      // http://localhost as trustworthy, so local dev still sets it fine.
+      document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=${LANG_COOKIE_MAX_AGE}; SameSite=Lax; Secure`;
       setLangState(next);
       // Re-render Server Components so server-rendered copy switches language.
       router.refresh();
