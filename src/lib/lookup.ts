@@ -1,3 +1,4 @@
+import "@/lib/zod-config"; // CSP: disable Zod JIT before any z.object() (no unsafe-eval)
 import { z } from "zod";
 import { copy, type Copy } from "@/lib/copy";
 
