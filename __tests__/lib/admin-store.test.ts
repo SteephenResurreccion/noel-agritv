@@ -150,6 +150,9 @@ describe("getAdminConfig — request dedup refactor", () => {
     const config = await getAdminConfig();
     expect(config.version).toBe(0);
     expect(getMock).not.toHaveBeenCalled();
+    // The token-missing non-strict path short-circuits to DEFAULT_CONFIG BEFORE
+    // the Data-Cache wrapper — so the cached reader is never even consulted.
+    expect(h.cachedReaderSpy).not.toHaveBeenCalled();
   });
 });
 

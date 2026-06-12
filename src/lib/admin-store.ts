@@ -303,8 +303,14 @@ export async function saveAdminConfig(
   // `profile: "max"` is rejected here — it is stale-while-revalidate and would
   // serve the admin the OLD config once more after saving. The single-arg
   // `revalidateTag(tag)` form is deprecated in Next 16 (and TS-errors); the
-  // two-arg `{ expire: 0 }` is its supported equivalent. Runs AFTER a successful
-  // put only — a failed write throws above and never reaches here, so the cache
-  // is never invalidated without an actual change landing.
+  // two-arg `{ expire: 0 }` is its supported equivalent. `updateTag` is NOT
+  // used: it does work with unstable_cache-tagged entries, but it THROWS when
+  // called outside a Server Action (the workStore.page '/route' check in
+  // next/dist/server/web/spec-extension/revalidate.js), and saveAdminConfig is a
+  // shared utility that may run from non-action server contexts — `revalidateTag`
+  // with `{ expire: 0 }` gives the same immediate expiry and is safe from any
+  // server context. Runs AFTER a successful put only — a failed write throws
+  // above and never reaches here, so the cache is never invalidated without an
+  // actual change landing.
   revalidateTag(ADMIN_CONFIG_TAG, { expire: 0 });
 }

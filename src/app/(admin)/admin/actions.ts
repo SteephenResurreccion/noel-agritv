@@ -173,7 +173,11 @@ async function requireOwner() {
 function revalidateStorefront() {
   revalidatePath("/");
   revalidatePath("/products");
-  revalidatePath("/products/[slug]", "page");
+  // The detail page's REGISTERED path includes the route group
+  // (.next/server/app-paths-manifest.json: "/(storefront)/products/[slug]/page");
+  // revalidatePath builds the soft tag verbatim from this arg, so it MUST match
+  // the route-group path or the call is a silent no-op.
+  revalidatePath("/(storefront)/products/[slug]", "page");
   revalidatePath("/checkout");
 }
 

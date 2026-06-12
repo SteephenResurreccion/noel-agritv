@@ -63,8 +63,9 @@ describe("revalidateStorefront — widened path coverage", () => {
     const calls = revalidatePath.mock.calls;
     expect(calls).toContainEqual(["/"]);
     expect(calls).toContainEqual(["/products"]);
-    // Dynamic route → MUST pass the 'page' type arg or the call is a no-op.
-    expect(calls).toContainEqual(["/products/[slug]", "page"]);
+    // Dynamic route → MUST pass the 'page' type arg AND the route-group path
+    // (registered as "/(storefront)/products/[slug]/page") or the call is a no-op.
+    expect(calls).toContainEqual(["/(storefront)/products/[slug]", "page"]);
     // Checkout renders shipping fees from admin config.
     expect(calls).toContainEqual(["/checkout"]);
   });
