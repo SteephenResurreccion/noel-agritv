@@ -1,22 +1,27 @@
-import "@/lib/zod-config"; // CSP: disable Zod JIT before any z.object() (no unsafe-eval)
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { z } from "zod";
 import { priceForQuantity } from "@/lib/pricing";
 
-export const cartItemSchema = z.object({
-  slug: z.string().min(1).max(200),
-  name: z.string().min(1).max(200),
-  priceCentavos: z.number().int().nonnegative(),
-  priceTiers: z
-    .array(z.object({ minQty: z.number().int().positive(), priceCentavos: z.number().int().nonnegative() }))
-    .optional(),
-  qty: z.number().int().min(1).max(99),
-  // Generous cap: proxied blob images ("/api/blob-image?url=<encoded blob url>")
-  // run ~130 chars; 500 bounds DoS without rejecting long-slug product images.
-  image: z.string().min(1).max(500),
-});
-export type CartItem = z.infer<typeof cartItemSchema>;
+/**
+ * A single cart line. Hand-written (NOT `z.infer`) so the zod vendor chunk stays
+ * OUT of the storefront client bundle — this module is pulled into
+ * `(storefront)/layout` first-load on every route via the `"use client"`
+ * CheckoutBar / cart-badge. The matching Zod schema (`cartItemSchema`,
+ * src/lib/cart-schema.ts, server-only) carries a compile-time `Equals` assertion
+ * against this interface so the two shapes cannot drift.
+ *
+ * Persisted carts are NOT zod-validated on the client today — Zustand `persist`
+ * rehydrates raw JSON — so keeping the schema server-side loses no client
+ * validation. The server re-validates the cart in `submitOrder` before pricing.
+ */
+export interface CartItem {
+  slug: string;
+  name: string;
+  priceCentavos: number;
+  priceTiers?: { minQty: number; priceCentavos: number }[];
+  qty: number;
+  image: string;
+}
 
 /** Per-line unit price honoring volume tiers (falls back to flat priceCentavos). */
 export function lineUnitPriceCentavos(item: CartItem): number {
