@@ -209,7 +209,7 @@ export default async function HomePage() {
             <div className="relative min-[741px]:self-stretch">
               <div className="overflow-hidden rounded-2xl min-[741px]:h-full">
                 <Image
-                  src="/images/New-Found-Hero.png"
+                  src="/images/New-Found-Hero.webp"
                   alt={copy.home.missionImageAlt}
                   width={640}
                   height={960}

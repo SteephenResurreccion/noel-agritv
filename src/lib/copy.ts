@@ -62,6 +62,7 @@ const copyFil = {
     mobileNavAriaLabel: "Mobile navigation",
     navHome: "Home",
     closeMenuAriaLabel: "Isara ang menu",
+    closeSearchAriaLabel: "Isara ang paghahanap",
   },
   footer: {
     logoAlt: "Noel AgriTV",
@@ -523,6 +524,7 @@ const copyEn: DeepWiden<typeof copyFil> = {
     mobileNavAriaLabel: "Mobile navigation",
     navHome: "Home",
     closeMenuAriaLabel: "Close menu",
+    closeSearchAriaLabel: "Close search",
   },
   footer: {
     logoAlt: "Noel AgriTV",

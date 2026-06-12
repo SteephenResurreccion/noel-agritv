@@ -32,8 +32,12 @@ import { createRateLimiter } from "@/lib/rate-limit";
  * coordinate across lambdas, and an attacker can spread across IPs. The durable
  * fixes live outside app code — a Cloudflare edge-cache + WAF rate-rule on
  * `/api/blob-image` (the response is already `immutable`, so the CDN fully
- * absorbs repeats), per AGENTS.md. We also normalize the cache key by ignoring
- * every query param except `url`, so `&x=<rand>` noise can't fragment caching.
+ * absorbs repeats), per AGENTS.md. Note this handler reads only `?url=` and
+ * ignores any other query param, but that does NOT stop cache-busting: the CDN
+ * keys its cache on the FULL request URL, so `&x=<rand>` noise still mints a
+ * distinct edge-cache key and the in-handler param-stripping (which runs only
+ * after the cache lookup) cannot prevent that fragmentation. The per-IP limiter
+ * above is what actually bounds such cache-busting abuse.
  */
 
 // 1 req/sec/IP, 60 req/min/IP — image pages legitimately fire several proxy
