@@ -1,6 +1,7 @@
 import "@/lib/zod-config"; // CSP: disable Zod JIT before any z.object() (no unsafe-eval)
 import { z } from "zod";
-import { cartItemSchema, type CartItem } from "@/lib/cart-store";
+import { cartItemSchema } from "@/lib/cart-schema";
+import type { CartItem } from "@/lib/cart-store";
 import { PH_REGIONS } from "@/lib/ph-regions";
 import { copy, type Copy } from "@/lib/copy";
 
