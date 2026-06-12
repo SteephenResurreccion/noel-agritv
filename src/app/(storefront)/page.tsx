@@ -199,7 +199,7 @@ export default async function HomePage() {
               </p>
               <Link
                 href="/about"
-                className="mt-6 inline-flex h-10 items-center justify-center rounded-full bg-brand-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+                className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-brand-accent px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
               >
                 {copy.home.ourStory}
               </Link>

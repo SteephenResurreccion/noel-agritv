@@ -71,7 +71,7 @@ export default function CartPage() {
         </h1>
         <Link
           href="/products"
-          className="mt-4 inline-block rounded-md bg-brand-darkest px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
+          className="mt-4 inline-block rounded-md bg-brand-darkest px-5 py-3.5 text-sm font-semibold text-white hover:bg-brand-dark"
         >
           {copy.cart.browse}
         </Link>
@@ -158,7 +158,7 @@ export default function CartPage() {
       <FreeShippingLine totalUnits={totalUnits} />
       <Link
         href="/checkout"
-        className="mt-4 block rounded-md bg-brand-darkest px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-dark"
+        className="mt-4 block rounded-md bg-brand-darkest px-5 py-3.5 text-center text-sm font-semibold text-white hover:bg-brand-dark"
       >
         {copy.cart.checkoutWithSubtotal(formatCentavos(subtotal))}
       </Link>

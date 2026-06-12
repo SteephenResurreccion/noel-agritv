@@ -46,7 +46,7 @@ export function AddToCart({
       <button
         type="button"
         onClick={handleAdd}
-        className="w-full rounded-md bg-brand-darkest px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+        className="w-full rounded-md bg-brand-darkest px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
       >
         {added ? copy.addToCart.added : copy.addToCart.add}
       </button>

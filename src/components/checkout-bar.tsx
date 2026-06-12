@@ -76,7 +76,7 @@ export function CheckoutBar(): React.ReactElement | null {
         </div>
         <Link
           href="/checkout"
-          className="rounded-md bg-brand-accent px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent sm:text-base"
+          className="rounded-md bg-brand-accent px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-brand-accent/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent sm:text-base"
         >
           {copy.checkoutBar.checkout}
         </Link>
