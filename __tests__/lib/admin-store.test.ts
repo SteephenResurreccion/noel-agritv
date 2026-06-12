@@ -32,17 +32,58 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  * We mock only `@vercel/blob get` and set the token so the real read path runs.
  */
 
-const { getMock } = vi.hoisted(() => ({
+const h = vi.hoisted(() => ({
   getMock: vi.fn(),
+  putMock: vi.fn(),
+  /**
+   * Stand-in for the function `unstable_cache` returns. It calls THROUGH to the
+   * wrapped origin reader (vitest has no Next request scope, so the real
+   * cross-request persistence can't run here — that is exercised by
+   * `npm run build`). Letting us assert the wrapper WAS used on non-strict reads
+   * and BYPASSED on strict reads is the unit-testable half of the contract.
+   */
+  cachedReaderSpy: vi.fn(),
+  revalidateTagMock: vi.fn(),
+  revalidatePathMock: vi.fn(),
+  /**
+   * Captures the fn + options handed to `unstable_cache` at module load, so we
+   * can prove (1) the cached fn THROWS on failure — a rejected promise is never
+   * written to the Data Cache, the no-poison guard — and (2) it is tagged + TTL'd.
+   */
+  captured: {
+    fn: null as null | (() => Promise<unknown>),
+    options: null as null | { tags?: string[]; revalidate?: number },
+  },
 }));
 
 vi.mock("@vercel/blob", () => ({
-  get: getMock,
-  // put is unused in these tests but must exist for the module import.
-  put: vi.fn(),
+  get: h.getMock,
+  put: h.putMock,
 }));
 
-import { getAdminConfig, resolveRoleStrict } from "@/lib/admin-store";
+vi.mock("next/cache", () => ({
+  unstable_cache: (
+    fn: () => Promise<unknown>,
+    _keyParts: unknown,
+    options: { tags?: string[]; revalidate?: number }
+  ) => {
+    h.captured.fn = fn;
+    h.captured.options = options;
+    h.cachedReaderSpy.mockImplementation(() => fn());
+    return h.cachedReaderSpy;
+  },
+  revalidateTag: h.revalidateTagMock,
+  revalidatePath: h.revalidatePathMock,
+}));
+
+import {
+  getAdminConfig,
+  saveAdminConfig,
+  resolveRoleStrict,
+} from "@/lib/admin-store";
+
+/** Alias so the existing tests below keep their concise `getMock` references. */
+const getMock = h.getMock;
 
 /** Build a fake `get` result whose stream yields the given config JSON. */
 function blobResultFor(config: unknown) {
@@ -166,5 +207,109 @@ describe("resolveRoleStrict — propagation contract", () => {
     );
     const role = await resolveRoleStrict("manager@noelagritv.com");
     expect(role).toBe("manager");
+  });
+});
+
+/**
+ * Guards the cross-request Data Cache (`unstable_cache`) layer added in
+ * perf/cacheable-catalog: non-strict render reads are served from Next's Data
+ * Cache (one Blob fetch per cache window instead of per render), strict reads
+ * stay origin-fresh, and a transient Blob failure must NOT poison the cache.
+ */
+describe("getAdminConfig — cross-request Data Cache (unstable_cache)", () => {
+  it("(a) non-strict read returns merged config VIA the cached wrapper", async () => {
+    getMock.mockResolvedValueOnce(
+      blobResultFor({ version: 7, hiddenProducts: ["x"] })
+    );
+    const config = await getAdminConfig();
+    // Routed through the unstable_cache wrapper, not a raw origin read.
+    expect(h.cachedReaderSpy).toHaveBeenCalledTimes(1);
+    expect(config.version).toBe(7);
+    expect(config.hiddenProducts).toEqual(["x"]);
+    // Still merged over DEFAULT_CONFIG across the cache boundary.
+    expect(config.shipping).toEqual({
+      enabled: false,
+      feesCentavos: { ncr: 0, luzon: 0, visayas: 0, mindanao: 0 },
+    });
+  });
+
+  it("(b) strict read BYPASSES the cross-request cache (fresh origin every call)", async () => {
+    getMock
+      .mockResolvedValueOnce(blobResultFor({ version: 1, managers: [] }))
+      .mockResolvedValueOnce(blobResultFor({ version: 2, managers: [] }));
+    await getAdminConfig({ strict: true });
+    await getAdminConfig({ strict: true });
+    // Never routed through the Data Cache wrapper...
+    expect(h.cachedReaderSpy).not.toHaveBeenCalled();
+    // ...and hit the origin fresh both times (premise of optimistic locking).
+    expect(getMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("(c) Blob failure returns DEFAULT_CONFIG and does NOT poison the cache", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    // First read fails → caught OUTSIDE the cache wrapper → DEFAULT_CONFIG.
+    getMock.mockRejectedValueOnce(new Error("blob blip"));
+    const first = await getAdminConfig();
+    expect(first.version).toBe(0);
+
+    // Structural no-poison guard: the fn handed to unstable_cache REJECTS on
+    // failure (a rejected promise is never written to the Data Cache) — it does
+    // NOT resolve to DEFAULT_CONFIG, which would be cacheable.
+    expect(h.captured.fn).toBeTypeOf("function");
+    getMock.mockRejectedValueOnce(new Error("blob blip"));
+    await expect(h.captured.fn!()).rejects.toThrow("blob blip");
+
+    // A subsequent SUCCESSFUL read returns the real config — failure wasn't cached.
+    getMock.mockResolvedValueOnce(blobResultFor({ version: 9 }));
+    const second = await getAdminConfig();
+    expect(second.version).toBe(9);
+    errSpy.mockRestore();
+  });
+
+  it("is configured with the admin-config tag and a finite backstop TTL", () => {
+    expect(h.captured.options).toMatchObject({
+      tags: ["admin-config"],
+      revalidate: 300,
+    });
+  });
+});
+
+/**
+ * Every successful save must invalidate the config Data Cache exactly once so
+ * the storefront stops serving the old config; a FAILED write must not (nothing
+ * changed → nothing to bust). The exact call shape — `{ expire: 0 }` for
+ * immediate read-your-own-write expiration — is asserted because `profile: "max"`
+ * (stale-while-revalidate) would show the admin stale config once more.
+ */
+describe("saveAdminConfig — config-tag invalidation on write", () => {
+  function fullConfig() {
+    return {
+      version: 3,
+      hiddenProducts: [],
+      videos: null,
+      customProducts: null,
+      featuredProductIds: [],
+      managers: [],
+      shipping: {
+        enabled: false,
+        feesCentavos: { ncr: 0, luzon: 0, visayas: 0, mindanao: 0 },
+      },
+    };
+  }
+
+  it("(d) a successful write invalidates the admin-config tag exactly once", async () => {
+    h.putMock.mockResolvedValueOnce(undefined);
+    await saveAdminConfig(fullConfig()); // no expectedVersion → no re-read
+    expect(h.putMock).toHaveBeenCalledTimes(1);
+    expect(h.revalidateTagMock).toHaveBeenCalledTimes(1);
+    expect(h.revalidateTagMock).toHaveBeenCalledWith("admin-config", {
+      expire: 0,
+    });
+  });
+
+  it("does NOT invalidate when the Blob write fails (no change → no bust)", async () => {
+    h.putMock.mockRejectedValueOnce(new Error("write failed"));
+    await expect(saveAdminConfig(fullConfig())).rejects.toThrow("write failed");
+    expect(h.revalidateTagMock).not.toHaveBeenCalled();
   });
 });

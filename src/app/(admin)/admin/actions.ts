@@ -161,10 +161,20 @@ async function requireOwner() {
   return session;
 }
 
-/** Revalidate all pages that read admin config */
+/**
+ * Revalidate the storefront pages that read admin config. `saveAdminConfig`
+ * already busts the cross-request config Data Cache via `revalidateTag`; this
+ * additionally purges the path/router cache for the affected pages so a soft
+ * navigation to them shows fresh content immediately (the two are complementary
+ * per the Next docs). The product DETAIL route is dynamic, so it needs the
+ * `'page'` type argument; `/checkout` is included because it renders shipping
+ * fees from config.
+ */
 function revalidateStorefront() {
   revalidatePath("/");
   revalidatePath("/products");
+  revalidatePath("/products/[slug]", "page");
+  revalidatePath("/checkout");
 }
 
 /**
