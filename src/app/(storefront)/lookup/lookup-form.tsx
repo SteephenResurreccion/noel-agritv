@@ -171,7 +171,7 @@ export function LookupForm({ initialOrderNumber }: LookupFormProps) {
         <button
           type="submit"
           disabled={isPending || !token}
-          className="min-h-11 w-full rounded-md bg-brand-darkest px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed sm:w-auto"
+          className="min-h-12 w-full rounded-md bg-brand-darkest px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed sm:w-auto"
         >
           {isPending ? copy.lookup.looking : copy.common.findMyOrder}
         </button>
@@ -193,7 +193,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
         <p>{result.message}</p>
         <a
           href={MESSENGER_URL}
-          className="mt-3 inline-block min-h-11 rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+          className="mt-3 inline-block min-h-12 rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
         >
           {copy.lookup.messageUsOnMessenger}
         </a>
@@ -240,7 +240,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
       {s.trackingNumber ? (
         <a
           href={trackHref}
-          className="mt-5 block min-h-11 rounded-md bg-brand-accent px-5 py-3 text-center text-sm font-semibold text-white hover:opacity-90"
+          className="mt-5 block min-h-12 rounded-md bg-brand-accent px-5 py-3 text-center text-sm font-semibold text-white hover:opacity-90"
         >
           {copy.lookup.trackJt}
         </a>
@@ -251,7 +251,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
           </p>
           <a
             href={MESSENGER_URL}
-            className="block min-h-11 rounded-md border border-border bg-surface px-5 py-3 text-center text-sm font-semibold text-brand-darkest hover:bg-bg-wheat"
+            className="block min-h-12 rounded-md border border-border bg-surface px-5 py-3 text-center text-sm font-semibold text-brand-darkest hover:bg-bg-wheat"
           >
             {copy.lookup.messageUs}
           </a>
