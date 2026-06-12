@@ -4,6 +4,10 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+Two stack facts agents reliably get wrong here:
+- **Route params are Promises** in this Next version — `await params` / `await searchParams` in pages, layouts, and route handlers.
+- **UI primitives are `@base-ui/react`** (shadcn CLI v4) — NOT Radix. There are zero `@radix-ui` dependencies; don't import or install them.
+
 ## Design conventions — MOBILE-FIRST
 
 **This storefront is mobile-first.** The primary user is a Filipino farmer on a budget Android phone over 3G. Build and verify every UI change at 390px FIRST, then adapt upward. Desktop is secondary: when a desktop layout fights long content, simplify/restructure the desktop layout — never compromise the mobile experience and never shorten client-approved copy to fix a desktop problem.
@@ -33,5 +37,5 @@ The two real defenses for abuse-prone POST endpoints are:
    - `/lookup` → `lookupOrder` (before the Sheets read) — added to raise the bot cost of order-status enumeration (order # + last-4-phone). The widget (`src/components/turnstile-widget.tsx`) is invisible and adds zero buyer friction; IAB-safe (no popup, same-tab).
    - Any new POST that reads or mutates buyer data should mount the same `TurnstileWidget` and call `verifyTurnstile` first.
 
-2. **Cloudflare WAF rate-rule on the POST path (RECOMMENDED — not yet configured).** Add a WAF rate-limiting rule in the Cloudflare dashboard that throttles POSTs to the order-lookup endpoint per source IP (suggested starting point: ~10 requests/min/IP, challenge or block on exceed). This is the cross-instance ceiling the in-process limiter cannot provide. Apply the same to `/checkout` submission and the `/api/geocode` proxy. Configure in Cloudflare, not in app code — keep the distributed limiter out of v1 (no Redis). Server-Action POSTs hit the route the page is served from, so scope the rule by method=POST + path prefix rather than expecting a dedicated URL.
+2. **Cloudflare WAF rate-rule on the abuse-prone paths (RECOMMENDED — not yet configured).** Add WAF rate-limiting rules in the Cloudflare dashboard (suggested starting point: ~10 requests/min/IP on order paths, challenge or block on exceed). This is the cross-instance ceiling the in-process limiter cannot provide. Method scoping matters: `/checkout` and `/lookup` mutations are Server-Action **POSTs to the page's own path** (scope by method=POST + path prefix — there is no dedicated URL), while the `/api/geocode` and `/api/blob-image` route handlers only export **GET** — a POST-scoped rule there matches nothing, so give them GET-scoped rules (blob-image needs a much higher threshold than 10/min: it serves every product image, and a challenge on an `<img>` GET is unsolvable — block at a generous rate instead). Configure in Cloudflare, not in app code — keep the distributed limiter out of v1 (no Redis).
 
