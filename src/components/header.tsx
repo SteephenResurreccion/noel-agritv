@@ -275,7 +275,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   <Link
                     href="/"
                     onClick={handleNavClick}
-                    className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
+                    className="flex min-h-12 items-center rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
                     {copy.header.navHome}
                   </Link>
@@ -284,7 +284,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   <Link
                     href="/products"
                     onClick={handleNavClick}
-                    className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
+                    className="flex min-h-12 items-center rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
                     {copy.common.productsNav}
                   </Link>
@@ -293,7 +293,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   <Link
                     href="/about"
                     onClick={handleNavClick}
-                    className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
+                    className="flex min-h-12 items-center rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
                     {copy.header.navAbout}
                   </Link>
@@ -302,7 +302,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   <Link
                     href="/contact"
                     onClick={handleNavClick}
-                    className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
+                    className="flex min-h-12 items-center rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
                     {copy.header.navContact}
                   </Link>
@@ -311,7 +311,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
                   <Link
                     href="/lookup"
                     onClick={handleNavClick}
-                    className="block rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
+                    className="flex min-h-12 items-center rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg hover:text-brand-accent"
                   >
                     {copy.common.findMyOrder}
                   </Link>

@@ -193,7 +193,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
         <p>{result.message}</p>
         <a
           href={MESSENGER_URL}
-          className="mt-3 inline-block min-h-12 rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+          className="mt-3 inline-flex min-h-12 items-center justify-center rounded-md bg-brand-accent px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
         >
           {copy.lookup.messageUsOnMessenger}
         </a>
@@ -240,7 +240,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
       {s.trackingNumber ? (
         <a
           href={trackHref}
-          className="mt-5 block min-h-12 rounded-md bg-brand-accent px-5 py-3 text-center text-sm font-semibold text-white hover:opacity-90"
+          className="mt-5 flex min-h-12 items-center justify-center rounded-md bg-brand-accent px-5 py-3 text-center text-sm font-semibold text-white hover:opacity-90"
         >
           {copy.lookup.trackJt}
         </a>
@@ -251,7 +251,7 @@ function LookupResultPanel({ result }: { result: LookupResult }) {
           </p>
           <a
             href={MESSENGER_URL}
-            className="block min-h-12 rounded-md border border-border bg-surface px-5 py-3 text-center text-sm font-semibold text-brand-darkest hover:bg-bg-wheat"
+            className="flex min-h-12 items-center justify-center rounded-md border border-border bg-surface px-5 py-3 text-center text-sm font-semibold text-brand-darkest hover:bg-bg-wheat"
           >
             {copy.lookup.messageUs}
           </a>

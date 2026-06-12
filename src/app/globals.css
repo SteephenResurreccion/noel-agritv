@@ -245,13 +245,15 @@
  * The bar toggles body[data-cart-active="true"] on mount / when the cart
  * has items on a non-hidden route. On mobile the CheckoutBar stacks above
  * the MobileBottomBar (which itself reserves 64px via pb-16 on <main>); on
- * desktop the MobileBottomBar is hidden, so we only need ~80px.
+ * desktop the MobileBottomBar is hidden, so we only need the bar's height.
+ * Reserve is 88px (5.5rem): the CheckoutBar is 72px mobile / 76px @sm, so
+ * this keeps ≥12px headroom in both cases and eases the notched safe-area case.
  */
 body[data-cart-active="true"] main {
-  padding-bottom: calc(4rem + 5rem); /* 64px mobile-bottom-bar + 80px checkout-bar */
+  padding-bottom: calc(4rem + 5.5rem); /* 64px mobile-bottom-bar + 88px checkout-bar */
 }
 @media (min-width: 1024px) {
   body[data-cart-active="true"] main {
-    padding-bottom: 5rem; /* 80px checkout-bar only — no mobile-bottom-bar */
+    padding-bottom: 5.5rem; /* 88px checkout-bar only — no mobile-bottom-bar */
   }
 }
