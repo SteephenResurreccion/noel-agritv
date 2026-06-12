@@ -122,7 +122,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               {/* Mobile: hamburger menu */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="flex h-10 w-10 items-center justify-center lg:hidden"
+                className="flex h-12 w-12 items-center justify-center lg:hidden"
                 aria-label={copy.header.openMenuAriaLabel}
               >
                 <Menu className="h-5 w-5 text-text-primary" />
@@ -130,7 +130,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
             </div>
 
             {/* Center — Logo (mobile) / wordmark lockup (desktop) */}
-            <Link href="/" className="flex items-center justify-center" aria-label={copy.header.logoAlt}>
+            <Link href="/" className="flex min-h-12 min-w-12 items-center justify-center" aria-label={copy.header.logoAlt}>
               {/* Mobile: lone emblem */}
               <Image
                 src="/images/whitebglogo.png"
@@ -174,7 +174,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               {/* Mobile search icon */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex h-10 w-10 items-center justify-center lg:hidden"
+                className="flex h-12 w-12 items-center justify-center lg:hidden"
                 aria-label={copy.header.searchAriaLabel}
               >
                 <Search className="h-5 w-5 text-text-primary" />
@@ -261,7 +261,7 @@ export function Header({ searchProducts = [] }: { searchProducts?: SearchProduct
               />
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex h-10 w-10 items-center justify-center"
+                className="flex h-12 w-12 items-center justify-center"
                 aria-label={copy.header.closeMenuAriaLabel}
               >
                 <X className="h-5 w-5 text-text-primary" />
