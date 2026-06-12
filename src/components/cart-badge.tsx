@@ -15,7 +15,7 @@ export function CartBadge() {
     <Link
       href="/cart"
       aria-label={mounted && count > 0 ? copy.cartBadge.aria(count) : copy.cartBadge.label}
-      className="relative flex h-10 w-10 items-center justify-center"
+      className="relative flex h-12 w-12 items-center justify-center"
     >
       <ShoppingCart className="h-5 w-5 text-text-primary" />
       {mounted && count > 0 && (
