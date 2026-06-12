@@ -10,8 +10,11 @@ import {
 } from "@/lib/admin-store";
 import { put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { priceTierSchema } from "@/lib/price-tiers";
+import { appendAuditLog, type AuditEntry } from "@/lib/audit";
+import { formatCentavos } from "@/lib/utils";
 
 // ── Validation Schemas ──
 
@@ -164,11 +167,38 @@ function revalidateStorefront() {
   revalidatePath("/products");
 }
 
+/**
+ * Fire-and-forget append of one audit row AFTER the response is sent.
+ *
+ * Mirrors the non-blocking `after()` pattern in checkout/actions.ts. Call this
+ * synchronously inside an action's success path — ONLY after `saveAdminConfig`
+ * resolves — so a failed mutation never logs a success row. The actual Sheets
+ * append runs in the after() callback; its try/catch swallows every failure
+ * (an audit-sheet outage, or a not-yet-created AuditLog tab → HTTP 400) so
+ * logging can NEVER fail or roll back the admin mutation it records. Never
+ * rethrows; failures are logged tagged "[audit]".
+ *
+ * actor/target/summary are sanitized for CSV/formula-injection inside
+ * appendAuditLog. NONE of the 16 call sites ingest buyer text — every value is
+ * server- or admin-authored — so that sanitization is purely defensive
+ * (CSV/XLSX export safety). The `action` code is a fixed server string.
+ */
+function logAudit(entry: AuditEntry): void {
+  after(async () => {
+    try {
+      await appendAuditLog(entry);
+    } catch (e) {
+      console.error(`[audit] ${entry.action} append failed:`, e);
+    }
+  });
+}
+
 // ── Product Seeding ──
 
 /** Seed the 4 built-in products into customProducts if they don't exist yet */
 export async function seedBuiltInProducts() {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const { products: builtInProducts, localizeProduct } = await import(
       "@/data/products"
@@ -222,6 +252,12 @@ export async function seedBuiltInProducts() {
     // Clear the built-in hidden list since they're now custom
     config.hiddenProducts = [];
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "PRODUCT_SEED",
+      target: newProducts.map((p) => p.slug).join(", "),
+      summary: `Seeded ${newProducts.length} built-in product(s)`,
+    });
     revalidatePath("/admin/products");
     revalidateStorefront();
   } catch (e) {
@@ -233,11 +269,14 @@ export async function seedBuiltInProducts() {
 // ── Products ──
 
 export async function toggleProductVisibility(slug: string) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
+    // Resolve the resulting state BEFORE mutating so the summary is accurate.
+    const willHide = !config.hiddenProducts.includes(slug);
     if (config.hiddenProducts.includes(slug)) {
       config.hiddenProducts = config.hiddenProducts.filter((s) => s !== slug);
     } else {
@@ -245,6 +284,12 @@ export async function toggleProductVisibility(slug: string) {
     }
 
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "PRODUCT_VISIBILITY",
+      target: slug,
+      summary: `${willHide ? "Hid" : "Showed"} built-in product '${slug}'`,
+    });
     revalidatePath("/admin/products");
     revalidateStorefront();
   } catch (e) {
@@ -254,7 +299,8 @@ export async function toggleProductVisibility(slug: string) {
 }
 
 export async function addProduct(formData: FormData) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
 
   try {
     const name = z.string().trim().min(1, "Name is required").max(200).parse(formData.get("name"));
@@ -342,6 +388,12 @@ export async function addProduct(formData: FormData) {
 
     config.customProducts = [...(config.customProducts ?? []), newProduct];
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "PRODUCT_ADD",
+      target: slug,
+      summary: `Added product '${name}' (${slug})`,
+    });
 
     revalidatePath("/admin/products");
     revalidateStorefront();
@@ -352,7 +404,8 @@ export async function addProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
 
   try {
     const name = z.string().trim().min(1).max(200).parse(formData.get("name"));
@@ -453,6 +506,12 @@ export async function updateProduct(id: string, formData: FormData) {
     };
 
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "PRODUCT_UPDATE",
+      target: slug,
+      summary: `Updated product '${name}' (${slug})`,
+    });
     revalidatePath("/admin/products");
     revalidateStorefront();
   } catch (e) {
@@ -463,14 +522,25 @@ export async function updateProduct(id: string, formData: FormData) {
 }
 
 export async function removeProduct(id: string) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
     if (config.customProducts) {
+      // Resolve name/slug BEFORE the filter — they're gone after the mutation.
+      const removed = config.customProducts.find((p) => p.id === id);
       config.customProducts = config.customProducts.filter((p) => p.id !== id);
       await saveAdminConfig(config, ver);
+      if (removed) {
+        logAudit({
+          actor,
+          action: "PRODUCT_REMOVE",
+          target: removed.slug,
+          summary: `Removed product '${removed.name}' (${removed.slug})`,
+        });
+      }
     }
 
     revalidatePath("/admin/products");
@@ -482,16 +552,27 @@ export async function removeProduct(id: string) {
 }
 
 export async function toggleCustomProductVisibility(id: string) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
     if (config.customProducts) {
+      const product = config.customProducts.find((p) => p.id === id);
       config.customProducts = config.customProducts.map((p) =>
         p.id === id ? { ...p, visible: !p.visible } : p
       );
       await saveAdminConfig(config, ver);
+      if (product) {
+        const nowVisible = !product.visible;
+        logAudit({
+          actor,
+          action: "PRODUCT_CUSTOM_VISIBILITY",
+          target: product.slug,
+          summary: `${nowVisible ? "Showed" : "Hid"} product '${product.name}'`,
+        });
+      }
     }
 
     revalidatePath("/admin/products");
@@ -505,11 +586,13 @@ export async function toggleCustomProductVisibility(id: string) {
 // ── Featured Products ──
 
 export async function toggleFeaturedProduct(id: string) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
+    const willFeature = !config.featuredProductIds.includes(id);
     if (config.featuredProductIds.includes(id)) {
       config.featuredProductIds = config.featuredProductIds.filter((fid) => fid !== id);
     } else {
@@ -517,6 +600,14 @@ export async function toggleFeaturedProduct(id: string) {
     }
 
     await saveAdminConfig(config, ver);
+    const product = (config.customProducts ?? []).find((p) => p.id === id);
+    const label = product ? `'${product.name}'` : id;
+    logAudit({
+      actor,
+      action: "PRODUCT_FEATURE",
+      target: product?.slug ?? id,
+      summary: `${willFeature ? "Featured" : "Unfeatured"} product ${label}`,
+    });
     revalidatePath("/admin/products");
     revalidateStorefront();
   } catch (e) {
@@ -531,7 +622,8 @@ export async function toggleFeaturedProduct(id: string) {
 const featuredOrderSchema = z.array(z.string().min(1).max(100)).max(50);
 
 export async function saveFeaturedOrder(orderedIds: string[]) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const ids = featuredOrderSchema.parse(orderedIds);
 
@@ -554,6 +646,12 @@ export async function saveFeaturedOrder(orderedIds: string[]) {
     config.featuredProductIds = [...new Set(ids.filter((id) => known.has(id)))];
 
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "PRODUCT_FEATURE_REORDER",
+      target: "featured-products",
+      summary: `Reordered featured products (${config.featuredProductIds.length} shown)`,
+    });
     revalidatePath("/admin/products");
     revalidateStorefront();
   } catch (e) {
@@ -565,7 +663,8 @@ export async function saveFeaturedOrder(orderedIds: string[]) {
 // ── Videos ──
 
 export async function saveVideos(videos: AdminVideo[]) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     // Validate and strip to known fields only (prevents mass assignment)
     const validated = z.array(videoSchema).max(100).parse(videos);
@@ -574,6 +673,12 @@ export async function saveVideos(videos: AdminVideo[]) {
     const ver = config.version;
     config.videos = validated;
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "VIDEO_SAVE",
+      target: "videos",
+      summary: `Saved video list (${validated.length} video(s))`,
+    });
     revalidatePath("/admin/videos");
     revalidateStorefront();
   } catch (e) {
@@ -583,7 +688,8 @@ export async function saveVideos(videos: AdminVideo[]) {
 }
 
 export async function addVideo(formData: FormData) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
 
   try {
     const title = z.string().trim().min(1, "Title is required").max(200).parse(formData.get("title"));
@@ -632,6 +738,12 @@ export async function addVideo(formData: FormData) {
     }
 
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "VIDEO_ADD",
+      target: newVideo.href,
+      summary: `Added video '${newVideo.title}'`,
+    });
     revalidatePath("/admin/videos");
     revalidateStorefront();
   } catch (e) {
@@ -641,14 +753,25 @@ export async function addVideo(formData: FormData) {
 }
 
 export async function removeVideo(id: string) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
     if (config.videos) {
+      // Resolve the title/href BEFORE the filter — gone after the mutation.
+      const removed = config.videos.find((v) => v.id === id);
       config.videos = config.videos.filter((v) => v.id !== id);
       await saveAdminConfig(config, ver);
+      if (removed) {
+        logAudit({
+          actor,
+          action: "VIDEO_REMOVE",
+          target: removed.href,
+          summary: `Removed video '${removed.title}'`,
+        });
+      }
     }
 
     revalidatePath("/admin/videos");
@@ -660,16 +783,27 @@ export async function removeVideo(id: string) {
 }
 
 export async function toggleVideoVisibility(id: string) {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
 
     if (config.videos) {
+      const video = config.videos.find((v) => v.id === id);
       config.videos = config.videos.map((v) =>
         v.id === id ? { ...v, visible: !v.visible } : v
       );
       await saveAdminConfig(config, ver);
+      if (video) {
+        const nowVisible = !video.visible;
+        logAudit({
+          actor,
+          action: "VIDEO_VISIBILITY",
+          target: video.href,
+          summary: `${nowVisible ? "Showed" : "Hid"} video '${video.title}'`,
+        });
+      }
     }
 
     revalidatePath("/admin/videos");
@@ -681,7 +815,8 @@ export async function toggleVideoVisibility(id: string) {
 }
 
 export async function moveVideo(id: string, direction: "up" | "down") {
-  await requireAuth();
+  const session = await requireAuth();
+  const actor = session.user?.email ?? "unknown";
   try {
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
@@ -694,6 +829,10 @@ export async function moveVideo(id: string, direction: "up" | "down") {
     const targetIdx = direction === "up" ? idx - 1 : idx + 1;
     if (targetIdx < 0 || targetIdx >= config.videos.length) return;
 
+    // Capture the moved video before the swap (these early returns above never
+    // save, so they correctly never log).
+    const moved = config.videos[idx];
+
     // Swap
     [config.videos[idx], config.videos[targetIdx]] = [
       config.videos[targetIdx],
@@ -701,6 +840,12 @@ export async function moveVideo(id: string, direction: "up" | "down") {
     ];
 
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "VIDEO_MOVE",
+      target: moved.href,
+      summary: `Moved video '${moved.title}' ${direction}`,
+    });
     revalidatePath("/admin/videos");
     revalidateStorefront();
   } catch (e) {
@@ -712,7 +857,8 @@ export async function moveVideo(id: string, direction: "up" | "down") {
 // ── Team Management (Owner only) ──
 
 export async function addManager(email: string) {
-  await requireOwner();
+  const session = await requireOwner();
+  const actor = session.user?.email ?? "unknown";
   try {
     const validated = z.string().email().toLowerCase().parse(email.trim());
 
@@ -732,6 +878,12 @@ export async function addManager(email: string) {
 
     config.managers = [...config.managers, validated];
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "MANAGER_ADD",
+      target: validated,
+      summary: `Added manager ${validated}`,
+    });
     revalidatePath("/admin/team");
   } catch (e) {
     console.error("addManager failed:", e);
@@ -743,7 +895,8 @@ export async function addManager(email: string) {
 }
 
 export async function removeManager(email: string) {
-  await requireOwner();
+  const session = await requireOwner();
+  const actor = session.user?.email ?? "unknown";
   try {
     const validated = z.string().email().toLowerCase().parse(email.trim());
 
@@ -754,6 +907,12 @@ export async function removeManager(email: string) {
       (e) => e.toLowerCase() !== validated
     );
     await saveAdminConfig(config, ver);
+    logAudit({
+      actor,
+      action: "MANAGER_REMOVE",
+      target: validated,
+      summary: `Removed manager ${validated}`,
+    });
     revalidatePath("/admin/team");
   } catch (e) {
     console.error("removeManager failed:", e);
@@ -785,13 +944,24 @@ const shippingSchema = z.object({
 
 export async function saveShippingConfig(input: z.infer<typeof shippingSchema>) {
   // Owner-only: shipping fees are a customer-facing financial control.
-  await requireOwner();
+  const session = await requireOwner();
+  const actor = session.user?.email ?? "unknown";
   try {
     const validated = shippingSchema.parse(input);
     const config = await getAdminConfig({ strict: true });
     const ver = config.version;
     config.shipping = validated;
     await saveAdminConfig(config, ver);
+    const f = validated.feesCentavos;
+    logAudit({
+      actor,
+      action: "SHIPPING_SAVE",
+      target: "shipping",
+      summary:
+        `Shipping ${validated.enabled ? "enabled" : "disabled"} — ` +
+        `NCR ${formatCentavos(f.ncr)} / Luzon ${formatCentavos(f.luzon)} / ` +
+        `Visayas ${formatCentavos(f.visayas)} / Mindanao ${formatCentavos(f.mindanao)}`,
+    });
     revalidatePath("/admin/shipping");
   } catch (e) {
     console.error("saveShippingConfig failed:", e);

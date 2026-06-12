@@ -60,6 +60,14 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+// addProduct/saveFeaturedOrder now schedule an audit-log append via after()
+// from next/server, which throws outside a request scope under vitest. Mock it
+// as a no-op (this suite asserts upload/validation behaviour, not audit) so the
+// callback is never invoked and the real appendAuditLog is never reached.
+vi.mock("next/server", () => ({
+  after: vi.fn(),
+}));
+
 import { addProduct, saveFeaturedOrder } from "@/app/(admin)/admin/actions";
 import { getAdminConfig } from "@/lib/admin-store";
 
