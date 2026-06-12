@@ -161,10 +161,24 @@ async function requireOwner() {
   return session;
 }
 
-/** Revalidate all pages that read admin config */
+/**
+ * Revalidate the storefront pages that read admin config. `saveAdminConfig`
+ * already busts the cross-request config Data Cache via `revalidateTag`; this
+ * additionally purges the path/router cache for the affected pages so a soft
+ * navigation to them shows fresh content immediately (the two are complementary
+ * per the Next docs). The product DETAIL route is dynamic, so it needs the
+ * `'page'` type argument; `/checkout` is included because it renders shipping
+ * fees from config.
+ */
 function revalidateStorefront() {
   revalidatePath("/");
   revalidatePath("/products");
+  // The detail page's REGISTERED path includes the route group
+  // (.next/server/app-paths-manifest.json: "/(storefront)/products/[slug]/page");
+  // revalidatePath builds the soft tag verbatim from this arg, so it MUST match
+  // the route-group path or the call is a silent no-op.
+  revalidatePath("/(storefront)/products/[slug]", "page");
+  revalidatePath("/checkout");
 }
 
 /**

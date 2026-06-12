@@ -1,8 +1,16 @@
 import { cache } from "react";
+import { unstable_cache, revalidateTag } from "next/cache";
 import { put, get } from "@vercel/blob";
 import type { PriceTier } from "@/lib/pricing";
 
 const CONFIG_PATH = "admin/config.json";
+
+/**
+ * Next Data-Cache tag for the admin config. Every successful `saveAdminConfig`
+ * invalidates this tag, so the cross-request cached render read (below) picks up
+ * the new config on the very next storefront render.
+ */
+const ADMIN_CONFIG_TAG = "admin-config";
 
 export type AdminRole = "owner" | "manager";
 
@@ -95,68 +103,108 @@ const DEFAULT_CONFIG: AdminConfig = {
 };
 
 /**
- * Uncached Blob read of the admin config. Always performs a fresh origin fetch.
- * - Default mode: returns DEFAULT_CONFIG on any error (safe for page rendering).
- * - strict mode: throws on error (use in mutations to prevent overwriting with empty config).
+ * Raw origin Blob read of the admin config. ALWAYS a fresh fetch.
+ *
+ * THROWS on any Blob/parse failure; a genuine not-found (no Blob object yet)
+ * resolves to DEFAULT_CONFIG, a valid and cacheable empty state. This is the
+ * shared core for BOTH read paths below, and its throw-on-failure shape is
+ * load-bearing for the cached path: a rejected promise is NEVER written to the
+ * Data Cache, so a transient Blob blip can't poison every instance with
+ * DEFAULT_CONFIG for the cache lifetime. The merge over DEFAULT_CONFIG happens
+ * HERE (pre-cache), so deserialized cache hits remain fully shaped.
  *
  * Callers MUST go through `getAdminConfig` (below), not this fn directly.
  */
-async function readAdminConfig(
-  opts: { strict?: boolean } = {}
-): Promise<AdminConfig> {
-  // If blob token isn't configured, skip blob entirely
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    if (opts.strict) throw new Error("BLOB_READ_WRITE_TOKEN not configured");
-    return DEFAULT_CONFIG;
-  }
-  try {
-    const result = await get(CONFIG_PATH, {
-      access: "private",
-      useCache: false,
-    });
-    if (!result) return DEFAULT_CONFIG;
+async function fetchConfigFromOrigin(): Promise<AdminConfig> {
+  const result = await get(CONFIG_PATH, {
+    access: "private",
+    useCache: false,
+  });
+  if (!result) return DEFAULT_CONFIG;
 
-    const text = await new Response(result.stream).text();
-    const data = JSON.parse(text);
-    return { ...DEFAULT_CONFIG, ...data };
-  } catch (e) {
-    if (opts.strict) {
-      throw e; // Let mutation callers handle this — don't silently return empty config
-    }
-    console.error("Failed to read admin config:", e);
-    return DEFAULT_CONFIG;
-  }
+  const text = await new Response(result.stream).text();
+  const data = JSON.parse(text);
+  return { ...DEFAULT_CONFIG, ...data };
 }
 
 /**
- * Request-scoped memo for the NON-STRICT (read-only render) path.
+ * Strict read path: a fresh origin fetch every call, propagating failure.
  *
- * React's `cache` dedupes within a single server render/request pass only — it
- * does NOT persist across requests, so admin saves + `revalidatePath` still take
- * effect on the very next request. This collapses the 3-4 identical Blob reads a
- * single product/storefront page render fires into ONE origin fetch.
- *
- * IMPORTANT: the returned object is a SHARED reference for the request. Treat it
- * as READ-ONLY. All current render callers only read it (filter/find/map →
- * new arrays), which is safe. Mutators must use `getAdminConfig({ strict: true })`,
- * which is NEVER memoized and returns a fresh object every call.
+ * Mutations call this twice per request — once before mutating and once inside
+ * `saveAdminConfig`'s optimistic-lock re-read — and BOTH must see the live Blob
+ * version, or concurrent-write detection silently fails. `resolveRoleStrict`
+ * likewise needs origin-fresh manager auth. This path NEVER touches the
+ * cross-request Data Cache below.
  */
-const getCachedConfig = cache(() => readAdminConfig({}));
+async function readConfigStrict(): Promise<AdminConfig> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error("BLOB_READ_WRITE_TOKEN not configured");
+  }
+  return fetchConfigFromOrigin();
+}
 
 /**
- * Read admin config from Blob.
- * - Default (non-strict) reads are request-deduped via React `cache` (one Blob
- *   fetch per render, shared read-only object).
- * - strict reads are ALWAYS fresh (never memoized): mutations call this twice
- *   per request — once before mutating and once inside `saveAdminConfig`'s
- *   optimistic-lock re-read — and both MUST see the live Blob version, or
- *   concurrent-write detection silently fails. `resolveRoleStrict` likewise
- *   needs origin-fresh manager auth.
+ * Cross-request Data Cache wrapper for the NON-STRICT (render) read.
+ *
+ * Every storefront render reads the admin config; without this, each render paid
+ * one Vercel Blob round-trip. `unstable_cache` persists the result across
+ * requests AND deployments, so the Blob is hit at most once per `revalidate`
+ * window (or until `revalidateTag(ADMIN_CONFIG_TAG)` fires on a save) — not once
+ * per render.
+ *
+ * Legacy-API note: Next 16 marks `unstable_cache` as superseded by the `use
+ * cache` directive, which requires opting into Cache Components. We deliberately
+ * stay on `unstable_cache` (no Cache Components) to keep this a narrow data-layer
+ * change: the storefront HTML stays fully dynamic (per-request nonce CSP +
+ * `naf_lang` cookie reads in layouts), so only the Blob READ is cached, never
+ * the rendered page.
+ *
+ * The wrapped fn is `fetchConfigFromOrigin`, which THROWS on failure — so the
+ * token short-circuit and error fallback live OUTSIDE this wrapper (see
+ * `getCachedConfig`), keeping DEFAULT_CONFIG out of the cache.
+ */
+const readConfigCached = unstable_cache(
+  fetchConfigFromOrigin,
+  ["admin-config-v1"],
+  { tags: [ADMIN_CONFIG_TAG], revalidate: 300 }
+);
+
+/**
+ * Request-scoped memo over the cross-request Data Cache.
+ *
+ * React's `cache` dedupes within a single render so the 3-4 config reads one
+ * page render fires collapse into ONE Data-Cache lookup. The token short-circuit
+ * and the error catch live HERE (outside `readConfigCached`): a missing token or
+ * a transient Blob failure returns DEFAULT_CONFIG WITHOUT caching it.
+ *
+ * IMPORTANT: the returned object is a SHARED reference for the request (and may
+ * be shared across requests via the Data Cache). Treat it as READ-ONLY. All
+ * current render callers only read it (filter/find/map → new arrays), which is
+ * safe. Mutators must use `getAdminConfig({ strict: true })`, which is NEVER
+ * cached and returns a fresh object every call.
+ */
+const getCachedConfig = cache(async (): Promise<AdminConfig> => {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return DEFAULT_CONFIG;
+  try {
+    return await readConfigCached();
+  } catch (e) {
+    console.error("Failed to read admin config:", e);
+    return DEFAULT_CONFIG;
+  }
+});
+
+/**
+ * Read admin config.
+ * - Default (non-strict, render) reads go through the cross-request Data Cache
+ *   (`unstable_cache`) plus a per-request React `cache` memo on top — one Blob
+ *   fetch per cache window, shared read-only object.
+ * - strict reads are ALWAYS a fresh origin fetch (see `readConfigStrict`), never
+ *   cached, so optimistic locking and manager auth see the live Blob version.
  */
 export async function getAdminConfig(
   opts: { strict?: boolean } = {}
 ): Promise<AdminConfig> {
-  if (opts.strict) return readAdminConfig({ strict: true });
+  if (opts.strict) return readConfigStrict();
   return getCachedConfig();
 }
 
@@ -244,4 +292,25 @@ export async function saveAdminConfig(
     allowOverwrite: true,
     contentType: "application/json",
   });
+
+  // Invalidate the cross-request Data Cache so the next render reads the fresh
+  // config, not the stale cached copy. This funnels through saveAdminConfig, so
+  // EVERY mutation (products, videos, team, shipping) busts the cache instantly.
+  //
+  // `{ expire: 0 }` = immediate expiration: the next non-strict read is a
+  // blocking cache miss → fresh Blob, AND Next marks the path as revalidated, so
+  // an admin sees their OWN write on the very next render (read-your-own-write).
+  // `profile: "max"` is rejected here — it is stale-while-revalidate and would
+  // serve the admin the OLD config once more after saving. The single-arg
+  // `revalidateTag(tag)` form is deprecated in Next 16 (and TS-errors); the
+  // two-arg `{ expire: 0 }` is its supported equivalent. `updateTag` is NOT
+  // used: it does work with unstable_cache-tagged entries, but it THROWS when
+  // called outside a Server Action (the workStore.page '/route' check in
+  // next/dist/server/web/spec-extension/revalidate.js), and saveAdminConfig is a
+  // shared utility that may run from non-action server contexts — `revalidateTag`
+  // with `{ expire: 0 }` gives the same immediate expiry and is safe from any
+  // server context. Runs AFTER a successful put only — a failed write throws
+  // above and never reaches here, so the cache is never invalidated without an
+  // actual change landing.
+  revalidateTag(ADMIN_CONFIG_TAG, { expire: 0 });
 }
