@@ -1,3 +1,4 @@
+import "@/lib/zod-config"; // CSP: disable Zod JIT before any z.object() (no unsafe-eval)
 import { z } from "zod";
 
 /** Validates a per-product volume tier ladder: ascending minQty, first tier starts at 1, positive centavos. Empty = no tiers. */

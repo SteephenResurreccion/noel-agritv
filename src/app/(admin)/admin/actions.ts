@@ -1,5 +1,6 @@
 "use server";
 
+import "@/lib/zod-config"; // CSP: disable Zod JIT before any z.object() (no unsafe-eval)
 import { auth } from "@/auth";
 import {
   getAdminConfig,

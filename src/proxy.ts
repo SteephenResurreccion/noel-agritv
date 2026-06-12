@@ -17,14 +17,85 @@ export const proxy = auth((req) => {
     return Response.redirect(new URL("/admin", req.nextUrl.origin));
   }
 
-  // Forward the pathname so the (admin) server layout can apply a
-  // defense-in-depth auth guard while still exempting /admin/login
-  // (which lives inside the (admin) route group).
+  // --- Per-request Content-Security-Policy nonce ---
+  // Next.js parses the `'nonce-…'` token from the Content-Security-Policy on
+  // the REQUEST headers and auto-applies it to its framework scripts, page
+  // bundles, and Next-generated inline scripts. That lets us drop
+  // `'unsafe-inline'`/`'unsafe-eval'` from script-src in production.
+  // `'strict-dynamic'` propagates trust to scripts/iframes those trusted
+  // scripts load themselves via createElement — Vercel Analytics + Speed
+  // Insights and Cloudflare Turnstile both inject that way — so host
+  // allowlists in script-src are unnecessary (and ignored under
+  // strict-dynamic). They remain in connect-src / frame-src.
+  // `'unsafe-eval'` is only added in development (React uses eval for richer
+  // error stacks); production never needs it.
+  // style-src deliberately KEEPS `'unsafe-inline'`: inline `style=` attributes
+  // and dnd-kit drag transforms cannot carry a nonce. Documented residual risk
+  // (CSS injection is far lower severity than script injection).
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const isDev = process.env.NODE_ENV === "development";
+
+  const csp = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://i.ytimg.com https://lh3.googleusercontent.com",
+    "font-src 'self'",
+    "connect-src 'self' https://va.vercel-scripts.com https://*.blob.vercel-storage.com https://challenges.cloudflare.com",
+    "frame-src https://www.youtube.com https://challenges.cloudflare.com",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+
+  // Forward the pathname (defense-in-depth input for the (admin) layout
+  // guard), the nonce, and the CSP on the REQUEST so Next can read them
+  // during SSR; mirror the SAME CSP onto the RESPONSE for the browser.
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-pathname", req.nextUrl.pathname);
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
 });
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  // matcher entries are OR'd: a request that matches ANY entry runs the proxy.
+  matcher: [
+    /*
+     * Entry 1 — ADMIN, UNCONDITIONAL. The proxy MUST run on every /admin/*
+     * request (prefetch or not) so the auth redirect AND the x-pathname
+     * overwrite always execute. There are deliberately NO `missing`/`has`
+     * conditions here: with them, a client sending a forged `purpose: prefetch`
+     * or `next-router-prefetch` header would skip the proxy entirely — bypassing
+     * the auth redirect and letting the (admin) layout guard trust a forged
+     * x-pathname (e.g. "/admin/login") to serve admin pages unauthenticated.
+     * Restoring the master invariant (proxy always runs on /admin) closes that
+     * bypass. The CSP nonce is applied on these requests too.
+     */
+    "/admin/:path*",
+    /*
+     * Entry 2 — STOREFRONT (all other HTML routes). Excludes API routes, Next
+     * internals, static assets, and /admin (Entry 1 owns it) so the two entries
+     * are disjoint. Each exclusion token is anchored with `(?:/|$)` so it matches
+     * a whole first segment only — `api` no longer prefix-matches `/apiculture`,
+     * `data` no longer matches `/database`, `admin` no longer matches
+     * `/administrators`. File tokens use escaped dots for an exact match.
+     * The prefetch `missing`-conditions are kept here (doc-sanctioned for nonce
+     * CSP): link prefetches have no HTML body to carry a nonce, and skipping the
+     * proxy on PUBLIC routes is safe because no auth decision rides on it.
+     */
+    {
+      source:
+        "/((?!admin(?:/|$)|api(?:/|$)|_next/static(?:/|$)|_next/image(?:/|$)|favicon\\.ico(?:/|$)|icon\\.png(?:/|$)|sitemap\\.xml(?:/|$)|robots\\.txt(?:/|$)|images(?:/|$)|data(?:/|$)).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+  ],
 };

@@ -1,3 +1,4 @@
+import "@/lib/zod-config"; // CSP: disable Zod JIT before any z.object() (no unsafe-eval)
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { z } from "zod";
