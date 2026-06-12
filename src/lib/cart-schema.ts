@@ -45,3 +45,5 @@ type Expect<T extends true> = T;
 // Exported so it counts as "used" (no unused-var lint); nothing imports it. The
 // value is irrelevant — its only job is to fail compilation if the shapes drift.
 export type AssertSchemaMatchesCartItem = Expect<Equals<z.infer<typeof cartItemSchema>, CartItem>>;
+// z.infer is z.output; input≠output the moment a .default()/.catch() is added — pin both sides.
+export type AssertSchemaInputMatchesCartItem = Expect<Equals<z.input<typeof cartItemSchema>, CartItem>>;
